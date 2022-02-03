@@ -21,5 +21,5 @@ class DataFormer:
             samples += [(i, subset, label, sentence)]
 
         if self.chunks:
-            return [samples[x:x+10] for x in range(0, len(samples), self.batch_size)]
+            return [samples[x:x+self.batch_size] for x in range(0, len(samples), self.batch_size)]
         return samples
