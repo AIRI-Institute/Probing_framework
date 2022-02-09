@@ -12,7 +12,7 @@ class DataFormer:
         self,
         probe_task: Enum,
         data_path: Optional[os.PathLike] = None,
-        batch_size: int = None
+        batch_size: Optional[int] = None
     ):
         self.probe_task = probe_task
         self.data_path = get_probe_task_path(data_path)
