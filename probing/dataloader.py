@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 from utils import get_probe_task_path
-from config import PROB_DATA_FORMAT = Tuple[int, Enum, str, str]
+from config import PROB_DATA_FORMAT
 
 
 class DataFormer:
