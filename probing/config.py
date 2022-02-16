@@ -1,5 +1,5 @@
-from enum import Enum
-from typing import Tuple
+import pathlib
+import os
 
 
-PROB_DATA_FORMAT = Tuple[int, Enum, str, str]
+data_folder = pathlib.Path(os.getcwd(), "../data")
