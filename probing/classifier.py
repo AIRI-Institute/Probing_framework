@@ -20,9 +20,9 @@ class MLP(torch.nn.Module):
     def __init__(
         self,
         input_dim: int,
-        num_hidden: int,
         num_classes: int,
-        dropout_rate: float
+        num_hidden: int=256,
+        dropout_rate: float=0.2
     ):
         self.input_dim = input_dim
         self.num_hidden = num_hidden
