@@ -1,8 +1,9 @@
 from transformers import  AutoConfig, AutoModel, AutoTokenizer
 import torch
-
 from typing import Optional, List, Union
 from enum import Enum
+import numpy as np
+
 
 class TransformersLoader:
     def __init__(
@@ -37,7 +38,7 @@ class TransformersLoader:
             self.device = "cpu"
             self.model.to(torch.device(self.device))
 
-    def encode_text(self, text: Union[str, List[str]]):
+    def encode_text(self, text: Union[str, List[str]], embedding_type: Enum = 'cls'):
         encoded_text = self.tokenizer(
             text,
             padding=self.padding,
@@ -57,5 +58,14 @@ class TransformersLoader:
                 if "hidden_states" in model_outputs
                 else model_outputs["encoder_hidden_states"]
             )
-            layers_outputs = [output.cpu().numpy() for output in model_outputs[1:]]
+            layers_outputs = []
+            for output in model_outputs[1:]:
+                vec_output = output.cpu().numpy()
+                if embedding_type == 'cls':
+                    sent_vector = vec_output[:, 0, :]
+                elif embedding_type == 'sum':
+                    sent_vector = np.sum(vec_output, axis=1)
+                elif embedding_type == 'avg':
+                    sent_vector = np.mean(vec_output, axis=1)
+                layers_outputs.append(sent_vector)
             return layers_outputs

@@ -7,6 +7,7 @@ class LogReg(torch.nn.Module):
         input_dim: int,
         num_classes: int
     ):
+        super(LogReg, self).__init__()
         self.input_dim = input_dim
         self.num_classes = num_classes
         self.fc = torch.nn.Linear(self.input_dim, self.num_classes)
@@ -21,9 +22,10 @@ class MLP(torch.nn.Module):
         self,
         input_dim: int,
         num_classes: int,
-        num_hidden: int=256,
-        dropout_rate: float=0.2
+        num_hidden: int,
+        dropout_rate: float
     ):
+        super(MLP, self).__init__()
         self.input_dim = input_dim
         self.num_hidden = num_hidden
         self.num_classes = num_classes

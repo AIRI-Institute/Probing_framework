@@ -3,11 +3,12 @@ from typing import Tuple, Dict, Optional, List, Union
 import os
 import numpy as np
 from tqdm import tqdm
-
-from utils import get_probe_task_path
-
 from torch.utils.data import DataLoader
 from torch.utils.data import BatchSampler
+from sklearn import preprocessing
+
+
+from utils import get_probe_task_path
 
 
 class DataFormer:
@@ -17,9 +18,11 @@ class DataFormer:
         data_path: Optional[os.PathLike] = None
     ):
         self.probe_task = probe_task
+        self.labels = []
         self.data_path = get_probe_task_path(probe_task, data_path)
 
         self.samples = self.__form_data()
+        self.num_classes = len(self.labels)
 
     def __len__(self):
         return len(self.samples)
@@ -35,6 +38,8 @@ class DataFormer:
             if data_type not in samples_dict:
                 samples_dict[data_type] = []
             samples_dict[data_type].append((text, label))
+            if label not in self.labels:
+                self.labels.append(label)
         return samples_dict
 
 
@@ -57,6 +62,30 @@ class EncodeLoader:
     
     def __len__(self):
         return len(self.dataset)
+    
+    def __label_encoder(self, array):
+        le = preprocessing.LabelEncoder()
+        le.fit(array)
+        self.encoded_labels = dict(zip(le.classes_, le.transform(le.classes_)))
+        return le.transform(array)
+    
+    def __get_sampled_data(self) -> Tuple[List[str], List[Union[Enum, int]]]:
+        texts, labels = [], []
+        for sample in self.list_texts_labels:
+            texts.append(sample[0])
+            labels.append(sample[1])
+        
+        encoded_labels = self.__label_encoder(labels)
+        sampled_texts = self.__batch_sampler(texts)
+        sampled_labels = self.__batch_sampler(encoded_labels)
+        return sampled_texts, sampled_labels
+    
+    def __batch_sampler(self, list_data) -> BatchSampler:
+        return BatchSampler(
+            list_data,
+            batch_size = self.batch_size,
+            drop_last = self.drop_last
+        )
 
     def __form_dataloader(self) -> DataLoader:
         sampled_texts, sampled_labels = self.__get_sampled_data()
@@ -66,26 +95,10 @@ class EncodeLoader:
             total = len(sampled_texts),
             desc='Data encoding'
         ):
-            dataset.append((self.encode_func(batch_text), batch_label))
+            encoded_batch_text = self.encode_func(batch_text)
+            dataset.append((encoded_batch_text, batch_label))
 
         return DataLoader(
             dataset=dataset,
             shuffle=self.shuffle
-        ) 
-    
-    def __get_sampled_data(self) -> Tuple[List[str], List[Union[Enum, int]]]:
-        texts, labels = [], []
-        for sample in self.list_texts_labels:
-            texts.append(sample[0])
-            labels.append(sample[1])
-
-        sampled_texts = self.__batch_sampler(texts)
-        sampled_labels = self.__batch_sampler(labels)
-        return sampled_texts, sampled_labels
-    
-    def __batch_sampler(self, list_data)->BatchSampler:
-        return BatchSampler(
-            list_data,
-            batch_size = self.batch_size,
-            drop_last = self.drop_last
         )
