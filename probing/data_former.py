@@ -1,12 +1,10 @@
 from enum import Enum
-from typing import Tuple, Dict, Optional, List, Union
+from typing import Tuple, Dict, Optional, List
 import os
-import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.data import BatchSampler
 from sklearn import preprocessing
-
 
 from probing.utils import get_probe_task_path
 
@@ -63,13 +61,13 @@ class EncodeLoader:
     def __len__(self):
         return len(self.dataset)
     
-    def __label_encoder(self, array):
+    def __label_encoder(self, array: List[str]) -> List[int]:
         le = preprocessing.LabelEncoder()
         le.fit(array)
         self.encoded_labels = dict(zip(le.classes_, le.transform(le.classes_)))
         return le.transform(array)
     
-    def __get_sampled_data(self) -> Tuple[List[str], List[Union[Enum, int]]]:
+    def __get_sampled_data(self) -> Tuple[List[str], List[int]]:
         texts, labels = [], []
         for sample in self.list_texts_labels:
             texts.append(sample[0])

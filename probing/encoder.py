@@ -2,7 +2,6 @@ from transformers import  AutoConfig, AutoModel, AutoTokenizer
 import torch
 from typing import Optional, List, Union
 from enum import Enum
-import numpy as np
 
 
 class TransformersLoader:
@@ -18,10 +17,15 @@ class TransformersLoader:
         output_attentions: bool = True
     ):
         self.config = AutoConfig.from_pretrained(
-            model_name, output_hidden_states=output_hidden_states, output_attentions=output_attentions
+            model_name, output_hidden_states=output_hidden_states, 
+            output_attentions=output_attentions
         )
-        self.model = AutoModel.from_pretrained(model_name, config=self.config)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, config=self.config)
+        self.model = AutoModel.from_pretrained(
+            model_name, config=self.config
+            )
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, config=self.config
+            )
 
         self.padding = padding
         self.return_tensors = return_tensors
@@ -38,7 +42,11 @@ class TransformersLoader:
             self.device = "cpu"
             self.model.to(torch.device(self.device))
 
-    def encode_text(self, text: Union[str, List[str]], embedding_type: Enum = 'cls'):
+    def encode_text(
+        self,
+        text: Union[str, List[str]],
+        embedding_type: Enum = 'cls'
+    ) -> List[torch.Tensor]:
         encoded_text = self.tokenizer(
             text,
             padding=self.padding,
@@ -60,12 +68,15 @@ class TransformersLoader:
             )
             layers_outputs = []
             for output in model_outputs[1:]:
-                vec_output = output.cpu().numpy()
                 if embedding_type == 'cls':
-                    sent_vector = vec_output[:, 0, :]
+                    sent_vector = output[:, 0, :]
                 elif embedding_type == 'sum':
-                    sent_vector = np.sum(vec_output, axis=1)
+                    sent_vector = torch.sum(output, dim=1)
                 elif embedding_type == 'avg':
-                    sent_vector = np.mean(vec_output, axis=1)
-                layers_outputs.append(sent_vector)
+                    sent_vector = torch.mean(output, dim=1)
+                else:
+                    raise NotImplementedError(
+                        f'Unknown type of embedding\'s aggregation: {embedding_type}'
+                        )
+                layers_outputs.append(sent_vector.cpu())
             return layers_outputs

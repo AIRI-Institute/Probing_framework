@@ -1,19 +1,16 @@
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import Optional, Callable
 import os
 from tqdm import trange
 import numpy as np
-import json
 import torch
-import pathlib
-from datetime import datetime
 from torch.utils.data import DataLoader
 
 from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing import config
+from probing.utils import save_log
 
 
 class ProbingPipeline:
@@ -24,6 +21,7 @@ class ProbingPipeline:
         device: Optional[Enum] = None,
         classifier_name: Enum = "mlp",
         metric_name: Enum = "accuracy",
+        embedding_type: Enum = "cls",
         batch_size: Optional[int] = 128,
         dropout_rate: float = 0.2,
         num_hidden: int = 256,
@@ -38,6 +36,7 @@ class ProbingPipeline:
         self.classifier_name = classifier_name
         self.metric_name = metric_name
         self.device = device
+        self.embedding_type = embedding_type
 
         self.metric = Metric(metric_name).metric
         self.transformer_model = TransformersLoader(hf_model_name, device)
@@ -46,7 +45,11 @@ class ProbingPipeline:
 
         self.log_info = {}
     
-    def get_classifier(self, classifier_name: Enum, num_classes: int):
+    def get_classifier(
+        self,
+        classifier_name: Enum,
+        num_classes: int
+    ) -> Callable:
         embed_dim = self.transformer_model.config.hidden_size
         if classifier_name == "logreg":
             return LogReg(
@@ -61,9 +64,13 @@ class ProbingPipeline:
                 dropout_rate = self.dropout_rate
             ).to(self.device)
         else:
-            return self.get_classifier("mlp")
+            raise NotImplementedError(f"Unknown classifier: {classifier_name}")
 
-    def train(self, train_loader, layer):
+    def train(
+        self,
+        train_loader: DataLoader,
+        layer: int
+    ) -> float:
         epoch_train_losses = []
         self.classifier.train()
         for x, y in train_loader:
@@ -74,16 +81,18 @@ class ProbingPipeline:
             loss = self.criterion(prediction, y)
             epoch_train_losses.append(loss.item())
             
-            self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-        return np.mean(epoch_train_losses)
+            self.optimizer.zero_grad()
+        
+        epoch_loss = np.mean(epoch_train_losses)
+        return epoch_loss
     
     def evaluate(
         self,
         dataloader: DataLoader,
         layer: int,
-        save_checkpoints: bool
+        save_checkpoints: bool = False
     ):
         epoch_losses = []
         epoch_predictions = []
@@ -97,12 +106,15 @@ class ProbingPipeline:
                 prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
                 epoch_losses.append(loss.item())
+                if save_checkpoints:
+                    raise NotImplementedError()
 
                 epoch_predictions += prediction.data.max(1).indices.cpu()
                 epoch_true_labels += y.cpu()
         
-        metric_score = self.metric(epoch_predictions, epoch_true_labels).item()
-        return np.mean(epoch_losses), metric_score
+        epoch_metric_score = self.metric(epoch_predictions, epoch_true_labels).item()
+        epoch_loss = np.mean(epoch_losses)
+        return epoch_loss, epoch_metric_score
 
     def run(
         self,
@@ -110,7 +122,7 @@ class ProbingPipeline:
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
         save_checkpoints: bool = False
-    ):
+    ) -> None:
         print(f'Task in progress: {probe_task}')
         num_layers = self.transformer_model.config.num_hidden_layers
         self.log_info[probe_task] = {}
@@ -133,7 +145,7 @@ class ProbingPipeline:
 
         self.log_info[probe_task]['params']['file_path'] = task_data.data_path
 
-        encode_func =  self.transformer_model.encode_text
+        encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size)
         val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size)
         test = EncodeLoader(task_dataset["te"], encode_func, self.batch_size)
@@ -142,7 +154,7 @@ class ProbingPipeline:
         test_loader = test.dataset
         self.log_info[probe_task]['results']['encoded_labels'] = train.encoded_labels
 
-        for layer in trange(num_layers):
+        for layer in trange(num_layers, desc="Probing by layers..."):
             self.log_info[probe_task]['results']['train_loss'][layer] = []
             self.log_info[probe_task]['results']['val_loss'][layer] = []
             self.log_info[probe_task]['results']['val_score'][layer] = []
@@ -150,7 +162,7 @@ class ProbingPipeline:
 
             self.classifier = self.get_classifier(self.classifier_name, num_classes)
             self.criterion = torch.nn.CrossEntropyLoss()
-            self.optimizer = torch.optim.Adam(self.classifier.parameters())
+            self.optimizer = torch.optim.AdamW(self.classifier.parameters())
 
             for epoch in range(train_epochs):
                 epoch_train_loss = self.train(train_loader, layer)
@@ -163,11 +175,4 @@ class ProbingPipeline:
             _, epoch_test_score = self.evaluate(test_loader, layer, save_checkpoints)
             self.log_info[probe_task]['results']['test_score'][layer].append(epoch_test_score)
 
-        date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
-        experiments_path = pathlib.Path(config.results_folder, f'{probe_task}_{date}')
-        os.makedirs(experiments_path)
-        
-        log_path = pathlib.Path(experiments_path, "log.json")
-        with open(log_path, "w") as outfile:
-            json.dump(self.log_info, outfile, indent = 4)
-        print('Experiments were saved in folder: ', str(experiments_path))
+        save_log(self.log_info)
