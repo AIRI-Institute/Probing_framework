@@ -123,7 +123,6 @@ class ProbingPipeline:
         train_epochs: int = 10,
         save_checkpoints: bool = False
     ) -> None:
-        print(f'Task in progress: {probe_task}')
         num_layers = self.transformer_model.config.num_hidden_layers
         self.log_info[probe_task] = {}
         self.log_info[probe_task]['results'] = {}
@@ -143,6 +142,7 @@ class ProbingPipeline:
         task_dataset = task_data.samples
         num_classes = task_data.num_classes
 
+        print(f'Task in progress: {probe_task}.\nPath to data: {task_data.data_path}')
         self.log_info[probe_task]['params']['file_path'] = task_data.data_path
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
@@ -154,7 +154,7 @@ class ProbingPipeline:
         test_loader = test.dataset
         self.log_info[probe_task]['results']['encoded_labels'] = train.encoded_labels
 
-        for layer in trange(num_layers, desc=f"Probing type: {self.probing_type}"):
+        for layer in trange(num_layers, desc="Probing by layers..."):
             self.log_info[probe_task]['results']['train_loss'][layer] = []
             self.log_info[probe_task]['results']['val_loss'][layer] = []
             self.log_info[probe_task]['results']['val_score'][layer] = []
