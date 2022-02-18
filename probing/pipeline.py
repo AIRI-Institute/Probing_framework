@@ -154,7 +154,7 @@ class ProbingPipeline:
         test_loader = test.dataset
         self.log_info[probe_task]['results']['encoded_labels'] = train.encoded_labels
 
-        for layer in trange(num_layers, desc="Probing by layers..."):
+        for layer in trange(num_layers, desc=f"Probing type: {self.probing_type}"):
             self.log_info[probe_task]['results']['train_loss'][layer] = []
             self.log_info[probe_task]['results']['val_loss'][layer] = []
             self.log_info[probe_task]['results']['val_score'][layer] = []
