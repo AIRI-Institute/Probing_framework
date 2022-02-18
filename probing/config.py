@@ -1,6 +1,6 @@
-import pathlib
-import os
+from pathlib import Path
 
 
-data_folder = pathlib.Path(os.getcwd(), "../data")
-results_folder = pathlib.Path(os.getcwd(), "../results")
+home_path = Path(__file__).resolve().parent.parent
+data_folder = Path(home_path, "data/")
+results_folder = Path(home_path, "results/")

@@ -9,11 +9,11 @@ import pathlib
 from datetime import datetime
 from torch.utils.data import DataLoader
 
-from classifier import LogReg, MLP
-from data_former import DataFormer, EncodeLoader
-from encoder import TransformersLoader
-from metric import Metric
-import config
+from probing.classifier import LogReg, MLP
+from probing.data_former import DataFormer, EncodeLoader
+from probing.encoder import TransformersLoader
+from probing.metric import Metric
+from probing import config
 
 
 class ProbingPipeline:
@@ -23,11 +23,11 @@ class ProbingPipeline:
         hf_model_name: Enum,
         device: Optional[Enum] = None,
         classifier_name: Enum = "mlp",
+        metric_name: Enum = "accuracy",
+        batch_size: Optional[int] = 128,
         dropout_rate: float = 0.2,
         num_hidden: int = 256,
-        batch_size: Optional[int] = 128,
-        shuffle: bool = False,
-        metric_name: Enum = "accuracy"
+        shuffle: bool = False
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
@@ -140,9 +140,9 @@ class ProbingPipeline:
         train_loader = train.dataset
         val_loader = val.dataset
         test_loader = test.dataset
-        self.encoded_labels = train.encoded_labels
+        self.log_info[probe_task]['results']['encoded_labels'] = train.encoded_labels
 
-        for layer in range(num_layers):
+        for layer in trange(num_layers):
             self.log_info[probe_task]['results']['train_loss'][layer] = []
             self.log_info[probe_task]['results']['val_loss'][layer] = []
             self.log_info[probe_task]['results']['val_score'][layer] = []
@@ -152,7 +152,7 @@ class ProbingPipeline:
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = torch.optim.Adam(self.classifier.parameters())
 
-            for epoch in trange(train_epochs):
+            for epoch in range(train_epochs):
                 epoch_train_loss = self.train(train_loader, layer)
                 epoch_val_loss, epoch_val_score = self.evaluate(val_loader, layer, save_checkpoints)
 

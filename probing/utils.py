@@ -4,7 +4,7 @@ import os
 import glob
 import pathlib
 
-import config
+from probing import config
 
 
 def get_probe_task_path(

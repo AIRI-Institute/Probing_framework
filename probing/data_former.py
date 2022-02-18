@@ -8,7 +8,7 @@ from torch.utils.data import BatchSampler
 from sklearn import preprocessing
 
 
-from utils import get_probe_task_path
+from probing.utils import get_probe_task_path
 
 
 class DataFormer:
