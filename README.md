@@ -14,21 +14,21 @@ For more parameters you can check out ```probing/main.py```
     ```
 
 * __Jupyter__:
-```python3
-from probing.pipeline import ProbingPipeline
+    ```python3
+    from probing.pipeline import ProbingPipeline
 
-experiment = ProbingPipeline(
-    probing_type = "layer",
-    hf_model_name = "bert-base-multilingual-cased",
-    device = "cuda:0",
-    classifier_name = "mlp",
-    metric_name = "accuracy",
-    embedding_type = "cls",
-    batch_size = 256,
-)
+    experiment = ProbingPipeline(
+        probing_type = "layer",
+        hf_model_name = "bert-base-multilingual-cased",
+        device = "cuda:0",
+        classifier_name = "mlp",
+        metric_name = "accuracy",
+        embedding_type = "cls",
+        batch_size = 256,
+    )
 
-experiment.run(probe_task = "sent_len", train_epochs = 10)
-```
+    experiment.run(probe_task = "sent_len", train_epochs = 10)
+    ```
 
 * __OUTPUT__:
     ```
