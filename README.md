@@ -7,7 +7,7 @@ pip install -r requirements.txt
 ```
 
 ### Example of how it works:
-For more parameters you can check out ```main.py```
+For more parameters you can check out ```probing/main.py```
 * __Command Line__:
     ```
     python probing/main.py --probe_task "conj_type" --hf_model_name "bert-base-multilingual-cased"
