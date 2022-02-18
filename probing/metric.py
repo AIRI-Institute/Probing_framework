@@ -8,7 +8,7 @@ class Metric:
         self.metric = self.get_metric(metric_name)
 
     def accuracy(self, predictions, true_labels):
-        return torch.mean((predictions == true_labels).float())
+        return torch.mean((torch.tensor(predictions) == torch.tensor(true_labels)).float())
 
     def get_metric(self, metric_name):
         if metric_name == "accuracy":
