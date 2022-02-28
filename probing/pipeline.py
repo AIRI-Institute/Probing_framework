@@ -44,7 +44,8 @@ class ProbingPipeline:
             self.device = self.transformer_model.device
 
         self.log_info = {}
-    
+
+
     def get_classifier(
         self,
         classifier_name: Enum,
@@ -111,7 +112,7 @@ class ProbingPipeline:
 
                 epoch_predictions += prediction.data.max(1).indices.cpu()
                 epoch_true_labels += y.cpu()
-        
+
         epoch_metric_score = self.metric(epoch_predictions, epoch_true_labels).item()
         epoch_loss = np.mean(epoch_losses)
         return epoch_loss, epoch_metric_score
