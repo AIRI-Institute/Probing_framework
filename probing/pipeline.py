@@ -45,7 +45,6 @@ class ProbingPipeline:
 
         self.log_info = {}
 
-
     def get_classifier(
         self,
         classifier_name: Enum,
