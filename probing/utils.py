@@ -49,5 +49,5 @@ def save_log(log: Dict, probe_task: str) -> None:
     
     log_path = pathlib.Path(experiments_path, "log.json")
     with open(log_path, "w") as outfile:
-        json.dump(log, outfile, indent = 4, default = myconverter)
+        json.dump({probe_task: log[probe_task]}, outfile, indent = 4, default = myconverter)
     print("Experiments were saved in the folder: ", str(experiments_path))
