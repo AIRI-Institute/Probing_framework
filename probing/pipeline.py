@@ -145,7 +145,7 @@ class ProbingPipeline:
 
         if verbose:
             print("=" * 50)
-            print(f'Task in progress: {probe_task}.\nPath to data: {task_data.data_path}')
+            print(f'Task in progress: {probe_task}\nPath to data: {task_data.data_path}')
             self.log_info[probe_task]['params']['file_path'] = task_data.data_path
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
