@@ -121,7 +121,8 @@ class ProbingPipeline:
         probe_task: Union[Enum, str],
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
-        save_checkpoints: bool = False
+        save_checkpoints: bool = False,
+        verbose: bool = True
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
         self.log_info[probe_task] = {}
@@ -142,9 +143,10 @@ class ProbingPipeline:
         task_dataset = task_data.samples
         num_classes = task_data.num_classes
 
-        print("=" * 50)
-        print(f'Task in progress: {probe_task}.\nPath to data: {task_data.data_path}')
-        self.log_info[probe_task]['params']['file_path'] = task_data.data_path
+        if verbose:
+            print("=" * 50)
+            print(f'Task in progress: {probe_task}.\nPath to data: {task_data.data_path}')
+            self.log_info[probe_task]['params']['file_path'] = task_data.data_path
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size)
@@ -176,4 +178,4 @@ class ProbingPipeline:
             _, epoch_test_score = self.evaluate(test_loader, layer, save_checkpoints)
             self.log_info[probe_task]['results']['test_score'][layer].append(epoch_test_score)
 
-        save_log(self.log_info, probe_task)
+        save_log(self.log_info, probe_task, verbose)
