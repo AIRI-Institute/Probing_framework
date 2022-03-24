@@ -142,6 +142,7 @@ class ProbingPipeline:
         task_dataset = task_data.samples
         num_classes = task_data.num_classes
 
+        print("=" * 50)
         print(f'Task in progress: {probe_task}.\nPath to data: {task_data.data_path}')
         self.log_info[probe_task]['params']['file_path'] = task_data.data_path
 
