@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple, Dict, Optional, List
+from typing import Tuple, Dict, Optional, List, Union
 import os
 from tqdm import tqdm
 from torch.utils.data import DataLoader
@@ -12,7 +12,7 @@ from probing.utils import get_probe_task_path
 class DataFormer:
     def __init__(
         self,
-        probe_task: Enum,
+        probe_task: Union[Enum, str],
         data_path: Optional[os.PathLike] = None
     ):
         self.probe_task = probe_task

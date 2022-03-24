@@ -42,8 +42,7 @@ def myconverter(obj: Any) -> Any:
     return obj
 
 
-def save_log(log: Dict) -> None:
-    probe_task = list(log.keys())[0]
+def save_log(log: Dict, probe_task: str) -> None:
     date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
     experiments_path = pathlib.Path(config.results_folder, f'{probe_task}_{date}')
     os.makedirs(experiments_path)

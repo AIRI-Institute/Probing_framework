@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 import os
 from tqdm import trange
 import numpy as np
@@ -118,7 +118,7 @@ class ProbingPipeline:
 
     def run(
         self,
-        probe_task: Enum,
+        probe_task: Union[Enum, str],
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
         save_checkpoints: bool = False
@@ -175,4 +175,4 @@ class ProbingPipeline:
             _, epoch_test_score = self.evaluate(test_loader, layer, save_checkpoints)
             self.log_info[probe_task]['results']['test_score'][layer].append(epoch_test_score)
 
-        save_log(self.log_info)
+        save_log(self.log_info, probe_task)

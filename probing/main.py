@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 import argparse
 import os
 
@@ -9,7 +9,7 @@ from probing.pipeline import ProbingPipeline
 def main(
     probing_type: Enum,
     hf_model_name: Enum,
-    probe_task: Enum,
+    probe_task: Union[Enum, str],
     train_epochs: int = 10,
     save_checkpoints: bool = False,
     path_to_task_file: Optional[os.PathLike] = None,
