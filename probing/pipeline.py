@@ -140,13 +140,13 @@ class ProbingPipeline:
 
         self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         self.log_info['params']['probing_task'] = probe_task
+        self.log_info['params']['task_language'] = task_language
+        self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
         self.log_info['params']['batch_size'] = self.batch_size
         self.log_info['params']['hf_model_name'] = self.hf_model_name
         self.log_info['params']['classifier_name'] = self.classifier_name
         self.log_info['params']['metric_name'] = self.metric_name
-        self.log_info['params']['task_language'] = task_language
-        self.log_info['params']['task_category'] = task_category
 
         if verbose:
             print("=" * 50)
