@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Callable, Union
+from typing import Optional, Callable, Union, List, Tuple
 import os
 from tqdm.notebook import trange
 import numpy as np
@@ -40,10 +40,9 @@ class ProbingPipeline:
         self.device = device
         self.embedding_type = embedding_type
 
-        self.metric = Metric(metric_name).metric
+        self.metric = Metric(metric_name)
         self.transformer_model = TransformersLoader(hf_model_name, device)
-        if device is None:
-            self.device = self.transformer_model.device
+        self.device = self.transformer_model.device if device is None else device
 
     def get_classifier(
         self,
@@ -62,7 +61,7 @@ class ProbingPipeline:
                 num_classes = num_classes,
                 num_hidden =  self.num_hidden,
                 dropout_rate = self.dropout_rate
-            ).to(self.device)
+                ).to(self.device)
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")
 
@@ -93,10 +92,11 @@ class ProbingPipeline:
         dataloader: DataLoader,
         layer: int,
         save_checkpoints: bool = False
-    ):
+    ) -> Tuple[List[float], List[float]]:
         epoch_losses = []
         epoch_predictions = []
         epoch_true_labels = []
+
         self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
@@ -106,6 +106,7 @@ class ProbingPipeline:
                 prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
                 epoch_losses.append(loss.item())
+
                 if save_checkpoints:
                     raise NotImplementedError()
 
