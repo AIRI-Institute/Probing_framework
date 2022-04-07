@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Tuple, Dict, Optional, List, Union
 import os
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.data import BatchSampler
 from sklearn import preprocessing
@@ -55,7 +55,6 @@ class EncodeLoader:
         self.batch_size = batch_size
         self.drop_last = drop_last
         self.shuffle = shuffle
-        
         self.dataset = self.__form_dataloader()
     
     def __len__(self):

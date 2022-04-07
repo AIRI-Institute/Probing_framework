@@ -1,9 +1,11 @@
 from enum import Enum
 from typing import Optional, Callable, Union
 import os
-from tqdm import trange
+from tqdm.notebook import trange
 import numpy as np
 import torch
+from pathlib import Path
+from collections import defaultdict
 from torch.utils.data import DataLoader
 
 from probing.classifier import LogReg, MLP
@@ -42,8 +44,6 @@ class ProbingPipeline:
         self.transformer_model = TransformersLoader(hf_model_name, device)
         if device is None:
             self.device = self.transformer_model.device
-
-        self.log_info = {}
 
     def get_classifier(
         self,
@@ -125,57 +125,54 @@ class ProbingPipeline:
         verbose: bool = True
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
-        self.log_info[probe_task] = {}
-        self.log_info[probe_task]['results'] = {}
-        self.log_info[probe_task]['params'] = {}
-        self.log_info[probe_task]['results']['train_loss'] = {}
-        self.log_info[probe_task]['results']['val_loss'] = {}
-        self.log_info[probe_task]['results']['val_score'] = {}
-        self.log_info[probe_task]['results']['test_score'] = {}
-
-        self.log_info[probe_task]['params']['probing_type'] = self.probing_type
-        self.log_info[probe_task]['params']['batch_size'] = self.batch_size
-        self.log_info[probe_task]['params']['hf_model_name'] = self.hf_model_name
-        self.log_info[probe_task]['params']['classifier_name'] = self.classifier_name
-        self.log_info[probe_task]['params']['metric_name'] = self.metric_name
-
         task_data = DataFormer(probe_task, path_to_task_file)
         task_dataset = task_data.samples
         num_classes = task_data.num_classes
+        path_to_file_for_probing = task_data.data_path
+
+        if '_' in path_to_file_for_probing:   
+            path = str(Path(path_to_file_for_probing).stem)           
+            task_language = path.split('_')[0]
+            task_category = path.split('_')[-1]
+        else:
+            task_language, task_category = None, None
+
+        self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+        self.log_info['params']['probing_task'] = probe_task
+        self.log_info['params']['probing_type'] = self.probing_type
+        self.log_info['params']['batch_size'] = self.batch_size
+        self.log_info['params']['hf_model_name'] = self.hf_model_name
+        self.log_info['params']['classifier_name'] = self.classifier_name
+        self.log_info['params']['metric_name'] = self.metric_name
+        self.log_info['params']['task_language'] = task_language
+        self.log_info['params']['task_category'] = task_category
 
         if verbose:
             print("=" * 50)
-            print(f'Task in progress: {probe_task}\nPath to data: {task_data.data_path}')
-            self.log_info[probe_task]['params']['file_path'] = task_data.data_path
+            print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size)
         val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size)
         test = EncodeLoader(task_dataset["te"], encode_func, self.batch_size)
-        train_loader = train.dataset
-        val_loader = val.dataset
-        test_loader = test.dataset
-        self.log_info[probe_task]['results']['encoded_labels'] = train.encoded_labels
+        self.log_info['params']['encoded_labels'] = train.encoded_labels
 
-        for layer in trange(num_layers, desc="Probing by layers..."):
-            self.log_info[probe_task]['results']['train_loss'][layer] = []
-            self.log_info[probe_task]['results']['val_loss'][layer] = []
-            self.log_info[probe_task]['results']['val_score'][layer] = []
-            self.log_info[probe_task]['results']['test_score'][layer] = []
-
+        probing_iter_range = trange(num_layers, desc="Probing by layers...") if verbose else range(num_layers)
+        for layer in probing_iter_range:
             self.classifier = self.get_classifier(self.classifier_name, num_classes)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = torch.optim.AdamW(self.classifier.parameters())
 
             for epoch in range(train_epochs):
-                epoch_train_loss = self.train(train_loader, layer)
-                epoch_val_loss, epoch_val_score = self.evaluate(val_loader, layer, save_checkpoints)
+                epoch_train_loss = self.train(train.dataset, layer)
+                epoch_val_loss, epoch_val_score = self.evaluate(val.dataset, layer, save_checkpoints)
 
-                self.log_info[probe_task]['results']['train_loss'][layer].append(epoch_train_loss)
-                self.log_info[probe_task]['results']['val_loss'][layer].append(epoch_val_loss)
-                self.log_info[probe_task]['results']['val_score'][layer].append(epoch_val_score)
+                self.log_info['results']['train_loss'][layer].append(epoch_train_loss)
+                self.log_info['results']['val_loss'][layer].append(epoch_val_loss)
+                self.log_info['results']['val_score'][layer].append(epoch_val_score)
 
-            _, epoch_test_score = self.evaluate(test_loader, layer, save_checkpoints)
-            self.log_info[probe_task]['results']['test_score'][layer].append(epoch_test_score)
+            _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
+
+            self.log_info['results']['test_score'][layer].append(epoch_test_score)
 
         save_log(self.log_info, probe_task, verbose)
