@@ -42,7 +42,7 @@ class ProbingPipeline:
 
         self.metric = Metric(metric_name)
         self.transformer_model = TransformersLoader(hf_model_name, device)
-        self.device = self.transformer_model.device if device is None else device
+        self.device = self.transformer_model.device
 
     def get_classifier(
         self,
