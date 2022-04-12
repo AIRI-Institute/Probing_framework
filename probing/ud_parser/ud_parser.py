@@ -18,12 +18,12 @@ from probing.ud_parser import ud_config
 class Splitter:
     def __init__(
         self,
-        language: Optional[str] = None,
+        language: str = "",
         shuffle: bool = True,
         save_path_dir: os.PathLike = ""
     ):
         self.categories: List[Enum] = ud_config.ud_categories
-        self.language = "" if not language else language + '_'
+        self.language = language
         self.shuffle = shuffle
         self.save_path_dir = save_path_dir
         
@@ -280,8 +280,9 @@ class Splitter:
                     ([1.0], [1.0], [1.0],)
                 )
         else:
-            self.save_path_dir = dir_path
             paths = self.get_filepaths_from_dir(dir_path)
+            self.save_path_dir = dir_path
+            self.language = str(paths[0]).split('-')[0] + "_"
             assert len(paths) <= 3, "too many files"
             parts = self.convert(*paths)
         return parts
