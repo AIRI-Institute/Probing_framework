@@ -160,13 +160,15 @@ class Splitter:
         else:
             data = {key: value for key, value in classified_sentences.items() if len(value) > 1}
             min_value = min([len(value) for value in data.values()], default=0)
-            if data and min_value > len(data.keys()):
+            if data and min_value > len(data.keys()) and len(data.keys()) > 1:
                 data = [(v, key) for key, value in data.items() for v in value]
                 parts = self.subsamples_split(
                     data, partitions,
                     random_seed, splits
                 )
             else:
+                if len(data.keys()) == 1:
+                    print(f"Category {category} has one value")
                 parts = {}
         return parts
 
