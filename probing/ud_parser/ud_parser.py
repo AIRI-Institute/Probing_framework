@@ -7,12 +7,10 @@ from math import fsum
 from pathlib import Path
 from typing import Optional, Union, Dict, List
 from collections import defaultdict
-from conllu import parse_tree
+from conllu import parse_tree, parse
 from conllu.models import TokenTree, Token
 from sklearn.model_selection import train_test_split
 from nltk.tokenize import wordpunct_tokenize
-
-from probing.ud_parser import ud_config
 
 
 class Splitter:
@@ -22,7 +20,6 @@ class Splitter:
         shuffle: bool = True,
         save_path_dir: os.PathLike = ""
     ):
-        self.categories: List[Enum] = ud_config.ud_categories
         self.language = language
         self.shuffle = shuffle
         self.save_path_dir = save_path_dir
@@ -99,10 +96,7 @@ class Splitter:
             shuffle: if sentences should be randomly shuffled
             split: parts that data should be split to
         """
-        data = {key: value for key, value in probing_data.items() if len(value) > 1}
-        data = [(v, key) for key, value in data.items() for v in value]
-        data, labels = map(np.array, zip(*data))
-
+        data, labels = map(np.array, zip(*probing_data))
         X_train, X_test, y_train, y_test = train_test_split(
             data, labels, stratify=labels, train_size=partition[0],
             shuffle=self.shuffle, random_state=random_seed
@@ -164,10 +158,18 @@ class Splitter:
             data = [(v, key) for key, value in data.items() for v in value]
             parts = {splits[0]: list(zip(*data))}
         else:
-            parts = self.subsamples_split(
-                classified_sentences, partitions,
-                random_seed, splits
-            )
+            data = {key: value for key, value in classified_sentences.items() if len(value) > 1}
+            min_value = min([len(value) for value in data.values()], default=0)
+            if data and min_value > len(data.keys()) and len(data.keys()) > 1:
+                data = [(v, key) for key, value in data.items() for v in value]
+                parts = self.subsamples_split(
+                    data, partitions,
+                    random_seed, splits
+                )
+            else:
+                if len(data.keys()) == 1:
+                    print(f"Category {category} has one value")
+                parts = {}
         return parts
 
     def writer(self, result_path: os.PathLike, partition_sets: Dict):
@@ -203,6 +205,16 @@ class Splitter:
         else:
             print(f'There are no examples for {category} in this language \n')
         return None
+    
+    def find_categories(self, filename):
+        set_of_values = set()
+        token_lists = parse(filename)
+        for token_list in token_lists:
+            for token in token_list:
+                feats = token['feats']
+                if feats:
+                    set_of_values.update(feats.keys())
+        return set_of_values
 
     def generate_(
         self,
@@ -217,7 +229,8 @@ class Splitter:
             splits: the way how the data should be split
             portions: the percentage of different splits
         """
-        for category in self.categories:
+        categories = self.find_categories("\n".join(paths))
+        for category in categories:
             parts = {}
             for path, split, portion in zip(paths, splits, partitions):
                 part = self.generate_probing_file(
