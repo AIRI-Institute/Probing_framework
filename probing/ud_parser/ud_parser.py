@@ -5,7 +5,7 @@ import numpy as np
 from enum import Enum
 from math import fsum
 from pathlib import Path
-from typing import Optional, Union, Dict, List
+from typing import Optional, Union, Dict, List, Tuple
 from collections import defaultdict
 from conllu import parse_tree, parse
 from conllu.models import TokenTree, Token
@@ -18,12 +18,14 @@ class Splitter:
         self,
         language: str = "",
         shuffle: bool = True,
-        save_path_dir: os.PathLike = ""
+        save_path_dir: Optional[os.PathLike] = None
     ):
         self.language = language
         self.shuffle = shuffle
         self.save_path_dir = save_path_dir
-        
+        if save_path_dir:
+            os.makedirs(save_path_dir, exist_ok=True)
+
     def read(self, path: str) -> str:
         """
         Reads a file
@@ -243,15 +245,19 @@ class Splitter:
     
     def get_filepaths_from_dir(self, dir_path: os.PathLike) -> List[os.PathLike]:        
         def sorting_parts_func(p: os.PathLike) -> int:
+            p = str(p)
             if 'train' in p:
                 return 0
             elif 'dev' in p:
                 return 1
             return 2
 
-        filepaths = [os.path.join(dir_path, p) for p in os.listdir(dir_path) if \
+        filepaths = [Path(dir_path, p) for p in os.listdir(dir_path) if \
                 re.match(".*-(train|dev|test).*\.conllu", p)]
         return sorted(filepaths, key=sorting_parts_func)
+
+    def __extract_lang_from_udfile(self, ud_file_path: os.PathLike) -> str:
+        return ud_file_path.stem.split('-')[0] + "_"
     
     def convert(
         self,
@@ -259,7 +265,7 @@ class Splitter:
         va_path: Optional[os.PathLike] = None,
         te_path: Optional[os.PathLike] = None,
         dir_path: Optional[os.PathLike] = None
-    ):
+    ) -> Dict[Enum, List[Tuple[str, str]]]:
         """
         Converts files in CONLLU format to SentEval probing files
         Args:
@@ -294,8 +300,8 @@ class Splitter:
                 )
         else:
             paths = self.get_filepaths_from_dir(dir_path)
-            self.save_path_dir = dir_path
-            self.language = str(paths[0]).split('-')[0] + "_"
+            self.save_path_dir = dir_path if not self.save_path_dir else self.save_path_dir
+            self.language = self.__extract_lang_from_udfile(paths[0])
             assert len(paths) <= 3, "too many files"
             parts = self.convert(*paths)
         return parts
