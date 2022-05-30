@@ -317,7 +317,7 @@ class Splitter:
                 raise NotImplementedError("Too much files.")
         else:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
-            assert len(paths) > 0, "You need to pass at least one conllu file."
+            assert len(paths) > 0, f"You need to pass at least one conllu file. Folder: {dir_conllu_path}"
 
             self.language = self.__extract_lang_from_udfile(paths[0])
             save_path_dir = self.__determine_ud_savepath(dir_conllu_path, save_path_dir)
