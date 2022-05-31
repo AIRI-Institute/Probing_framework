@@ -288,6 +288,7 @@ class Splitter:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
+        dir_conllu_path = Path(dir_conllu_path).absolute()
         if dir_conllu_path is None:
             known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
             assert len(known_paths) > 0
@@ -318,7 +319,7 @@ class Splitter:
                 raise NotImplementedError(f"Too much files. You provided {len(known_paths)} files")
         else:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
-            assert len(paths) > 0, f"You need to have at least one conllu file in folder: {Path(dir_conllu_path).absolute()}"
+            assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
 
             self.language = self.__extract_lang_from_udfile(paths[0], language)
             self.save_path_dir = self.__determine_ud_savepath(dir_conllu_path, save_path_dir)
