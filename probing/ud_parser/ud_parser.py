@@ -258,7 +258,6 @@ class Splitter:
         categories = self.find_categories("\n".join(texts))
         if len(categories) == 0:
             print(f"Something went wrong during processing paths:")
-            paths = paths * 2
             print(*paths, sep = '\n')
 
         for category in categories:
