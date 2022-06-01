@@ -257,7 +257,7 @@ class Splitter:
         texts = [self.read(p) for p in paths]
         categories = self.find_categories("\n".join(texts))
         if len(categories) == 0:
-            print(f"Something went wrong during processing paths:")
+            print(f"Something went wrong during processing. None categories were found for:")
             print(*paths, sep = '\n')
 
         for category in categories:
