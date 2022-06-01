@@ -257,8 +257,7 @@ class Splitter:
         texts = [self.read(p) for p in paths]
         categories = self.find_categories("\n".join(texts))
         if len(categories) == 0:
-            print(f"Something went wrong during processing paths:")
-            paths = paths * 2
+            print(f"Something went wrong during processing files. None categories were found for paths:")
             print(*paths, sep = '\n')
 
         for category in categories:
@@ -288,7 +287,7 @@ class Splitter:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
-        dir_conllu_path = Path(dir_conllu_path).absolute()
+        dir_conllu_path = Path(dir_conllu_path).absolute() if dir_conllu_path is not None else None
         if dir_conllu_path is None:
             known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
             assert len(known_paths) > 0
