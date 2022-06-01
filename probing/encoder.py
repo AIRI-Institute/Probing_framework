@@ -47,12 +47,15 @@ class TransformersLoader:
         text: Union[str, List[str]],
         embedding_type: Enum = 'cls'
     ) -> List[torch.Tensor]:
-        encoded_text = self.tokenizer(
-            text,
-            padding=self.padding,
-            return_tensors=self.return_tensors,
-            add_special_tokens = self.add_special_tokens
-            )
+        try:
+            encoded_text = self.tokenizer(
+                text,
+                padding=self.padding,
+                return_tensors=self.return_tensors,
+                add_special_tokens = self.add_special_tokens
+                )
+        except:
+            raise NotImplementedError(f"Something went wrong for model \"{self.config._name_or_path}\" during data processing.")
 
         input_ids = encoded_text["input_ids"].to(self.device)
         attention_mask = encoded_text["attention_mask"].to(self.device)
