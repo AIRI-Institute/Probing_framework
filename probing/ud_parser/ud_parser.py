@@ -31,12 +31,12 @@ class Splitter:
             conllu_file = f.read()
         return conllu_file 
 
-    def find_category(
+    def find_category_token(
         self,
         category: Enum,
         head: Token,
         children: List[TokenTree]
-    ) -> Optional[Union[str, Dict]]:
+    ) -> Optional[str]:
         """
         Finds a token that has a given category and is located on the top of a tree
         Args:
@@ -49,9 +49,11 @@ class Splitter:
 
         for token in children:
             token_info = token.token
-            result = self.find_category(category, token_info, token.children)
+            result = self.find_category_token(category, token_info, token.children)
             if result:
+                print(result)
                 return result
+                
         return None
 
     def classify(
@@ -69,7 +71,7 @@ class Splitter:
         for token_tree in token_trees:
             s_text = ' '.join(wordpunct_tokenize(token_tree.metadata['text']))
             root = token_tree.token
-            category_token = self.find_category(category, root, token_tree.children)
+            category_token = self.find_category_token(category, root, token_tree.children)
             if category_token:
                 value = category_token['feats'][category]
                 probing_data[value].append(s_text)
@@ -204,7 +206,7 @@ class Splitter:
             print(f'There are no examples for {category} in this language \n')
         return None
     
-    def find_categories(self, text_data: str):
+    def find_categories(self, text_data: str) -> List[Enum]:
         set_of_values = set()
         token_lists = parse(text_data)
         for token_list in token_lists:
