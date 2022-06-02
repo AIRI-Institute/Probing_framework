@@ -204,9 +204,9 @@ class Splitter:
             print(f'There are no examples for {category} in this language \n')
         return None
     
-    def find_categories(self, filename):
+    def find_categories(self, text_data: str):
         set_of_values = set()
-        token_lists = parse(filename)
+        token_lists = parse(text_data)
         for token_list in token_lists:
             for token in token_list:
                 feats = token['feats']
