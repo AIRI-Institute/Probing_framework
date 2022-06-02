@@ -36,7 +36,7 @@ class Splitter:
         category: Enum,
         head: Token,
         children: List[TokenTree]
-    ) -> Optional[Union[str, Dict]]:
+    ) -> Optional[str]:
         """
         Finds a token that has a given category and is located on the top of a tree
         Args:
