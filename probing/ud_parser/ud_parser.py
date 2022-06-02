@@ -2,10 +2,11 @@ import re
 import os
 import csv
 import numpy as np
+import logging
 from enum import Enum
 from math import fsum
 from pathlib import Path
-from typing import Optional, Union, Dict, List, Tuple
+from typing import Optional, Dict, List
 from collections import defaultdict
 from conllu import parse_tree, parse
 from conllu.models import TokenTree, Token
@@ -51,7 +52,6 @@ class Splitter:
             token_info = token.token
             result = self.find_category_token(category, token_info, token.children)
             if result:
-                print(result)
                 return result
                 
         return None
@@ -167,7 +167,7 @@ class Splitter:
                 )
             else:
                 if len(data.keys()) == 1:
-                    print(f"Category {category} has one value")
+                    logging.warn(f"Category {category} has one value")
                 parts = {}
         return parts
 
@@ -194,16 +194,16 @@ class Splitter:
             category: a grammatical value
         """
         if not all(parts.values()):
-            print(f'One of the files does not contain examples for {category} \n')
+            logging.warn(f'One of the files does not contain examples for {category} \n')
         elif 'tr' in parts and 'va' in parts and 'te' in parts:
             if set(parts['tr'][1]) != set(parts['va'][1]):
-                print("The number of category meanings is different in train and validation parts.")
+                logging.warn("The number of category meanings is different in train and validation parts.")
             elif set(parts['tr'][1]) != set(parts['te'][1]):
-                print("The number of category meanings is different in train and test parts.")
+                logging.warn("The number of category meanings is different in train and test parts.")
             save_path_file = Path(self.save_path_dir.absolute(), f'{self.language}{category}.csv')
             self.writer(save_path_file, parts)
         else:
-            print(f'There are no examples for {category} in this language \n')
+            logging.warn(f'There are no examples for {category} in this language \n')
         return None
     
     def find_categories(self, text_data: str) -> List[Enum]:
@@ -259,8 +259,8 @@ class Splitter:
         texts = [self.read(p) for p in paths]
         categories = self.find_categories("\n".join(texts))
         if len(categories) == 0:
-            print(f"Something went wrong during processing files. None categories were found for paths:")
-            print(*paths, sep = '\n')
+            paths_str = "\n".join([str(p) for p in paths])
+            logging.warn(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
 
         for category in categories:
             parts = {}

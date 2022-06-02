@@ -37,7 +37,6 @@ class ProbingPipeline:
         self.num_hidden = num_hidden
         self.classifier_name = classifier_name
         self.metric_name = metric_name
-        self.device = device
         self.embedding_type = embedding_type
 
         self.metric = Metric(metric_name)
