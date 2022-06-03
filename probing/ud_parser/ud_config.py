@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from enum import Enum
 
 
@@ -10,3 +10,7 @@ ud_categories: List[Enum] = [
     "Voice", "Abbr", "Definite", "Evident", "Typo",
     "Degree", "Polarity", "Person", "Polite", "Clusivity"
 ]
+
+partitions: Dict[str, tuple[List[float]]] = {"one_file": ([0.8, 0.1, 0.1],),
+                                             "two_files": [([1.0], [0.5, 0.5], )],
+                                             "three_files": [([1.0], [1.0], [1.0],)]}
