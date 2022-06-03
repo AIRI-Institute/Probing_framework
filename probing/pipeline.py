@@ -12,7 +12,7 @@ from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import save_log
+from probing.utils import save_log, get_ratio_by_classes
 
 
 class ProbingPipeline:
@@ -37,7 +37,6 @@ class ProbingPipeline:
         self.num_hidden = num_hidden
         self.classifier_name = classifier_name
         self.metric_name = metric_name
-        self.device = device
         self.embedding_type = embedding_type
 
         self.metric = Metric(metric_name)
@@ -149,7 +148,6 @@ class ProbingPipeline:
         self.log_info['params']['metric_name'] = self.metric_name
 
         if verbose:
-            print("=" * 50)
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
@@ -157,8 +155,9 @@ class ProbingPipeline:
         val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size)
         test = EncodeLoader(task_dataset["te"], encode_func, self.batch_size)
         self.log_info['params']['encoded_labels'] = train.encoded_labels
+        self.log_info['params']['classes_ratio'] = get_ratio_by_classes(task_dataset)
 
-        probing_iter_range = trange(num_layers, desc="Probing by layers...") if verbose else range(num_layers)
+        probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(self.classifier_name, num_classes)
             self.criterion = torch.nn.CrossEntropyLoss()
@@ -176,4 +175,6 @@ class ProbingPipeline:
 
             self.log_info['results']['test_score'][layer].append(epoch_test_score)
 
-        save_log(self.log_info, probe_task, verbose)
+        output_path = save_log(self.log_info, probe_task)
+        if verbose:
+            print("Experiments were saved in the folder: ", output_path)

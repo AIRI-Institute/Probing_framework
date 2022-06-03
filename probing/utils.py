@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+from collections import Counter
 import os
 import glob
 import pathlib
@@ -50,6 +51,12 @@ def save_log(log: Dict, probe_task: str, verbose: bool = True) -> None:
     log_path = pathlib.Path(experiments_path, "log.json")
     with open(log_path, "w") as outfile:
         json.dump(log, outfile, indent = 4, default = myconverter)
-    
-    if verbose:
-        print("Experiments were saved in the folder: ", str(experiments_path))
+    return str(experiments_path)
+
+
+def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum, int]]:
+    ratio_by_classes = {}
+    for class_name in samples:
+        class_labels_all = [i[1] for i in samples[class_name]]
+        ratio_by_classes[class_name] = dict(Counter(class_labels_all))
+    return ratio_by_classes

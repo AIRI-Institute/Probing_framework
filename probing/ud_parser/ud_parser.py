@@ -17,11 +17,9 @@ from nltk.tokenize import wordpunct_tokenize
 class Splitter:
     def __init__(
         self,
-        shuffle: bool = True,
-        partitions: List = [0.8, 0.1, 0.1]
+        shuffle: bool = True
     ):
         self.shuffle = shuffle
-        self.partitions = partitions
 
     def read(self, path: str) -> str:
         """
@@ -54,6 +52,7 @@ class Splitter:
             result = self.find_category_token(category, token_info, token.children)
             if result:
                 return result
+                
         return None
 
     def classify(
@@ -195,6 +194,7 @@ class Splitter:
             self.writer(save_path_file, parts)
         else:
             logging.warn(f'There are no examples for {category} in this language \n')
+        return None
     
     def find_categories(self, text_data: str) -> List[Enum]:
         set_of_values = set()
@@ -272,8 +272,7 @@ class Splitter:
         te_path: Optional[os.PathLike] = None,
         dir_conllu_path: Optional[os.PathLike] = None,
         language: str = None,
-        save_path_dir: Optional[os.PathLike] = None,
-        partitions: List[float] = [0.8, 0.1, 0.1]
+        save_path_dir: Optional[os.PathLike] = None
     ) -> None:
         """
         Converts files in CONLLU format to SentEval probing files
@@ -284,8 +283,6 @@ class Splitter:
             dir_path: a path to a directory with all files
         """
         dir_conllu_path = Path(dir_conllu_path).absolute() if dir_conllu_path is not None else None
-        if fsum(partitions) != 1:
-            raise ValueError('the sum of the parts must equal 1')
         if dir_conllu_path is None:
             known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
             assert len(known_paths) > 0
