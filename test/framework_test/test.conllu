@@ -1,0 +1,191 @@
+# sent_id = 2013Algoritm.xml_1
+# text = Алгоритм, от имени учёного аль-Хорезми, - точный набор инструкций, описывающих порядок действий исполнителя для достижения результата решения задачи за конечное время.
+1	Алгоритм	алгоритм	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	12	nsubj	12:nsubj	SpaceAfter=No
+2	,	,	PUNCT	_	_	4	punct	4:punct	_
+3	от	от	ADP	_	_	4	case	4:case	_
+4	имени	имя	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	1	conj	1:conj|12:nsubj	_
+5	учёного	ученый	NOUN	_	Animacy=Anim|Case=Gen|Gender=Masc|Number=Sing	4	nmod	4:nmod:gen	_
+6	аль	аль	PART	_	_	5	appos	5:appos	SpaceAfter=No
+7	-	-	PUNCT	_	_	8	punct	8:punct	SpaceAfter=No
+8	Хорезми	Хорезми	PROPN	_	Animacy=Anim|Case=Gen|Gender=Masc|Number=Sing	6	flat:name	6:flat:name	SpaceAfter=No
+9	,	,	PUNCT	_	_	8	punct	8:punct	_
+10	-	-	PUNCT	_	_	1	punct	1:punct	_
+11	точный	точный	ADJ	_	Case=Nom|Degree=Pos|Gender=Masc|Number=Sing	12	amod	12:amod	_
+12	набор	набор	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	0	root	0:root	_
+13	инструкций	инструкция	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur	12	nmod	12:nmod:gen	SpaceAfter=No
+14	,	,	PUNCT	_	_	15	punct	15:punct	_
+15	описывающих	описывать	VERB	_	Aspect=Imp|Case=Gen|Number=Plur|Tense=Pres|VerbForm=Part|Voice=Act	13	acl	13:acl	_
+16	порядок	порядок	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	15	obj	15:obj	_
+17	действий	действие	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Plur	16	nmod	16:nmod:gen	_
+18	исполнителя	исполнитель	NOUN	_	Animacy=Anim|Case=Gen|Gender=Masc|Number=Sing	17	nmod	17:nmod:gen	_
+19	для	для	ADP	_	_	20	case	20:case	_
+20	достижения	достижение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	16	nmod	16:nmod:для:gen	_
+21	результата	результат	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing	20	nmod	20:nmod:gen	_
+22	решения	решение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	21	nmod	21:nmod:gen	_
+23	задачи	задача	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	22	nmod	22:nmod:gen	_
+24	за	за	ADP	_	_	26	case	26:case	_
+25	конечное	конечный	ADJ	_	Case=Acc|Degree=Pos|Gender=Neut|Number=Sing	26	amod	26:amod	_
+26	время	время	NOUN	_	Animacy=Inan|Case=Acc|Gender=Neut|Number=Sing	20	nmod	20:nmod:за:acc	SpaceAfter=No
+27	.	.	PUNCT	_	_	12	punct	12:punct	_
+
+# sent_id = 2013Algoritm.xml_2
+# text = В старой трактовке вместо слова "порядок" использовалось слово "последовательность", но по мере развития параллельности в работе компьютеров слово "последовательность" стали заменять более общим словом "порядок".
+1	В	в	ADP	_	_	3	case	3:case	_
+2	старой	старый	ADJ	_	Case=Loc|Degree=Pos|Gender=Fem|Number=Sing	3	amod	3:amod	_
+3	трактовке	трактовка	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing	9	obl	9:obl:в:loc	_
+4	вместо	вместо	ADP	_	_	5	case	5:case	_
+5	слова	слово	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	9	obl	9:obl:вместо:gen	_
+6	"	"	PUNCT	_	_	7	punct	7:punct	SpaceAfter=No
+7	порядок	порядок	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	5	nmod	5:nmod:nom	SpaceAfter=No
+8	"	"	PUNCT	_	_	7	punct	7:punct	_
+9	использовалось	использовать	VERB	_	Aspect=Imp|Gender=Neut|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Pass	0	root	0:root	_
+10	слово	слово	NOUN	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing	9	nsubj:pass	9:nsubj:pass	_
+11	"	"	PUNCT	_	_	12	punct	12:punct	SpaceAfter=No
+12	последовательность	последовательность	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	10	nmod	10:nmod:nom	SpaceAfter=No
+13	"	"	PUNCT	_	_	12	punct	12:punct	SpaceAfter=No
+14	,	,	PUNCT	_	_	27	punct	27:punct	_
+15	но	но	CCONJ	_	_	27	cc	27:cc	_
+16	по	по	ADP	_	_	18	case	18:case	_
+17	мере	мера	NOUN	_	Animacy=Inan|Case=Dat|Gender=Fem|Number=Sing	16	fixed	16:fixed	_
+18	развития	развитие	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	27	obl	27:obl:по_мера:gen	_
+19	параллельности	параллельность	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	18	nmod	18:nmod:gen	_
+20	в	в	ADP	_	_	21	case	21:case	_
+21	работе	работа	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing	19	nmod	19:nmod:в:loc	_
+22	компьютеров	компьютер	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Plur	21	nmod	21:nmod:gen	_
+23	слово	слово	NOUN	_	Animacy=Inan|Case=Acc|Gender=Neut|Number=Sing	28	obj	28:obj	_
+24	"	"	PUNCT	_	_	25	punct	25:punct	SpaceAfter=No
+25	последовательность	последовательность	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	23	nmod	23:nmod:nom	SpaceAfter=No
+26	"	"	PUNCT	_	_	25	punct	25:punct	_
+27	стали	стать	VERB	_	Aspect=Perf|Mood=Ind|Number=Plur|Tense=Past|VerbForm=Fin|Voice=Act	9	conj	0:root|9:conj	_
+28	заменять	заменять	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	27	xcomp	27:xcomp	_
+29	более	более	ADV	_	Degree=Cmp	30	obl	30:obl	_
+30	общим	общий	ADJ	_	Case=Ins|Degree=Pos|Gender=Neut|Number=Sing	31	amod	31:amod	_
+31	словом	слово	NOUN	_	Animacy=Inan|Case=Ins|Gender=Neut|Number=Sing	28	obl	28:obl:ins	_
+32	"	"	PUNCT	_	_	33	punct	33:punct	SpaceAfter=No
+33	порядок	порядок	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	31	nmod	31:nmod:nom	SpaceAfter=No
+34	"	"	PUNCT	_	_	33	punct	33:punct	SpaceAfter=No
+35	.	.	PUNCT	_	_	9	punct	9:punct	_
+
+# sent_id = 2013Algoritm.xml_3
+# text = Это связано с тем, что работа каких-то инструкций алгоритма может быть зависима от других инструкций или результатов их работы.
+1	Это	это	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Dem	2	nsubj:pass	2:nsubj:pass	_
+2	связано	связать	VERB	_	Aspect=Perf|Gender=Neut|Number=Sing|Tense=Past|Variant=Short|VerbForm=Part|Voice=Pass	0	root	0:root	_
+3	с	с	ADP	_	_	4	case	4:case	_
+4	тем	то	PRON	_	Animacy=Inan|Case=Ins|Gender=Neut|Number=Sing|PronType=Dem	2	obl	2:obl:с:ins	SpaceAfter=No
+5	,	,	PUNCT	_	_	11	punct	11:punct	_
+6	что	что	SCONJ	_	_	11	mark	11:mark	_
+7	работа	работа	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	11	nsubj	11:nsubj	_
+8	каких-то	какой-то	DET	_	Case=Gen|Number=Plur|PronType=Ind	9	det	9:det	_
+9	инструкций	инструкция	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur	7	nmod	7:nmod:gen	_
+10	алгоритма	алгоритм	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing	9	nmod	9:nmod:gen	_
+11	может	мочь	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	4	acl	4:acl:что	_
+12	быть	быть	AUX	_	Aspect=Imp|VerbForm=Inf|Voice=Act	13	cop	13:cop	_
+13	зависима	зависимый	ADJ	_	Degree=Pos|Gender=Fem|Number=Sing|Variant=Short	11	obl	11:obl	_
+14	от	от	ADP	_	_	16	case	16:case	_
+15	других	другой	ADJ	_	Case=Gen|Degree=Pos|Number=Plur	16	amod	16:amod	_
+16	инструкций	инструкция	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur	13	obl	13:obl:от:gen	_
+17	или	или	CCONJ	_	_	18	cc	18:cc	_
+18	результатов	результат	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Plur	16	conj	13:obl:от:gen|16:conj	_
+19	их	их	DET	_	Poss=Yes|PronType=Prs	20	det	20:det	_
+20	работы	работа	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	18	nmod	18:nmod:gen	SpaceAfter=No
+21	.	.	PUNCT	_	_	2	punct	2:punct	_
+
+# sent_id = 2013Algoritm.xml_4
+# text = Таким образом, некоторые инструкции должны выполняться строго после завершения работы инструкций, от которых они зависят.
+1	Таким	такой	DET	_	Case=Ins|Gender=Masc|Number=Sing|PronType=Dem	2	det	2:det	_
+2	образом	образ	NOUN	_	Animacy=Inan|Case=Ins|Gender=Masc|Number=Sing	6	parataxis	6:parataxis	SpaceAfter=No
+3	,	,	PUNCT	_	_	2	punct	2:punct	_
+4	некоторые	некоторый	DET	_	Case=Nom|Number=Plur|PronType=Ind	5	det	5:det	_
+5	инструкции	инструкция	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Plur	6	nsubj	6:nsubj|7:nsubj	_
+6	должны	должен	ADJ	_	Degree=Pos|Number=Plur|Variant=Short	0	root	0:root	_
+7	выполняться	выполнять	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Pass	6	xcomp	6:xcomp	_
+8	строго	строго	ADV	_	Degree=Pos	10	obl	10:obl	_
+9	после	после	ADP	_	_	10	case	10:case	_
+10	завершения	завершение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	7	obl	7:obl:после:gen	_
+11	работы	работа	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	10	nmod	10:nmod:gen	_
+12	инструкций	инструкция	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur	11	nmod	11:nmod:gen|17:obl:от:gen	SpaceAfter=No
+13	,	,	PUNCT	_	_	17	punct	17:punct	_
+14	от	от	ADP	_	_	15	case	15:case	_
+15	которых	который	PRON	_	Case=Gen|PronType=Int,Rel	17	obl	12:ref	_
+16	они	они	PRON	_	Case=Nom|Number=Plur|Person=3|PronType=Prs	17	nsubj	17:nsubj	_
+17	зависят	зависеть	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	12	acl:relcl	12:acl:relcl	SpaceAfter=No
+18	.	.	PUNCT	_	_	6	punct	6:punct	_
+
+# sent_id = 2013Algoritm.xml_5
+# text = Независимые инструкции или инструкции, ставшие независимыми из-за завершения работы инструкций, от которых они зависят, могут выполняться в произвольном порядке, параллельно или одновременно, если это позволяют используемые процессор и операционная система.
+1	Независимые	независимый	ADJ	_	Case=Nom|Degree=Pos|Number=Plur	2	amod	2:amod	_
+2	инструкции	инструкция	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Plur	18	nsubj	18:nsubj|19:nsubj	_
+3	или	или	CCONJ	_	_	4	cc	4:cc	_
+4	инструкции	инструкция	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Plur	2	conj	2:conj|18:nsubj|19:nsubj	SpaceAfter=No
+5	,	,	PUNCT	_	_	6	punct	6:punct	_
+6	ставшие	стать	VERB	_	Aspect=Perf|Case=Nom|Number=Plur|Tense=Past|VerbForm=Part|Voice=Mid	4	acl	4:acl	_
+7	независимыми	независимый	ADJ	_	Case=Ins|Degree=Pos|Number=Plur	6	obl	6:obl:ins	_
+8	из-за	из-за	ADP	_	_	9	case	9:case	_
+9	завершения	завершение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	6	obl	6:obl:изза:gen	_
+10	работы	работа	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	9	nmod	9:nmod:gen	_
+11	инструкций	инструкция	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur	10	nmod	10:nmod:gen|16:obl:от:gen	SpaceAfter=No
+12	,	,	PUNCT	_	_	16	punct	16:punct	_
+13	от	от	ADP	_	_	14	case	14:case	_
+14	которых	который	PRON	_	Case=Gen|PronType=Int,Rel	16	obl	11:ref	_
+15	они	они	PRON	_	Case=Nom|Number=Plur|Person=3|PronType=Prs	16	nsubj	16:nsubj	_
+16	зависят	зависеть	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	11	acl:relcl	11:acl:relcl	SpaceAfter=No
+17	,	,	PUNCT	_	_	6	punct	6:punct	_
+18	могут	мочь	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	0	root	0:root	_
+19	выполняться	выполнять	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Pass	18	xcomp	18:xcomp	_
+20	в	в	ADP	_	_	22	case	22:case	_
+21	произвольном	произвольный	ADJ	_	Case=Loc|Degree=Pos|Gender=Masc|Number=Sing	22	amod	22:amod	_
+22	порядке	порядок	NOUN	_	Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing	19	obl	19:obl:в:loc	SpaceAfter=No
+23	,	,	PUNCT	_	_	24	punct	24:punct	_
+24	параллельно	параллельно	ADV	_	Degree=Pos	22	conj	19:advmod|22:conj	_
+25	или	или	CCONJ	_	_	26	cc	26:cc	_
+26	одновременно	одновременно	ADV	_	Degree=Pos	22	conj	19:advmod|22:conj	SpaceAfter=No
+27	,	,	PUNCT	_	_	30	punct	30:punct	_
+28	если	если	SCONJ	_	_	30	mark	30:mark	_
+29	это	это	PRON	_	Animacy=Inan|Case=Acc|Gender=Neut|Number=Sing|PronType=Dem	30	obj	30:obj	_
+30	позволяют	позволять	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	19	advcl	19:advcl:если	_
+31	используемые	использовать	VERB	_	Aspect=Imp|Case=Nom|Number=Plur|Tense=Pres|VerbForm=Part|Voice=Pass	32	amod	32:amod	_
+32	процессор	процессор	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	30	nsubj	30:nsubj	_
+33	и	и	CCONJ	_	_	35	cc	35:cc	_
+34	операционная	операционный	ADJ	_	Case=Nom|Degree=Pos|Gender=Fem|Number=Sing	35	amod	35:amod	_
+35	система	система	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	32	conj	30:nsubj|32:conj	SpaceAfter=No
+36	.	.	PUNCT	_	_	18	punct	18:punct	_
+
+# sent_id = 2013Algoritm.xml_6
+# text = Независимые инструкции или инструкции, ставшие независимыми из-за завершения работы инструкций, от которых они зависят, могут выполняться в произвольном порядке, параллельно или одновременно, если это позволяют используемые процессор и операционная система.
+1	Независимые	независимый	ADJ	_	Case=Nom|Degree=Pos|Number=Plur	2	amod	2:amod	_
+2	инструкции	инструкция	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Plur	18	nsubj	18:nsubj|19:nsubj	_
+3	или	или	CCONJ	_	_	4	cc	4:cc	_
+4	инструкции	инструкция	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Plur	2	conj	2:conj|18:nsubj|19:nsubj	SpaceAfter=No
+5	,	,	PUNCT	_	_	6	punct	6:punct	_
+6	ставшие	стать	VERB	_	Aspect=Perf|Case=Nom|Number=Plur|Tense=Past|VerbForm=Part|Voice=Mid	4	acl	4:acl	_
+7	независимыми	независимый	ADJ	_	Case=Ins|Degree=Pos|Number=Plur	6	obl	6:obl:ins	_
+8	из-за	из-за	ADP	_	_	9	case	9:case	_
+9	завершения	завершение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	6	obl	6:obl:изза:gen	_
+10	работы	работа	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	9	nmod	9:nmod:gen	_
+11	инструкций	инструкция	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur	10	nmod	10:nmod:gen|16:obl:от:gen	SpaceAfter=No
+12	,	,	PUNCT	_	_	16	punct	16:punct	_
+13	от	от	ADP	_	_	14	case	14:case	_
+14	которых	который	PRON	_	Case=Gen|PronType=Int,Rel	16	obl	11:ref	_
+15	они	они	PRON	_	Case=Nom|Number=Plur|Person=3|PronType=Prs	16	nsubj	16:nsubj	_
+16	зависят	зависеть	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	11	acl:relcl	11:acl:relcl	SpaceAfter=No
+17	,	,	PUNCT	_	_	6	punct	6:punct	_
+18	могут	мочь	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	0	root	0:root	_
+19	выполняться	выполнять	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Pass	18	xcomp	18:xcomp	_
+20	в	в	ADP	_	_	22	case	22:case	_
+21	произвольном	произвольный	ADJ	_	Case=Loc|Degree=Pos|Gender=Masc|Number=Sing	22	amod	22:amod	_
+22	порядке	порядок	NOUN	_	Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing	19	obl	19:obl:в:loc	SpaceAfter=No
+23	,	,	PUNCT	_	_	24	punct	24:punct	_
+24	параллельно	параллельно	ADV	_	Degree=Pos	22	conj	19:advmod|22:conj	_
+25	или	или	CCONJ	_	_	26	cc	26:cc	_
+26	одновременно	одновременно	ADV	_	Degree=Pos	22	conj	19:advmod|22:conj	SpaceAfter=No
+27	,	,	PUNCT	_	_	30	punct	30:punct	_
+28	если	если	SCONJ	_	_	30	mark	30:mark	_
+29	это	это	PRON	_	Animacy=Inan|Case=Acc|Gender=Neut|Number=Sing|PronType=Dem	30	obj	30:obj	_
+30	позволяют	позволять	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	19	advcl	19:advcl:если	_
+31	используемые	использовать	VERB	_	Aspect=Imp|Case=Nom|Number=Plur|Tense=Pres|VerbForm=Part|Voice=Pass	32	amod	32:amod	_
+32	процессор	процессор	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	30	nsubj	30:nsubj	_
+33	и	и	CCONJ	_	_	35	cc	35:cc	_
+34	операционная	операционный	ADJ	_	Case=Nom|Degree=Pos|Gender=Fem|Number=Sing	35	amod	35:amod	_
+35	система	система	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	32	conj	30:nsubj|32:conj	SpaceAfter=No
+36	.	.	PUNCT	_	_	18	punct	18:punct	_
+
