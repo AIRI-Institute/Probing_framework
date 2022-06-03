@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from nltk.tokenize import wordpunct_tokenize
 
 
-class Splitter:
+class ConlluUDParser:
     def __init__(
         self,
         shuffle: bool = True
