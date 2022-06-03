@@ -1,9 +1,9 @@
-from ud_parser import Splitter
+from probing.ud_parser import ConlluUDParser
 
 import pytest
 import os
 import unittest
-from conllu import parse, parse_tree
+from conllu import parse_tree
 from collections import defaultdict
 from pathlib import Path
 
@@ -12,7 +12,7 @@ from pathlib import Path
 class TestUDParser(unittest.TestCase):
 
     def test_categories(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         categories = sorted(["Animacy", "Case", "Gender", "Number", "Degree", "Aspect", "Tense",
                              "VerbForm", "Voice", "PronType", "Person", "Mood", "Variant", "Poss"])
         conllu_text = open("test.conllu", encoding="utf-8").read()
@@ -21,7 +21,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(list, type(found_categories))
 
     def test_classify(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         person_dict = defaultdict(list)
         person_dict["3"].extend(["Это связано с тем , что работа каких - то инструкций алгоритма может быть зависима от других инструкций или результатов их работы .",
         "Таким образом , некоторые инструкции должны выполняться строго после завершения работы инструкций , от которых они зависят .",
@@ -31,7 +31,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(person_dict, parser.classify(sentences, "Person"))
 
     def test_check(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         category = "Animacy"
         set_1 = {"tr": [], "te": ["a"], "va": ["b"]}
         with self.assertLogs('', 'DEBUG') as experiment_1:
@@ -64,7 +64,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(log_4, experiment_4.output[0])
 
     def test_writer(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         result_path = "ru_animacy.csv"
         set_1 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a"]],
@@ -73,7 +73,7 @@ class TestUDParser(unittest.TestCase):
         self.assertIn(result_path, os.listdir())
 
     def test_find_tokens(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         text = open("test.conllu", encoding="utf-8").read()
         sentences = parse_tree(text)
         animacy_token = parser.find_category_token(category="Animacy",
@@ -90,7 +90,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(None, prontype_token)  # this sentence does not have the category in search
 
     def test_subsamples(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         probing_data = [("повторяет", "3"), ("повторяешь", "2"),
                         ("бывает", "3"), ("говорит", "3"),
                         ("весит", "3"), ("узнаешь", "2")]
@@ -108,7 +108,7 @@ class TestUDParser(unittest.TestCase):
                                                         random_seed=0)["te"]))
 
     def test_generate_probing_file(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         conllu_text = open("test.conllu", encoding="utf-8").read()
         log_1 = "WARNING:root:Category Degree has one value"
         with self.assertLogs('', 'DEBUG') as experiment_1:
@@ -123,14 +123,14 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual({}, parts_3)
 
     def test_generate(self):
-        parser = Splitter()
+        parser = ConlluUDParser()
         data = parser.generate_(paths=["test.conllu"], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
         self.assertEqual(14, len(data.keys()))
         self.assertEqual([{}, ] * 14, list(data.values()))
 
-    def test_convert(self):
-        parser = Splitter()
-        self.assertRaises(ValueError, parser.convert, "test.conllu", partitions=[0.9, 0.1, 0.1])
+#    def test_convert(self):
+#        parser = ConlluUDParser()
+#        self.assertRaises(ValueError, parser.convert, "test.conllu", partitions=[0.9, 0.1, 0.1])
 
 
 if __name__ == '__main__':
