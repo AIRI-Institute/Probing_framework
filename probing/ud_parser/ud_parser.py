@@ -185,21 +185,16 @@ class Splitter:
             category: a grammatical value
         """
         if not all(parts.values()):
-            log = f'One of the files does not contain examples for {category} \n'
             logging.warn(f'One of the files does not contain examples for {category} \n')
         elif 'tr' in parts and 'va' in parts and 'te' in parts:
             if set(parts['tr'][1]) != set(parts['va'][1]):
-                log = "The number of category meanings is different in train and validation parts."
                 logging.warn("The number of category meanings is different in train and validation parts.")
             elif set(parts['tr'][1]) != set(parts['te'][1]):
-                log = "The number of category meanings is different in train and test parts."
                 logging.warn("The number of category meanings is different in train and test parts.")
             save_path_file = Path(self.save_path_dir.absolute(), f'{self.language}{category}.csv')
             self.writer(save_path_file, parts)
         else:
-            log = f'There are no examples for {category} in this language \n'
             logging.warn(f'There are no examples for {category} in this language \n')
-        return log
     
     def find_categories(self, text_data: str) -> List[Enum]:
         set_of_values = set()
