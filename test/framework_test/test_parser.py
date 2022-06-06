@@ -1,4 +1,3 @@
-from codecs import ignore_errors
 from probing.ud_parser.ud_parser import ConlluUDParser
 
 import pytest
@@ -64,7 +63,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(log_2, experiment_2.output[0])
         self.assertEqual(log_3, experiment_3.output[0])
         self.assertEqual(log_4, experiment_4.output[0])
-        os.remove(f"{parser.language}_{category}.csv", ignore_errors)
+        os.remove(f"{parser.language}_{category}.csv")
 
     def test_writer(self):
         parser = ConlluUDParser()
