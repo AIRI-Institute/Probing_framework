@@ -223,7 +223,7 @@ class ConlluUDParser:
 
     def __extract_lang_from_udfile(self, ud_file_path: Path, language: str) -> str:
         if not language:
-            return ud_file_path.stem.split('-')[0] + "_"
+            return ud_file_path.stem.split('-')[0]
         return language
     
     def __determine_ud_savepath(self, path_from_files: os.PathLike, save_path_dir: os.PathLike):
@@ -238,15 +238,15 @@ class ConlluUDParser:
     def generate_(
         self,
         paths: List[os.PathLike],
-        splits: List[Enum] = ["tr", "va", "te"],
-        partitions: List[float] = None
+        splits: List[List[Enum]] = [["tr"], ["va"], ["te"]],
+        partitions: List[List[float]] = None
     ) -> None:
         """
         Generates files for all categories
         Args:
             paths: files with data in CONLLU format
             splits: the way how the data should be split
-            portions: the percentage of different splits
+            partitions: the percentage of different splits
         """
         texts = [self.read(p) for p in paths]
         categories = self.find_categories("\n".join(texts))
@@ -257,10 +257,10 @@ class ConlluUDParser:
 
         for category in categories:
             parts = {}
-            for text, split, portion in zip(texts, splits, partitions):
+            for text, split, partion in zip(texts, splits, partitions):
                 part = self.generate_probing_file(
                     conllu=text, splits=split,
-                    partitions=portion, category=category
+                    partitions=partion, category=category
                 )
                 parts.update(part)
             self.check(parts, category)
