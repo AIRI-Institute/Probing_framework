@@ -1,4 +1,5 @@
-from probing.ud_parser import ConlluUDParser
+from codecs import ignore_errors
+from probing.ud_parser.ud_parser import ConlluUDParser
 
 import pytest
 import os
@@ -10,13 +11,14 @@ from pathlib import Path
 
 @pytest.mark.ud_parser
 class TestUDParser(unittest.TestCase):
+    path_testfile1 = Path(Path(__file__).parent.resolve(), "test.conllu")
+    text_testfile1 = open(path_testfile1, encoding="utf-8").read()
 
     def test_categories(self):
         parser = ConlluUDParser()
         categories = sorted(["Animacy", "Case", "Gender", "Number", "Degree", "Aspect", "Tense",
                              "VerbForm", "Voice", "PronType", "Person", "Mood", "Variant", "Poss"])
-        conllu_text = open("test.conllu", encoding="utf-8").read()
-        found_categories = parser.find_categories(conllu_text)
+        found_categories = parser.find_categories(self.text_testfile1)
         self.assertEqual(categories, found_categories)
         self.assertEqual(list, type(found_categories))
 
@@ -27,7 +29,7 @@ class TestUDParser(unittest.TestCase):
         "Таким образом , некоторые инструкции должны выполняться строго после завершения работы инструкций , от которых они зависят .",
         "Независимые инструкции или инструкции , ставшие независимыми из - за завершения работы инструкций , от которых они зависят , могут выполняться в произвольном порядке , параллельно или одновременно , если это позволяют используемые процессор и операционная система .",
         "Независимые инструкции или инструкции , ставшие независимыми из - за завершения работы инструкций , от которых они зависят , могут выполняться в произвольном порядке , параллельно или одновременно , если это позволяют используемые процессор и операционная система ."],)
-        sentences = parse_tree(open("test.conllu", encoding="utf-8").read())
+        sentences = parse_tree(self.text_testfile1)
         self.assertEqual(person_dict, parser.classify(sentences, "Person"))
 
     def test_check(self):
@@ -62,6 +64,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(log_2, experiment_2.output[0])
         self.assertEqual(log_3, experiment_3.output[0])
         self.assertEqual(log_4, experiment_4.output[0])
+        os.remove(f"{parser.language}_{category}.csv", ignore_errors)
 
     def test_writer(self):
         parser = ConlluUDParser()
@@ -71,11 +74,11 @@ class TestUDParser(unittest.TestCase):
                  "te": [[1, 2], ["a", "b"]], }
         parser.writer(result_path, set_1)
         self.assertIn(result_path, os.listdir())
+        os.remove(result_path)
 
     def test_find_tokens(self):
         parser = ConlluUDParser()
-        text = open("test.conllu", encoding="utf-8").read()
-        sentences = parse_tree(text)
+        sentences = parse_tree(self.text_testfile1)
         animacy_token = parser.find_category_token(category="Animacy",
                                                    head=sentences[0].token,
                                                    children=sentences[0].children)
@@ -109,13 +112,12 @@ class TestUDParser(unittest.TestCase):
 
     def test_generate_probing_file(self):
         parser = ConlluUDParser()
-        conllu_text = open("test.conllu", encoding="utf-8").read()
         log_1 = "WARNING:root:Category Degree has one value"
         with self.assertLogs('', 'DEBUG') as experiment_1:
-            parts_1 = parser.generate_probing_file(conllu_text, "Degree")
+            parts_1 = parser.generate_probing_file(self.text_testfile1, "Degree")
 
-        parts_2 = parser.generate_probing_file(conllu_text, "Number", splits=["tr"])
-        parts_3 = parser.generate_probing_file(conllu_text, "Number", splits=["tr", "va", "te"])
+        parts_2 = parser.generate_probing_file(self.text_testfile1, "Number", splits=["tr"])
+        parts_3 = parser.generate_probing_file(self.text_testfile1, "Number", splits=["tr", "va", "te"])
 
         self.assertEqual(log_1, experiment_1.output[0])
         self.assertEqual({}, parts_1)
@@ -124,15 +126,6 @@ class TestUDParser(unittest.TestCase):
 
     def test_generate(self):
         parser = ConlluUDParser()
-        data = parser.generate_(paths=["test.conllu"], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
+        data = parser.generate_(paths=[self.path_testfile1], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
         self.assertEqual(14, len(data.keys()))
         self.assertEqual([{}, ] * 14, list(data.values()))
-
-#    def test_convert(self):
-#        parser = ConlluUDParser()
-#        self.assertRaises(ValueError, parser.convert, "test.conllu", partitions=[0.9, 0.1, 0.1])
-
-
-if __name__ == '__main__':
-    unittest.main()
-#    unittest.main(argv=['first-arg-is-ignored'], exit=False)

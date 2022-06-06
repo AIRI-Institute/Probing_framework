@@ -13,6 +13,8 @@ from conllu.models import TokenTree, Token
 from sklearn.model_selection import train_test_split
 from nltk.tokenize import wordpunct_tokenize
 
+from probing.ud_parser.ud_config import partitions_by_files
+
 
 class ConlluUDParser:
     def __init__(
@@ -149,7 +151,7 @@ class ConlluUDParser:
         classified_sentences = self.classify(sentences, category)
         num_categories = len(classified_sentences)
         if num_categories < 2:
-            logging.warn(f"Category {category} has one value")
+            logging.warning(f"Category {category} has one value")
             parts = {}
         else:
             data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_categories for v in value]
@@ -184,16 +186,16 @@ class ConlluUDParser:
             category: a grammatical value
         """
         if not all(parts.values()):
-            logging.warn(f'One of the files does not contain examples for {category} \n')
+            logging.warning(f'One of the files does not contain examples for {category} \n')
         elif 'tr' in parts and 'va' in parts and 'te' in parts:
             if set(parts['tr'][1]) != set(parts['va'][1]):
-                logging.warn("The number of category meanings is different in train and validation parts.")
+                logging.warning("The number of category meanings is different in train and validation parts.")
             elif set(parts['tr'][1]) != set(parts['te'][1]):
-                logging.warn("The number of category meanings is different in train and test parts.")
-            save_path_file = Path(self.save_path_dir.absolute(), f'{self.language}{category}.csv')
+                logging.warning("The number of category meanings is different in train and test parts.")
+            save_path_file = Path(self.save_path_dir.absolute(), f'{self.language}_{category}.csv')
             self.writer(save_path_file, parts)
         else:
-            logging.warn(f'There are no examples for {category} in this language \n')
+            logging.warning(f'There are no examples for {category} in this language \n')
         return None
     
     def find_categories(self, text_data: str) -> List[Enum]:
@@ -236,7 +238,7 @@ class ConlluUDParser:
     def generate_(
         self,
         paths: List[os.PathLike],
-        splits: List[Enum] = None,
+        splits: List[Enum] = ["tr", "va", "te"],
         partitions: List[float] = None
     ) -> None:
         """
@@ -251,7 +253,7 @@ class ConlluUDParser:
         data = defaultdict(dict)
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
-            logging.warn(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
+            logging.warning(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
 
         for category in categories:
             parts = {}
@@ -292,22 +294,19 @@ class ConlluUDParser:
 
             if len(known_paths) == 1:
                 self.generate_(
-                    [tr_path],
-                    (["tr", "va", "te"], ),
-                    (partitions, )
+                    paths=[tr_path],
+                    partitions=partitions_by_files["one_file"]
                 )
             elif len(known_paths) == 2:
                 second_path = te_path if te_path is not None else va_path
                 self.generate_(
-                    [tr_path, second_path],
-                    (["tr"], ["va", "te"], ),
-                    ([1.0], [0.5, 0.5], )
+                    paths=[tr_path, second_path],
+                    partitions=partitions_by_files["two_files"]
                 )
             elif len(known_paths) == 3:
                 self.generate_(
-                    [tr_path, va_path, te_path],
-                    (["tr"], ["va"], ["te"], ),
-                    ([1.0], [1.0], [1.0],)
+                    paths=[tr_path, va_path, te_path],
+                    partitions=partitions_by_files["three_files"]
                 )
             else:
                 raise NotImplementedError(f"Too much files. You provided {len(known_paths)} files")
