@@ -13,6 +13,9 @@ class TestUDParser(unittest.TestCase):
     path_testfile1 = Path(Path(__file__).parent.resolve(), "test.conllu")
     text_testfile1 = open(path_testfile1, encoding="utf-8").read()
 
+    path_testfile2 = Path(Path(__file__).parent.resolve(), "constructed_test.conllu")
+    text_testfile2 = open(path_testfile2, encoding="utf-8").read()
+
     def test_categories(self):
         parser = ConlluUDParser()
         categories = sorted(["Animacy", "Case", "Gender", "Number", "Degree", "Aspect", "Tense",
@@ -34,10 +37,6 @@ class TestUDParser(unittest.TestCase):
     def test_check(self):
         parser = ConlluUDParser()
         category = "Animacy"
-        set_1 = {"tr": [], "te": ["a"], "va": ["b"]}
-        with self.assertLogs('', 'DEBUG') as experiment_1:
-            parser.check(set_1, category)
-        log_1 = f'WARNING:root:One of the files does not contain examples for {category} \n'
 
         set_2 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a"]],
@@ -55,14 +54,8 @@ class TestUDParser(unittest.TestCase):
             parser.check(set_3, category)
         log_3 = "WARNING:root:The number of category meanings is different in train and test parts."
 
-        with self.assertLogs('', 'DEBUG') as experiment_4:
-            parser.check({}, category)
-        log_4 = f"WARNING:root:There are no examples for {category} in this language \n"
-
-        self.assertEqual(log_1, experiment_1.output[0])
         self.assertEqual(log_2, experiment_2.output[0])
         self.assertEqual(log_3, experiment_3.output[0])
-        self.assertEqual(log_4, experiment_4.output[0])
         os.remove(f"{parser.language}_{category}.csv")
 
     def test_writer(self):
@@ -111,17 +104,41 @@ class TestUDParser(unittest.TestCase):
 
     def test_generate_probing_file(self):
         parser = ConlluUDParser()
-        log_1 = "WARNING:root:Category Degree has one value"
-        with self.assertLogs('', 'DEBUG') as experiment_1:
-            parts_1 = parser.generate_probing_file(self.text_testfile1, "Degree")
+        log_1 = "WARNING:root:Category Degree has one class value"
+        with self.assertLogs("", "DEBUG") as experiment_1:
+            parts_1 = parser.generate_probing_file(self.text_testfile1, "Degree",
+                                                   splits=["tr", "va", "te"],
+                                                   partitions=[0.8, 0.1, 0.1])
 
-        parts_2 = parser.generate_probing_file(self.text_testfile1, "Number", splits=["tr"])
-        parts_3 = parser.generate_probing_file(self.text_testfile1, "Number", splits=["tr", "va", "te"])
+        parts_2 = parser.generate_probing_file(self.text_testfile1, "Number",
+                                               splits=["tr"], partitions=[1.0])
+
+        log_2 = "WARNING:root:Not enough data of category Voice for stratified split"
+        with self.assertLogs("", "DEBUG") as experiment_2:
+            parts_3 = parser.generate_probing_file(self.text_testfile2, "Voice",
+                                               splits=["tr", "va", "te"], partitions=[0.8, 0.1, 0.1])
+
+        log_3 = "WARNING:root:This file does not contain examples for category Number"
+        with self.assertLogs('', 'DEBUG') as experiment_3:
+            parts_4 = parser.generate_probing_file(self.text_testfile2, "Number",
+                                               splits=["tr", "va", "te"], partitions=[0.8, 0.1, 0.1])
+
+        cases = ["Nom"]
+        parts_5 = parser.generate_probing_file(self.text_testfile1, "Case",
+                                               splits=["va", "te"], partitions=[0.5, 0.5])
+
+        parts_6 = parser.generate_probing_file(self.text_testfile2, "Number",
+                                               splits=["va", "te"], partitions=[0.5, 0.5])
 
         self.assertEqual(log_1, experiment_1.output[0])
         self.assertEqual({}, parts_1)
         self.assertEqual(6, len(parts_2["tr"][0]))
+        self.assertEqual(log_2, experiment_2.output[0])
         self.assertEqual({}, parts_3)
+        self.assertEqual({}, parts_4)
+        self.assertEqual(log_3, experiment_3.output[0])
+        self.assertEqual(set(cases), set(parts_5["te"][1]))
+        self.assertEqual({}, parts_6)
 
     def test_generate(self):
         parser = ConlluUDParser()
