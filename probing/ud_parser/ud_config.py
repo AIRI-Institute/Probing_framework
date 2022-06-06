@@ -12,7 +12,7 @@ ud_categories: List[Enum] = [
 ]
 
 partitions_by_files: Dict[str, List[List[float]]] = {
-    "one_file": [[0.8], [0.1], [0.1]],
-    "two_files": [[1.0], [0.5], [0.5]],
+    "one_file": [[0.8, 0.1, 0.1]],
+    "two_files": [[1.0], [0.5, 0.5]],
     "three_files": [[1.0], [1.0], [1.0]]
     }

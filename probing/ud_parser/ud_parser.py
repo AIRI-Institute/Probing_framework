@@ -133,8 +133,8 @@ class ConlluUDParser:
         self,
         conllu: os.PathLike,
         category: Enum,
-        splits: List[Enum] = None,
-        partitions: List[float] = [0.8, 0.1, 0.1],
+        splits: List[Enum],
+        partitions: List[float],
         random_seed: int = 42
     ) -> Dict:
         """
@@ -152,15 +152,15 @@ class ConlluUDParser:
         num_categories = len(classified_sentences)
         if num_categories < 2:
             logging.warning(f"Category {category} has one value")
-            parts = {}
+            return {}
+
+        data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_categories for v in value]
+        if len(splits) == 1:
+            parts = {splits[0]: list(zip(*data))}
+        elif data:
+            parts = self.subsamples_split(data, partitions, random_seed, splits)
         else:
-            data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_categories for v in value]
-            if len(splits) == 1:
-                parts = {splits[0]: list(zip(*data))}
-            elif data:
-                parts = self.subsamples_split(data, partitions, random_seed, splits)
-            else:
-                parts = {}
+            parts = {}
         return parts
 
     def writer(self, result_path: os.PathLike, partition_sets: Dict):
@@ -238,7 +238,7 @@ class ConlluUDParser:
     def generate_(
         self,
         paths: List[os.PathLike],
-        splits: List[List[Enum]] = [["tr"], ["va"], ["te"]],
+        splits: List[List[Enum]] = None,
         partitions: List[List[float]] = None
     ) -> None:
         """
@@ -295,18 +295,21 @@ class ConlluUDParser:
             if len(known_paths) == 1:
                 self.generate_(
                     paths=[tr_path],
-                    partitions=partitions_by_files["one_file"]
+                    partitions=partitions_by_files["one_file"],
+                    splits = [["tr", "va", "te"]]
                 )
             elif len(known_paths) == 2:
                 second_path = te_path if te_path is not None else va_path
                 self.generate_(
                     paths=[tr_path, second_path],
-                    partitions=partitions_by_files["two_files"]
+                    partitions=partitions_by_files["two_files"],
+                    splits = [["tr"], ["va", "te"]]
                 )
             elif len(known_paths) == 3:
                 self.generate_(
                     paths=[tr_path, va_path, te_path],
-                    partitions=partitions_by_files["three_files"]
+                    partitions=partitions_by_files["three_files"],
+                    splits = [["tr"], ["va"], ["te"]]
                 )
             else:
                 raise NotImplementedError(f"Too much files. You provided {len(known_paths)} files")
