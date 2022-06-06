@@ -149,18 +149,25 @@ class ConlluUDParser:
         """
         sentences = parse_tree(conllu)
         classified_sentences = self.classify(sentences, category)
-        num_categories = len(classified_sentences)
-        if num_categories < 2:
-            logging.warning(f"Category {category} has one value")
+        num_classes = len(classified_sentences)
+        if num_classes == 1:
+            logging.warning(f"Category {category} has one class value")
+            return {}
+        elif num_classes == 0:
+            logging.warning(f"This file does not contain examples for category {category}")
             return {}
 
-        data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_categories for v in value]
         if len(splits) == 1:
+            data = [(v, key) for key, value in classified_sentences.items() for v in value]
             parts = {splits[0]: list(zip(*data))}
-        elif data:
+            return parts
+
+        data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_classes for v in value]
+        if data:
             parts = self.subsamples_split(data, partitions, random_seed, splits)
         else:
             parts = {}
+            logging.warning(f"Not enough data of category {category} for stratified split")
         return parts
 
     def writer(self, result_path: os.PathLike, partition_sets: Dict):
@@ -185,17 +192,13 @@ class ConlluUDParser:
             parts: train, val and test sets
             category: a grammatical value
         """
-        if not all(parts.values()):
-            logging.warning(f'One of the files does not contain examples for {category} \n')
-        elif 'tr' in parts and 'va' in parts and 'te' in parts:
+        if len(parts) == 3:
             if set(parts['tr'][1]) != set(parts['va'][1]):
                 logging.warning("The number of category meanings is different in train and validation parts.")
             elif set(parts['tr'][1]) != set(parts['te'][1]):
                 logging.warning("The number of category meanings is different in train and test parts.")
             save_path_file = Path(self.save_path_dir.absolute(), f'{self.language}_{category}.csv')
             self.writer(save_path_file, parts)
-        else:
-            logging.warning(f'There are no examples for {category} in this language \n')
         return None
     
     def find_categories(self, text_data: str) -> List[Enum]:
