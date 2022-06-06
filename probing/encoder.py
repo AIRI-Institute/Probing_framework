@@ -19,7 +19,7 @@ class TransformersLoader:
         self.config = AutoConfig.from_pretrained(
             model_name, output_hidden_states=output_hidden_states, 
             output_attentions=output_attentions
-        )
+            )
         self.model = AutoModel.from_pretrained(
             model_name, config=self.config
             )
