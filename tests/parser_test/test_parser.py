@@ -45,14 +45,14 @@ class TestUDParser(unittest.TestCase):
         parser.language = "russian"
         with self.assertLogs('', 'DEBUG') as experiment_2:
             parser.check(set_2, category)
-        log_2 = "The number of category \"meanings\" is different in train and validation parts."
+        log_2 = f"The classes in train and validation parts are different for category \"{category}\""
 
         set_3 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a", "b"]],
                  "te": [[1, 2], ["a"]], }
         with self.assertLogs('', 'DEBUG') as experiment_3:
             parser.check(set_3, category)
-        log_3 = "The number of category \"meanings\" is different in train and test parts."
+        log_3 = f"The classes in train and test parts are different for category \"{category}\""
 
         self.assertIn(log_2, experiment_2.output[0])
         self.assertIn(log_3, experiment_3.output[0])

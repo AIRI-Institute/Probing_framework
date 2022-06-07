@@ -192,10 +192,13 @@ class ConlluUDParser:
             category: a grammatical value
         """
         if len(parts) == 3:
-            if set(parts['tr'][1]) != set(parts['va'][1]):
-                logging.warning("The number of category \"meanings\" is different in train and validation parts.")
-            elif set(parts['tr'][1]) != set(parts['te'][1]):
-                logging.warning("The number of category \"meanings\" is different in train and test parts.")
+            tr_categories_set = set(parts['tr'][1])
+            val_categories_set = set(parts['va'][1])
+            te_categories_set = set(parts['te'][1])
+            if tr_categories_set != val_categories_set:
+                logging.warning(f"The classes in train and validation parts are different for category \"{category}\".")
+            elif val_categories_set != te_categories_set:
+                logging.warning(f"The classes in train and test parts are different for category \"{category}\".")
             save_path_file = Path(self.save_path_dir.resolve(), f'{self.language}_{category}.csv')
             self.writer(save_path_file, parts)
         return None
