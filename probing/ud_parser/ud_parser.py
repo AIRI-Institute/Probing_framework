@@ -23,7 +23,6 @@ class ConlluUDParser:
     ):
         self.shuffle = shuffle
 
-
     def read(self, path: str) -> str:
         """
         Reads a file
