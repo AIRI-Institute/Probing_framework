@@ -16,3 +16,5 @@ partitions_by_files: Dict[str, List[List[float]]] = {
     "two_files": [[1.0], [0.5, 0.5]],
     "three_files": [[1.0], [1.0], [1.0]]
     }
+
+too_much_files_err_str = "Too much files. You provided \"{}\" files"
