@@ -21,7 +21,7 @@ class ProbingPipeline:
         probing_type: Enum,
         hf_model_name: Enum,
         device: Optional[Enum] = None,
-        classifier_name: Enum = "mlp",
+        classifier_name: Enum = "logreg",
         metric_name: Enum = "accuracy",
         embedding_type: Enum = "cls",
         batch_size: Optional[int] = 128,

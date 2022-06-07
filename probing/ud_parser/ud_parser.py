@@ -228,7 +228,11 @@ class ConlluUDParser:
             return ud_file_path.stem.split('-')[0]
         return language
     
-    def __determine_ud_savepath(self, path_from_files: os.PathLike, save_path_dir: os.PathLike):
+    def __determine_ud_savepath(
+        self,
+        path_from_files: os.PathLike,
+        save_path_dir: os.PathLike
+    ) -> os.PathLike:
         final_path = None
         if not save_path_dir:
             final_path = path_from_files
@@ -271,11 +275,11 @@ class ConlluUDParser:
 
     def process_paths(
         self,
-        tr_path: os.PathLike=None,
-        va_path: os.PathLike=None,
-        te_path: os.PathLike=None,
-        language: str=None,
-        save_path_dir: Optional[os.PathLike]=None
+        tr_path: os.PathLike = None,
+        va_path: os.PathLike = None,
+        te_path: os.PathLike = None,
+        language: str = None,
+        save_path_dir: Optional[os.PathLike] = None
     ) -> None:
         known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
         assert len(known_paths) > 0, "None paths were provided."
