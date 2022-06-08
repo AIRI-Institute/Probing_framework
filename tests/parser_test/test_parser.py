@@ -45,17 +45,17 @@ class TestUDParser(unittest.TestCase):
         parser.language = "russian"
         with self.assertLogs('', 'DEBUG') as experiment_2:
             parser.check(set_2, category)
-        log_2 = "WARNING:root:The number of category meanings is different in train and validation parts."
+        log_2 = f"The classes in train and validation parts are different for category \"{category}\""
 
         set_3 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a", "b"]],
                  "te": [[1, 2], ["a"]], }
         with self.assertLogs('', 'DEBUG') as experiment_3:
             parser.check(set_3, category)
-        log_3 = "WARNING:root:The number of category meanings is different in train and test parts."
+        log_3 = f"The classes in train and test parts are different for category \"{category}\""
 
-        self.assertEqual(log_2, experiment_2.output[0])
-        self.assertEqual(log_3, experiment_3.output[0])
+        self.assertIn(log_2, experiment_2.output[0])
+        self.assertIn(log_3, experiment_3.output[0])
         os.remove(f"{parser.language}_{category}.csv")
 
     def test_writer(self):
@@ -104,7 +104,7 @@ class TestUDParser(unittest.TestCase):
 
     def test_generate_probing_file(self):
         parser = ConlluUDParser()
-        log_1 = "WARNING:root:Category Degree has one class value"
+        log_1 = "Category \"Degree\" has only one class."
         with self.assertLogs("", "DEBUG") as experiment_1:
             parts_1 = parser.generate_probing_file(self.text_testfile1, "Degree",
                                                    splits=["tr", "va", "te"],
@@ -113,12 +113,12 @@ class TestUDParser(unittest.TestCase):
         parts_2 = parser.generate_probing_file(self.text_testfile1, "Number",
                                                splits=["tr"], partitions=[1.0])
 
-        log_2 = "WARNING:root:Not enough data of category Voice for stratified split"
+        log_2 = "Not enough data of category \"Voice\" for stratified split."
         with self.assertLogs("", "DEBUG") as experiment_2:
             parts_3 = parser.generate_probing_file(self.text_testfile2, "Voice",
                                                splits=["tr", "va", "te"], partitions=[0.8, 0.1, 0.1])
 
-        log_3 = "WARNING:root:This file does not contain examples for category Number"
+        log_3 = "This file does not contain examples of category \"Number\"."
         with self.assertLogs('', 'DEBUG') as experiment_3:
             parts_4 = parser.generate_probing_file(self.text_testfile2, "Number",
                                                splits=["tr", "va", "te"], partitions=[0.8, 0.1, 0.1])
@@ -130,13 +130,13 @@ class TestUDParser(unittest.TestCase):
         parts_6 = parser.generate_probing_file(self.text_testfile2, "Number",
                                                splits=["va", "te"], partitions=[0.5, 0.5])
 
-        self.assertEqual(log_1, experiment_1.output[0])
+        self.assertIn(log_1, experiment_1.output[0])
         self.assertEqual({}, parts_1)
         self.assertEqual(6, len(parts_2["tr"][0]))
-        self.assertEqual(log_2, experiment_2.output[0])
+        self.assertIn(log_2, experiment_2.output[0])
         self.assertEqual({}, parts_3)
         self.assertEqual({}, parts_4)
-        self.assertEqual(log_3, experiment_3.output[0])
+        self.assertIn(log_3, experiment_3.output[0])
         self.assertEqual(set(cases), set(parts_5["te"][1]))
         self.assertEqual({}, parts_6)
 
