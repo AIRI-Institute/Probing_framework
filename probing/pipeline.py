@@ -177,5 +177,5 @@ class ProbingPipeline:
 
         output_path = save_log(self.log_info, probe_task)
         if verbose:
-            print("Experiments were saved in the folder: ", output_path)
+            print(f"Experiments were saved in the folder: {output_path}")
             print('=' * 100)
