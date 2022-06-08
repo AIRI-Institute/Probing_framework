@@ -13,14 +13,15 @@ from conllu.models import TokenTree, Token
 from sklearn.model_selection import train_test_split
 from nltk.tokenize import wordpunct_tokenize
 
+from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str
 
-class Splitter:
+
+class ConlluUDParser:
     def __init__(
         self,
         shuffle: bool = True
     ):
         self.shuffle = shuffle
-
 
     def read(self, path: str) -> str:
         """
@@ -53,7 +54,6 @@ class Splitter:
             result = self.find_category_token(category, token_info, token.children)
             if result:
                 return result
-                
         return None
 
     def classify(
@@ -132,8 +132,8 @@ class Splitter:
         self,
         conllu: os.PathLike,
         category: Enum,
-        splits: List[Enum] = None,
-        partitions: List[float] = [0.8, 0.1, 0.1],
+        splits: List[Enum],
+        partitions: List[float],
         random_seed: int = 42
     ) -> Dict:
         """
@@ -148,27 +148,25 @@ class Splitter:
         """
         sentences = parse_tree(conllu)
         classified_sentences = self.classify(sentences, category)
-        if len(classified_sentences) == 0:
-            parts = {}
-        elif fsum(partitions) != 1:
-            raise ValueError('the sum of the parts must equal 1')
-        elif len(splits) == 1:
-            data = {key: value for key, value in classified_sentences.items() if len(value) > 1}
-            data = [(v, key) for key, value in data.items() for v in value]
+        num_classes = len(classified_sentences)
+        if num_classes == 1:
+            logging.warning(f"Category \"{category}\" has only one class.")
+            return {}
+        elif num_classes == 0:
+            logging.warning(f"This file does not contain examples of category \"{category}\".")
+            return {}
+
+        if len(splits) == 1:
+            data = [(v, key) for key, value in classified_sentences.items() for v in value]
             parts = {splits[0]: list(zip(*data))}
+            return parts
+
+        data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_classes for v in value]
+        if data:
+            parts = self.subsamples_split(data, partitions, random_seed, splits)
         else:
-            data = {key: value for key, value in classified_sentences.items() if len(value) > 1}
-            min_value = min([len(value) for value in data.values()], default=0)
-            if data and min_value > len(data.keys()) and len(data.keys()) > 1:
-                data = [(v, key) for key, value in data.items() for v in value]
-                parts = self.subsamples_split(
-                    data, partitions,
-                    random_seed, splits
-                )
-            else:
-                if len(data.keys()) == 1:
-                    logging.warn(f"Category {category} has one value")
-                parts = {}
+            parts = {}
+            logging.warning(f"Not enough data of category \"{category}\" for stratified split.")
         return parts
 
     def writer(self, result_path: os.PathLike, partition_sets: Dict):
@@ -193,17 +191,16 @@ class Splitter:
             parts: train, val and test sets
             category: a grammatical value
         """
-        if not all(parts.values()):
-            logging.warn(f'One of the files does not contain examples for {category} \n')
-        elif 'tr' in parts and 'va' in parts and 'te' in parts:
-            if set(parts['tr'][1]) != set(parts['va'][1]):
-                logging.warn("The number of category meanings is different in train and validation parts.")
-            elif set(parts['tr'][1]) != set(parts['te'][1]):
-                logging.warn("The number of category meanings is different in train and test parts.")
-            save_path_file = Path(self.save_path_dir.absolute(), f'{self.language}{category}.csv')
+        if len(parts) == 3:
+            tr_categories_set = set(parts['tr'][1])
+            val_categories_set = set(parts['va'][1])
+            te_categories_set = set(parts['te'][1])
+            if tr_categories_set != val_categories_set:
+                logging.warning(f"The classes in train and validation parts are different for category \"{category}\".")
+            elif val_categories_set != te_categories_set:
+                logging.warning(f"The classes in train and test parts are different for category \"{category}\".")
+            save_path_file = Path(self.save_path_dir.resolve(), f'{self.language}_{category}.csv')
             self.writer(save_path_file, parts)
-        else:
-            logging.warn(f'There are no examples for {category} in this language \n')
         return None
     
     def find_categories(self, text_data: str) -> List[Enum]:
@@ -231,10 +228,14 @@ class Splitter:
 
     def __extract_lang_from_udfile(self, ud_file_path: Path, language: str) -> str:
         if not language:
-            return ud_file_path.stem.split('-')[0] + "_"
+            return ud_file_path.stem.split('-')[0]
         return language
     
-    def __determine_ud_savepath(self, path_from_files: os.PathLike, save_path_dir: os.PathLike):
+    def __determine_ud_savepath(
+        self,
+        path_from_files: os.PathLike,
+        save_path_dir: os.PathLike
+    ) -> os.PathLike:
         final_path = None
         if not save_path_dir:
             final_path = path_from_files
@@ -246,31 +247,70 @@ class Splitter:
     def generate_(
         self,
         paths: List[os.PathLike],
-        splits: List[Enum] = None,
-        partitions: List[float] = None
+        splits: List[List[Enum]] = None,
+        partitions: List[List[float]] = None
     ) -> None:
         """
         Generates files for all categories
         Args:
             paths: files with data in CONLLU format
             splits: the way how the data should be split
-            portions: the percentage of different splits
+            partitions: the percentage of different splits
         """
         texts = [self.read(p) for p in paths]
         categories = self.find_categories("\n".join(texts))
+        data = defaultdict(dict)
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
-            logging.warn(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
+            logging.warning(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
 
         for category in categories:
             parts = {}
-            for text, split, portion in zip(texts, splits, partitions):
+            for text, split, partion in zip(texts, splits, partitions):
                 part = self.generate_probing_file(
                     conllu=text, splits=split,
-                    partitions=portion, category=category
+                    partitions=partion, category=category
                 )
                 parts.update(part)
             self.check(parts, category)
+            data[category] = parts
+        return data
+
+    def process_paths(
+        self,
+        tr_path: os.PathLike = None,
+        va_path: os.PathLike = None,
+        te_path: os.PathLike = None,
+        language: str = None,
+        save_path_dir: Optional[os.PathLike] = None
+    ) -> None:
+        known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
+        assert len(known_paths) > 0, "None paths were provided."
+        assert tr_path is not None, "At least the path to train data should be provided."
+        self.language = self.__extract_lang_from_udfile(known_paths[0], language)
+        self.save_path_dir = self.__determine_ud_savepath(known_paths[0].parent, save_path_dir)
+
+        if len(known_paths) == 1:
+            self.generate_(
+                paths=[tr_path],
+                partitions=partitions_by_files["one_file"],
+                splits = [["tr", "va", "te"]]
+            )
+        elif len(known_paths) == 2:
+            second_path = te_path if te_path is not None else va_path
+            self.generate_(
+                paths=[tr_path, second_path],
+                partitions=partitions_by_files["two_files"],
+                splits = [["tr"], ["va", "te"]]
+            )
+        elif len(known_paths) == 3:
+            self.generate_(
+                paths=[tr_path, va_path, te_path],
+                partitions=partitions_by_files["three_files"],
+                splits = [["tr"], ["va"], ["te"]]
+            )
+        else:
+            raise NotImplementedError(too_much_files_err_str.format(len(known_paths)))
 
     def convert(
         self,
@@ -289,41 +329,15 @@ class Splitter:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
-        dir_conllu_path = Path(dir_conllu_path).absolute() if dir_conllu_path is not None else None
+        dir_conllu_path = Path(dir_conllu_path).resolve() if dir_conllu_path is not None else None
         if dir_conllu_path is None:
-            known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
-            assert len(known_paths) > 0
-            assert tr_path is not None, "At least path to train data should be passed."
-            self.language = self.__extract_lang_from_udfile(known_paths[0], language)
-            self.save_path_dir = self.__determine_ud_savepath(known_paths[0].parent, save_path_dir)
-
-            if len(known_paths) == 1:
-                self.generate_(
-                    [tr_path],
-                    (["tr", "va", "te"], ),
-                    ([0.8, 0.1, 0.1], )
-                )
-            elif len(known_paths) == 2:
-                second_path = te_path if te_path is not None else va_path
-                self.generate_(
-                    [tr_path, second_path],
-                    (["tr"], ["va", "te"], ),
-                    ([1.0], [0.5, 0.5], )
-                )
-            elif len(known_paths) == 3:
-                self.generate_(
-                    [tr_path, va_path, te_path],
-                    (["tr"], ["va"], ["te"], ),
-                    ([1.0], [1.0], [1.0],)
-                )
-            else:
-                raise NotImplementedError(f"Too much files. You provided {len(known_paths)} files")
+            self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
         else:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
             assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
+            assert len(paths) <= 3, too_much_files_err_str.format(len(paths))
 
             self.language = self.__extract_lang_from_udfile(paths[0], language)
             self.save_path_dir = self.__determine_ud_savepath(dir_conllu_path, save_path_dir)
 
-            assert len(paths) <= 3, f"Too much files. You provided {len(paths)} files"
-            return self.convert(*paths, language = self.language, save_path_dir = self.save_path_dir)
+            self.process_paths(*paths, language=self.language, save_path_dir=self.save_path_dir)
