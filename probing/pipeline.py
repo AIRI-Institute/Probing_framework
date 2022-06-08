@@ -24,7 +24,7 @@ class ProbingPipeline:
         classifier_name: Enum = "logreg",
         metric_name: Enum = "accuracy",
         embedding_type: Enum = "cls",
-        batch_size: Optional[int] = 128,
+        batch_size: Optional[int] = 64,
         dropout_rate: float = 0.2,
         num_hidden: int = 256,
         shuffle: bool = False
@@ -149,6 +149,7 @@ class ProbingPipeline:
 
         if verbose:
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
+            print("Data encoding.")
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size)
@@ -178,3 +179,4 @@ class ProbingPipeline:
         output_path = save_log(self.log_info, probe_task)
         if verbose:
             print("Experiments were saved in the folder: ", output_path)
+            print('=' * 100)

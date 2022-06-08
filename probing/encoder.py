@@ -14,7 +14,9 @@ class TransformersLoader:
         add_special_tokens: bool = True,
         return_dict: bool = True,
         output_hidden_states: bool = True,
-        output_attentions: bool = True
+        output_attentions: bool = True,
+        max_length: int = 512,
+        truncation: bool = True
     ):
         self.config = AutoConfig.from_pretrained(
             model_name, output_hidden_states=output_hidden_states, 
@@ -31,6 +33,8 @@ class TransformersLoader:
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
+        self.max_length = max_length
+        self.truncation = truncation
 
         if device:
             self.device = device
@@ -52,7 +56,9 @@ class TransformersLoader:
                 text,
                 padding=self.padding,
                 return_tensors=self.return_tensors,
-                add_special_tokens = self.add_special_tokens
+                add_special_tokens = self.add_special_tokens,
+                max_length = self.max_length,
+                truncation = self.truncation
                 )
         except:
             raise NotImplementedError(f"Something went wrong for model \"{self.config._name_or_path}\" during data processing.")
