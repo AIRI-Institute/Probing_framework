@@ -104,7 +104,7 @@ class ConlluUDParser:
             return {split[0]: [X_train, y_train], split[1]: [X_test, y_test]}
 
         label = [y for y, count in zip(*np.unique(y_test, return_counts=True)) if count > 1]
-        if not label:
+        if label:
             X_train = X_train[np.isin(y_train, label)]
             y_train = y_train[np.isin(y_train, label)]
             X_test = X_test[np.isin(y_test, label)]
