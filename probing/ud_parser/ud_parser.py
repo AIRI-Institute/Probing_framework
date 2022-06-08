@@ -93,7 +93,6 @@ class ConlluUDParser:
             all the sentences they are found in
             partition: a relation that sentences should be split in
             random_seed: random seed for spliting
-            shuffle: if sentences should be randomly shuffled
             split: parts that data should be split to
         """
         data, labels = map(np.array, zip(*probing_data))
@@ -102,12 +101,10 @@ class ConlluUDParser:
             shuffle=self.shuffle, random_state=random_seed
         )
         if len(partition) == 2:
-            parts = {
-                split[0]: [X_train, y_train],
-                split[1]: [X_test, y_test]
-            }
-        else:
-            label = [y for y, count in zip(*np.unique(y_test, return_counts=True)) if count > 1]
+            return {split[0]: [X_train, y_train], split[1]: [X_test, y_test]}
+
+        label = [y for y, count in zip(*np.unique(y_test, return_counts=True)) if count > 1]
+        if not label:
             X_train = X_train[np.isin(y_train, label)]
             y_train = y_train[np.isin(y_train, label)]
             X_test = X_test[np.isin(y_test, label)]
@@ -115,19 +112,15 @@ class ConlluUDParser:
 
             val_size = partition[1] / (1 - partition[0])
 
-            if y_test.size != 0:
-                X_val, X_test, y_val, y_test = train_test_split(
+            X_val, X_test, y_val, y_test = train_test_split(
                     X_test, y_test, stratify=y_test, train_size=val_size,
-                    shuffle=self.shuffle, random_state=random_seed
-                )
-                parts = {
-                    split[0]: [X_train, y_train],
-                    split[1]: [X_test, y_test],
-                    split[2]: [X_val, y_val]
-                }
-            else:
-                parts = {}
-        return parts
+                    shuffle=self.shuffle, random_state=random_seed)
+
+            return {split[0]: [X_train, y_train],
+                    split[1]: [X_val, y_val],
+                    split[2]: [X_test, y_test]}
+
+        return {}
 
     def generate_probing_file(
         self,
@@ -150,12 +143,14 @@ class ConlluUDParser:
         sentences = parse_tree(conllu)
         classified_sentences = self.classify(sentences, category)
         num_classes = len(classified_sentences)
+
         if num_classes == 1:
             logging.warning(f"Category {category} has one class value")
             return {}
         elif num_classes == 0:
             logging.warning(f"This file does not contain examples for category {category}")
             return {}
+
 
         if len(splits) == 1:
             data = [(v, key) for key, value in classified_sentences.items() for v in value]
