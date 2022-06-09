@@ -22,19 +22,19 @@ class MLP(torch.nn.Module):
         self,
         input_dim: int,
         num_classes: int,
-        num_hidden: int,
+        hidden_size: int,
         dropout_rate: float
     ):
         super(MLP, self).__init__()
         self.input_dim = input_dim
-        self.num_hidden = num_hidden
+        self.hidden_size = hidden_size
         self.num_classes = num_classes
         self.dropout_rate = dropout_rate
 
-        self.fc1 = torch.nn.Linear(self.input_dim, self.num_hidden)
+        self.fc1 = torch.nn.Linear(self.input_dim, self.hidden_size)
         self.dropout = torch.nn.Dropout(self.dropout_rate)
         self.activation = torch.nn.Sigmoid()
-        self.fc2 = torch.nn.Linear(self.num_hidden, self.num_classes)
+        self.fc2 = torch.nn.Linear(self.hidden_size, self.num_classes)
 
     def forward(self, x: torch.Tensor):
         x = self.fc1(x)

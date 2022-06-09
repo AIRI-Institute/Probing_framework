@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
+from pathlib import Path
 from collections import Counter
 import os
 import glob
@@ -60,3 +61,12 @@ def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum
         class_labels_all = [i[1] for i in samples[class_name]]
         ratio_by_classes[class_name] = dict(Counter(class_labels_all))
     return ratio_by_classes
+
+def lang_category_extraction(file_path: os.PathLike) -> Tuple[Optional[str], Optional[str]]:
+    if '_' in file_path:   
+        path = str(Path(file_path).stem)           
+        task_language = path.split('_')[0]
+        task_category = path.split('_')[-1]
+    else:
+        task_language, task_category = None, None
+    return task_language, task_category
