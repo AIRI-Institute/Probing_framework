@@ -4,7 +4,6 @@ import os
 from tqdm.notebook import trange
 import numpy as np
 import torch
-from pathlib import Path
 from collections import defaultdict
 from torch.utils.data import DataLoader
 
@@ -12,7 +11,7 @@ from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import save_log, get_ratio_by_classes
+from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction
 
 
 class ProbingPipeline:
@@ -26,7 +25,7 @@ class ProbingPipeline:
         embedding_type: Enum = "cls",
         batch_size: Optional[int] = 64,
         dropout_rate: float = 0.2,
-        num_hidden: int = 256,
+        hidden_size: int = 256,
         shuffle: bool = False
     ):
         self.hf_model_name = hf_model_name
@@ -34,7 +33,7 @@ class ProbingPipeline:
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.dropout_rate = dropout_rate
-        self.num_hidden = num_hidden
+        self.hidden_size = hidden_size
         self.classifier_name = classifier_name
         self.metric_name = metric_name
         self.embedding_type = embedding_type
@@ -46,9 +45,9 @@ class ProbingPipeline:
     def get_classifier(
         self,
         classifier_name: Enum,
-        num_classes: int
+        num_classes: int,
+        embed_dim: int
     ) -> Callable:
-        embed_dim = self.transformer_model.config.hidden_size
         if classifier_name == "logreg":
             return LogReg(
                 input_dim = embed_dim,
@@ -58,7 +57,7 @@ class ProbingPipeline:
             return MLP(
                 input_dim = embed_dim,
                 num_classes = num_classes,
-                num_hidden =  self.num_hidden,
+                hidden_size =  self.hidden_size,
                 dropout_rate = self.dropout_rate
                 ).to(self.device)
         else:
@@ -126,16 +125,9 @@ class ProbingPipeline:
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
         task_data = DataFormer(probe_task, path_to_task_file)
-        task_dataset = task_data.samples
-        num_classes = task_data.num_classes
+        task_dataset, num_classes = task_data.samples, task_data.num_classes
         path_to_file_for_probing = task_data.data_path
-
-        if '_' in path_to_file_for_probing:   
-            path = str(Path(path_to_file_for_probing).stem)           
-            task_language = path.split('_')[0]
-            task_category = path.split('_')[-1]
-        else:
-            task_language, task_category = None, None
+        task_language, task_category = lang_category_extraction(path_to_file_for_probing)
 
         self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         self.log_info['params']['probing_task'] = probe_task
@@ -160,7 +152,7 @@ class ProbingPipeline:
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         for layer in probing_iter_range:
-            self.classifier = self.get_classifier(self.classifier_name, num_classes)
+            self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = torch.optim.AdamW(self.classifier.parameters())
 
