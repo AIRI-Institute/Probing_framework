@@ -17,7 +17,7 @@ def main(
     classifier_name: Enum = "mlp",
     metric_name: Enum = "accuracy",
     embedding_type: Enum = "cls",
-    batch_size: Optional[int] = 128,
+    batch_size: Optional[int] = 64,
     dropout_rate: float = 0.2,
     num_hidden: int = 250,
     shuffle: bool = True,
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=128,
+        default=64,
         help="Batch size."
     )
 

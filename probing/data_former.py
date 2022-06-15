@@ -53,7 +53,7 @@ class EncodeLoader:
         self,
         list_texts_labels: List[Tuple[str, Enum]],
         encode_func,
-        batch_size: int = 128,
+        batch_size: int = 64,
         drop_last: bool = False,
         shuffle: bool = True
     ):  
