@@ -1,5 +1,4 @@
-torch==1.7.1
-sklearn==1.0.2
+sklearn
 transformers==4.11.3
-fire==1.16.0
-pytest
+fire
+conllu

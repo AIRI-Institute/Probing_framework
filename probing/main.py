@@ -17,10 +17,11 @@ def main(
     classifier_name: Enum = "mlp",
     metric_name: Enum = "accuracy",
     embedding_type: Enum = "cls",
-    batch_size: Optional[int] = 128,
+    batch_size: Optional[int] = 64,
     dropout_rate: float = 0.2,
     num_hidden: int = 250,
-    shuffle: bool = False
+    shuffle: bool = True,
+    truncation: bool = False
 ):
     experiment = ProbingPipeline(
         probing_type,
@@ -32,7 +33,8 @@ def main(
         batch_size,
         dropout_rate,
         num_hidden,
-        shuffle
+        shuffle,
+        truncation
     )
 
     experiment.run(
@@ -105,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=128,
+        default=64,
         help="Batch size."
     )
 
@@ -133,7 +135,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--shuffle',
         type=bool,
-        default=False,
+        default=True,
         help="Whether or not to apply the shuffling for the data during train, val, test parts."
     )
 
@@ -142,6 +144,13 @@ if __name__ == "__main__":
         type=bool,
         default=False,
         help="Save model\'s checkpoints at each epoch or do not."
+    )
+
+    parser.add_argument(
+        '--truncation',
+        type=bool,
+        default=False,
+        help="Truncate or exclude long sentences."
     )
 
     args = parser.parse_args()
@@ -159,5 +168,5 @@ if __name__ == "__main__":
         args.batch_size,
         args.dropout_rate,
         args.num_hidden,
-        args.shuffle 
+        args.shuffle
     )

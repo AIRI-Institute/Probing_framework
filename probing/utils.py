@@ -5,6 +5,7 @@ from collections import Counter
 import os
 import glob
 import pathlib
+import torch
 import numpy as np
 import json
 from datetime import datetime
@@ -70,3 +71,18 @@ def lang_category_extraction(file_path: os.PathLike) -> Tuple[Optional[str], Opt
     else:
         task_language, task_category = None, None
     return task_language, task_category
+
+
+def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tensor:
+    if len(tensor.size()) == 1:
+        tensor = tensor.view(-1,1)
+
+    tensor_shape = tensor.size()
+    assert len(tensor_shape) == 2
+    tensor = tensor.view(*tensor_shape,1)
+
+    mask = torch.ones(tensor_shape, dtype=torch.bool)
+    mask[rows_to_exclude, :] = False
+    new_num_rows = tensor_shape[0] - len(rows_to_exclude)
+    output = tensor[mask].view(new_num_rows, -1)
+    return output
