@@ -32,7 +32,7 @@ class TransformersLoader:
             model_name, config=self.config
             )
 
-        self.truncation = truncation
+        self.truncation = truncation 
         self.padding = padding
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
@@ -64,7 +64,7 @@ class TransformersLoader:
             logging.warning(f"Since you decided not to truncate long sentences, {len(row_ids_to_exclude)} samples were excluded.")
         return input_ids.to(self.device), attention_mask.to(self.device), row_ids_to_exclude
 
-    def _get_embeddings_by_layers(self, model_outputs, embedding_type: Enum):
+    def _get_embeddings_by_layers(self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum):
         layers_outputs = []
         for output in model_outputs[1:]:
             if embedding_type == 'cls':

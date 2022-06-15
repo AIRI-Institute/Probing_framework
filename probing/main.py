@@ -20,7 +20,8 @@ def main(
     batch_size: Optional[int] = 128,
     dropout_rate: float = 0.2,
     num_hidden: int = 250,
-    shuffle: bool = True
+    shuffle: bool = True,
+    truncation: bool = False
 ):
     experiment = ProbingPipeline(
         probing_type,
@@ -32,7 +33,8 @@ def main(
         batch_size,
         dropout_rate,
         num_hidden,
-        shuffle
+        shuffle,
+        truncation
     )
 
     experiment.run(
