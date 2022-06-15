@@ -143,7 +143,7 @@ class ProbingPipeline:
         self.log_info['params']['hf_model_name'] = self.hf_model_name
         self.log_info['params']['classifier_name'] = self.classifier_name
         self.log_info['params']['metric_name'] = self.metric_name
-        self.log_info['params']['classes_ratio'] = get_ratio_by_classes(task_dataset)
+        self.log_info['params']['original_classes_ratio'] = get_ratio_by_classes(task_dataset)
 
         if verbose:
             print('=' * 100)
