@@ -20,7 +20,7 @@ def main(
     batch_size: Optional[int] = 128,
     dropout_rate: float = 0.2,
     num_hidden: int = 250,
-    shuffle: bool = False
+    shuffle: bool = True
 ):
     experiment = ProbingPipeline(
         probing_type,
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--shuffle',
         type=bool,
-        default=False,
+        default=True,
         help="Whether or not to apply the shuffling for the data during train, val, test parts."
     )
 
@@ -142,6 +142,13 @@ if __name__ == "__main__":
         type=bool,
         default=False,
         help="Save model\'s checkpoints at each epoch or do not."
+    )
+
+    parser.add_argument(
+        '--truncation',
+        type=bool,
+        default=False,
+        help="Truncate or exclude long sentences."
     )
 
     args = parser.parse_args()
@@ -159,5 +166,5 @@ if __name__ == "__main__":
         args.batch_size,
         args.dropout_rate,
         args.num_hidden,
-        args.shuffle 
+        args.shuffle
     )

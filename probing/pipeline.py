@@ -26,7 +26,8 @@ class ProbingPipeline:
         batch_size: Optional[int] = 64,
         dropout_rate: float = 0.2,
         hidden_size: int = 256,
-        shuffle: bool = False
+        shuffle: bool = True,
+        truncation: bool = False
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
@@ -39,7 +40,11 @@ class ProbingPipeline:
         self.embedding_type = embedding_type
 
         self.metric = Metric(metric_name)
-        self.transformer_model = TransformersLoader(hf_model_name, device)
+        self.transformer_model = TransformersLoader(
+            model_name = hf_model_name,
+            device = device,
+            truncation = truncation
+            )
         self.device = self.transformer_model.device
 
     def get_classifier(
@@ -144,9 +149,9 @@ class ProbingPipeline:
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
-        train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size)
-        val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size)
-        test = EncodeLoader(task_dataset["te"], encode_func, self.batch_size)
+        train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size, shuffle = self.shuffle)
+        val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size, shuffle = self.shuffle)
+        test = EncodeLoader(task_dataset["te"], encode_func, self.batch_size, shuffle = self.shuffle)
         self.log_info['params']['encoded_labels'] = train.encoded_labels
         self.log_info['params']['classes_ratio'] = get_ratio_by_classes(task_dataset)
 

@@ -4,9 +4,10 @@ import os
 from tqdm.notebook import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.data import BatchSampler
+import torch
 from sklearn import preprocessing
 
-from probing.utils import get_probe_task_path
+from probing.utils import get_probe_task_path, exclude_rows
 
 
 class DataFormer:
@@ -48,7 +49,7 @@ class EncodeLoader:
         encode_func,
         batch_size: int=128,
         drop_last: bool=False,
-        shuffle: bool=False
+        shuffle: bool=True
     ):  
         self.encode_func = encode_func
         self.list_texts_labels = list_texts_labels
@@ -92,8 +93,9 @@ class EncodeLoader:
             total = len(sampled_texts),
             desc='Data encoding'
         ):
-            encoded_batch_text = self.encode_func(batch_text)
-            dataset.append((encoded_batch_text, batch_label))
+            encoded_batch_text, row_ids_to_exclude = self.encode_func(batch_text)
+            fixed_labels = exclude_rows(torch.tensor(batch_label), row_ids_to_exclude).view(-1).tolist()
+            dataset.append((encoded_batch_text, fixed_labels))
 
         return DataLoader(
             dataset=dataset,
