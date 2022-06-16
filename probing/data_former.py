@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple, Dict, Optional, List, Union
+from typing import Tuple, Dict, Optional, List, Union, Callable
 import os
 from tqdm.notebook import tqdm
 from torch.utils.data import DataLoader
@@ -53,7 +53,7 @@ class EncodeLoader:
     def __init__(
         self,
         list_texts_labels: List[Tuple[str, Enum]],
-        encode_func,
+        encode_func: Callable,
         batch_size: int = 64,
         drop_last: bool = False,
         shuffle: bool = True
