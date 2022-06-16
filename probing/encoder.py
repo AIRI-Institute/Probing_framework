@@ -54,13 +54,16 @@ class TransformersLoader:
         row_ids_to_exclude = []
         if not self.truncation and input_ids.size()[1] > self.max_length:
             pad_token_id = self.tokenizer.pad_token_id
-            row_ids_to_exclude = torch.where(input_ids[:, self.max_length - 1] > pad_token_id)
+            row_ids_to_exclude = torch.where(input_ids[:, self.max_length - 1] != pad_token_id)
+            if isinstance(row_ids_to_exclude, tuple):
+                row_ids_to_exclude = row_ids_to_exclude[0]
 
             input_ids = exclude_rows(input_ids, row_ids_to_exclude)[:, :self.max_length]
             attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[:, :self.max_length]
+            row_ids_to_exclude = row_ids_to_exclude.tolist()
         return input_ids.to(self.device), attention_mask.to(self.device), row_ids_to_exclude
 
-    def _get_embeddings_by_layers(self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum):
+    def _get_embeddings_by_layers(self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:
             if embedding_type == 'cls':
@@ -76,11 +79,7 @@ class TransformersLoader:
             layers_outputs.append(sent_vector.cpu())
         return layers_outputs
 
-    def encode_text(
-        self,
-        text: Union[str, List[str]],
-        embedding_type: Enum = 'cls'
-    ) -> Tuple[List[torch.Tensor], List[int]]:
+    def encode_text(self, text: Union[str, List[str]], embedding_type: Enum = 'cls') -> Tuple[List[torch.Tensor], List[int]]:
         encoded_text = self.tokenizer(
             text,
             padding=self.padding,
