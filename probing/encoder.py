@@ -1,6 +1,5 @@
 from transformers import  AutoConfig, AutoModel, AutoTokenizer
 import torch
-import logging
 from typing import Optional, List, Tuple, Union, Dict
 from enum import Enum
 
@@ -59,9 +58,6 @@ class TransformersLoader:
 
             input_ids = exclude_rows(input_ids, row_ids_to_exclude)[:, :self.max_length]
             attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[:, :self.max_length]
-
-        if row_ids_to_exclude:
-            logging.warning(f"Since you decided not to truncate long sentences, {len(row_ids_to_exclude)} samples were excluded.")
         return input_ids.to(self.device), attention_mask.to(self.device), row_ids_to_exclude
 
     def _get_embeddings_by_layers(self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum):
