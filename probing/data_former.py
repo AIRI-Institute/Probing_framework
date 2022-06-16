@@ -1,10 +1,11 @@
 from enum import Enum
-from typing import Tuple, Dict, Optional, List, Union
+from typing import Tuple, Dict, Optional, List, Union, Callable
 import os
 from tqdm.notebook import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.data import BatchSampler
 import torch
+import logging
 import numpy as np
 from sklearn import preprocessing
 
@@ -52,7 +53,7 @@ class EncodeLoader:
     def __init__(
         self,
         list_texts_labels: List[Tuple[str, Enum]],
-        encode_func,
+        encode_func: Callable,
         batch_size: int = 64,
         drop_last: bool = False,
         shuffle: bool = True
@@ -94,6 +95,7 @@ class EncodeLoader:
     def __form_dataloader(self) -> DataLoader:
         sampled_texts, sampled_labels = self.__get_sampled_data()
         dataset = []
+        all_excluded_rows = []
         for batch_text, batch_label in tqdm(
             zip(sampled_texts, sampled_labels), 
             total = len(sampled_texts),
@@ -102,6 +104,10 @@ class EncodeLoader:
             encoded_batch_text, row_ids_to_exclude = self.encode_func(batch_text)
             fixed_labels = exclude_rows(torch.tensor(batch_label), row_ids_to_exclude).view(-1).tolist()
             dataset.append((encoded_batch_text, fixed_labels))
+            all_excluded_rows.extend(row_ids_to_exclude)
+
+        if all_excluded_rows:
+            logging.warning(f"Since you decided not to truncate long sentences, {len(all_excluded_rows)} samples were excluded.")
 
         return DataLoader(
             dataset=dataset,
