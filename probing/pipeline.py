@@ -146,7 +146,6 @@ class ProbingPipeline:
         self.log_info['params']['original_classes_ratio'] = get_ratio_by_classes(task_dataset)
 
         if verbose:
-            print('=' * 100)
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
