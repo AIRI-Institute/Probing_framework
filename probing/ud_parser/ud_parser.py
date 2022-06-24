@@ -4,7 +4,6 @@ import csv
 import numpy as np
 import logging
 from enum import Enum
-from math import fsum
 from pathlib import Path
 from typing import Optional, Dict, List
 from collections import defaultdict

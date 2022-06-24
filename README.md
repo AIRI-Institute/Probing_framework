@@ -6,13 +6,34 @@ Framework for probing tasks.
 pip install -r requirements.txt
 ```
 
-### Example of how it works:
-For more parameters you can check out ```probing/main.py```
-* __Command Line__:
-    ```
-    python probing/main.py --probe_task "conj_type" --hf_model_name "bert-base-multilingual-cased"
+### Example of how SentEval Converter works:
+* __Jupyter__:
+    ```python3
+    from probing.ud_parser.ud_parser import ConlluUDParser
+
+    splitter = ConlluUDParser()
+
+    # You can provide a direct path to the folder with conllu files
+    splitter.convert(dir_conllu_path=<folder path>)
+
+    # Or you can pass paths to each of three possible conllu files
+    splitter.convert(tr_path=..., va_path=..., te_path=...)
     ```
 
+* __OUTPUT__:
+    ```
+    0%|          | 0/1 [00:00<?, ?it/s]WARNING:root:Category "Case" has only one class.
+    WARNING:root:Category "Mood" has only one class.
+    WARNING:root:Category "NumType" has only one class.
+    WARNING:root:Category "Polarity" has only one class.
+    WARNING:root:Category "VerbForm" has only one class.
+    100%|██████████| 1/1 [00:00<00:00, 38.07it/s]
+    Writing to file: /home/jovyan/data/UD/UD_Soi-AHA/soj_aha_Number.csv
+    ```
+
+
+### Example of how Probing Engine works:
+For more parameters you can check out ```probing/main.py```
 * __Jupyter__:
     ```python3
     from probing.pipeline import ProbingPipeline
@@ -27,8 +48,20 @@ For more parameters you can check out ```probing/main.py```
         batch_size = 256,
     )
 
-    experiment.run(probe_task = "sent_len", train_epochs = 10)
+    # In case of the custom data for task SentLen
+    experiment.run(probe_task = "sent_len", train_epochs = 10, verbose=True)
+
+    # In case you want to provide the folder with your probing files
+    experiment.run(probe_task = <task name>, path_to_task_file = <path to file for probing task>, train_epochs = 10, verbose=True)
     ```
+
+* __Command Line__:
+    ```
+    python probing/main.py --probe_task "conj_type" --hf_model_name "bert-base-multilingual-cased" --device "cuda:0"
+
+    python probing/main.py --probe_task <task name> --path_to_task_file <path to file for probing task> --hf_model_name "bert-base-multilingual-cased" --device "cuda:0"
+    ```
+
 
 * __OUTPUT__:
     ```
