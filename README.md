@@ -16,7 +16,7 @@ pip install -r requirements.txt
     # You can provide a direct path to the folder with conllu files
     splitter.convert(dir_conllu_path=<folder path>)
 
-    # Or you can 
+    # Or you can pass paths to each of three possible conllu files
     splitter.convert(tr_path=..., va_path=..., te_path=...)
     ```
 
