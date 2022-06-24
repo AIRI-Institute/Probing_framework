@@ -20,8 +20,16 @@ pip install -r requirements.txt
     splitter.convert(tr_path=..., va_path=..., te_path=...)
     ```
 
-
-
+* __OUTPUT__:
+    ```
+    0%|          | 0/1 [00:00<?, ?it/s]WARNING:root:Category "Case" has only one class.
+    WARNING:root:Category "Mood" has only one class.
+    WARNING:root:Category "NumType" has only one class.
+    WARNING:root:Category "Polarity" has only one class.
+    WARNING:root:Category "VerbForm" has only one class.
+    100%|██████████| 1/1 [00:00<00:00, 38.07it/s]
+    Writing to file: /home/jovyan/data/UD/UD_Soi-AHA/soj_aha_Number.csv
+    ```
 
 
 ### Example of how Probing Engine works:
