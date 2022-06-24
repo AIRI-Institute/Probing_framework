@@ -149,7 +149,6 @@ class ProbingPipeline:
 
         if verbose:
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
-            print("Data encoding.")
 
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size)
@@ -178,5 +177,5 @@ class ProbingPipeline:
 
         output_path = save_log(self.log_info, probe_task)
         if verbose:
-            print("Experiments were saved in the folder: ", output_path)
+            print(f"Experiments were saved in the folder: {output_path}")
             print('=' * 100)
