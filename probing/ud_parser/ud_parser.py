@@ -95,6 +95,9 @@ class ConlluUDParser:
             split: parts that data should be split to
         """
         data, labels = map(np.array, zip(*probing_data))
+        if len(labels) == 1:
+            logging.warning(f"Category \"{category}\" has only one class after filtration.")
+            return {}
         X_train, X_test, y_train, y_test = train_test_split(
             data, labels, stratify=labels, train_size=partition[0],
             shuffle=self.shuffle, random_state=random_seed
