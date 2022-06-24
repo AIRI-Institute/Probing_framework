@@ -51,7 +51,7 @@ For more parameters you can check out ```probing/main.py```
     ```
     python probing/main.py --probe_task "conj_type" --hf_model_name "bert-base-multilingual-cased" --device "cuda:0"
 
-    python probing/main.py --probe_task <task name> --hf_model_name "bert-base-multilingual-cased" --device "cuda:0" --path_to_task_file <path to file for probing task>
+    python probing/main.py --probe_task <task name> --path_to_task_file <path to file for probing task> --hf_model_name "bert-base-multilingual-cased" --device "cuda:0"
     ```
 
 
