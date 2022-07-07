@@ -80,6 +80,13 @@ class TransformersLoader:
         return layers_outputs
 
     def encode_text(self, text: Union[str, List[str]], embedding_type: Enum = 'cls') -> Tuple[List[torch.Tensor], List[int]]:
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+
+            # this step is necessary because we've added some tokens (pad_token) to the embeddings
+            # otherwise the tokenizer and model tensors won't match up
+            self.model.resize_token_embeddings(len(self.tokenizer))
+
         encoded_text = self.tokenizer(
             text,
             padding=self.padding,
@@ -91,8 +98,10 @@ class TransformersLoader:
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
         with torch.no_grad():
             model_outputs = self.model(
-                    input_ids, attention_mask, return_dict=self.return_dict
-            )
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                return_dict=self.return_dict
+                )
             model_outputs = (
                 model_outputs["hidden_states"]
                 if "hidden_states" in model_outputs

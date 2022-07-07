@@ -17,8 +17,8 @@ from probing.utils import save_log, get_ratio_by_classes, lang_category_extracti
 class ProbingPipeline:
     def __init__(
         self,
-        probing_type: Enum,
         hf_model_name: Enum,
+        probing_type: Optional[Enum] = "layer",
         device: Optional[Enum] = None,
         classifier_name: Enum = "logreg",
         metric_name: Enum = "accuracy",
