@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from collections import defaultdict
 from torch.utils.data import DataLoader
+from transformers import AdamW
 
 from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
@@ -86,7 +87,7 @@ class ProbingPipeline:
             loss.backward()
             self.optimizer.step()
             self.optimizer.zero_grad()
-        
+
         epoch_loss = np.mean(epoch_train_losses)
         return epoch_loss
     
@@ -159,7 +160,7 @@ class ProbingPipeline:
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
-            self.optimizer = torch.optim.AdamW(self.classifier.parameters())
+            self.optimizer = AdamW(self.classifier.parameters())
 
             for epoch in range(train_epochs):
                 epoch_train_loss = self.train(train.dataset, layer)

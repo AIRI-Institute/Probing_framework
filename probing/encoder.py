@@ -97,11 +97,22 @@ class TransformersLoader:
         )
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
         with torch.no_grad():
-            model_outputs = self.model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                return_dict=self.return_dict
-                )
+
+            # In case of encoder-decoder model, for embeddings we use only encoder 
+            if hasattr(self.model, 'encoder') and hasattr(self.model, 'decoder'):
+                model_outputs = self.model.encoder(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    return_dict=self.return_dict
+                    )
+            else:
+                # In case of the models with decoder or encoder only
+                model_outputs = self.model(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    return_dict=self.return_dict
+                    )
+
             model_outputs = (
                 model_outputs["hidden_states"]
                 if "hidden_states" in model_outputs
