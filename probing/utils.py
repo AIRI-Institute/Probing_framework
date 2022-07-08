@@ -30,7 +30,7 @@ def get_probe_task_path(
         return path_to_file[0]
 
     elif not os.path.exists(file_path):
-        raise RuntimeError(f"Provided path: {file_path} doesn\'t exist.")
+        raise RuntimeError(f"Provided path: {file_path} doesn\'t exist")
     return file_path
 
 
