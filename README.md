@@ -66,10 +66,10 @@ For more parameters you can check out ```probing/main.py```
 * __OUTPUT__:
     ```
     Task in progress: sent_len.
-    Path to data: /home/jovyan/protasov/AIRI/Probing_framework/data/sent_len.txt
+    Path to data: /home/jovyan/test/TEST/Probing_framework/data/sent_len.txt
     Data encoding: 100%|████████████████████████████████████████████████████████████████████████████████| 782/782 [01:26<00:00,  9.06it/s]
     Data encoding: 100%|██████████████████████████████████████████████████████████████████████████████████| 79/79 [00:08<00:00,  8.94it/s]
     Data encoding: 100%|██████████████████████████████████████████████████████████████████████████████████| 79/79 [00:08<00:00,  9.33it/s]
     Probing by layers... 100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 12/12 [04:04<00:00, 20.40s/it]
-    Experiments were saved in folder:  /home/jovyan/protasov/AIRI/Probing_framework/results/sent_len_2022_02_18-05:51:47_PM
+    Experiments were saved in folder:  /home/test/test/TEST/Probing_framework/results/sent_len_2022_02_18-05:51:47_PM
     ```
