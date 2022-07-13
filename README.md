@@ -28,7 +28,7 @@ pip install -r requirements.txt
     WARNING:root:Category "Polarity" has only one class.
     WARNING:root:Category "VerbForm" has only one class.
     100%|██████████| 1/1 [00:00<00:00, 38.07it/s]
-    Writing to file: /home/jovyan/data/UD/UD_Soi-AHA/soj_aha_Number.csv
+    Writing to file: /home/test/data/UD/UD_Soi-AHA/soj_aha_Number.csv
     ```
 
 
