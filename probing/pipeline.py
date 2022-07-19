@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from collections import defaultdict
 from torch.utils.data import DataLoader
-from transformers import AdamW
+from torch.optim import AdamW
 
 from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
