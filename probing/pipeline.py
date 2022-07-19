@@ -138,6 +138,7 @@ class ProbingPipeline:
 
         self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         self.log_info['params']['probing_task'] = probe_task
+        self.log_info['params']['file_path'] = path_to_file_for_probing
         self.log_info['params']['task_language'] = task_language
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
