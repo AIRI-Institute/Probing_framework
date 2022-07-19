@@ -1,3 +1,4 @@
+from time import time
 from enum import Enum
 from typing import Optional, Callable, Union, List, Tuple
 import os
@@ -134,6 +135,7 @@ class ProbingPipeline:
         task_dataset, num_classes = task_data.samples, task_data.num_classes
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
+        start_time = time()
 
         self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         self.log_info['params']['probing_task'] = probe_task
@@ -173,7 +175,8 @@ class ProbingPipeline:
             _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
 
             self.log_info['results']['test_score'][layer].append(epoch_test_score)
-
+        
+        self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
         if verbose:
             print(f"Experiments were saved in the folder: {output_path}")
