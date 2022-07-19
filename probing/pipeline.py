@@ -135,7 +135,6 @@ class ProbingPipeline:
         task_dataset, num_classes = task_data.samples, task_data.num_classes
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
-        start_time = time()
 
         self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         self.log_info['params']['probing_task'] = probe_task
@@ -152,6 +151,7 @@ class ProbingPipeline:
             print('=' * 100)
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
+        start_time = time()
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size, shuffle = self.shuffle)
         val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size, shuffle = self.shuffle)
