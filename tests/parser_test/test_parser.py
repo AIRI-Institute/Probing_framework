@@ -97,10 +97,10 @@ class TestUDParser(unittest.TestCase):
                                                         partition=[0.8, 0.2],
                                                         split=["tr", "te"],
                                                         random_seed=0)["te"]))
-        self.assertEqual(2, len(parser.subsamples_split(probing_data + probing_data,
+        self.assertEqual({}, parser.subsamples_split(probing_data + probing_data,
                                                         partition=[0.8, 0.1, 0.1],
                                                         split=["tr", "va", "te"],
-                                                        random_seed=0)["te"]))
+                                                        random_seed=0))
 
     def test_generate_probing_file(self):
         parser = ConlluUDParser()
