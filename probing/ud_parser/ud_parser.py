@@ -342,8 +342,4 @@ class ConlluUDParser:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
             assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
             assert len(paths) <= 3, too_much_files_err_str.format(len(paths))
-
-            self.language = self.__extract_lang_from_udfile(paths[0], language)
-            self.save_path_dir = self.__determine_ud_savepath(dir_conllu_path, save_path_dir)
-
-            self.process_paths(*paths, language=self.language, save_path_dir=self.save_path_dir)
+            self.process_paths(*paths, language=language, save_path_dir=save_path_dir)
