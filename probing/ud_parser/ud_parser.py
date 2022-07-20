@@ -172,6 +172,8 @@ class ConlluUDParser:
             parts = self.subsamples_split(data, partitions, random_seed, splits)
         else:
             parts = {}
+        
+        if not parts:
             logging.warning(f"Not enough data of category \"{category}\" for stratified split")
         return parts
 
