@@ -3,9 +3,10 @@ import os
 import csv
 import numpy as np
 import logging
+from collections import Counter
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 from collections import defaultdict
 from conllu import parse_tree, parse
 from conllu.models import TokenTree, Token
@@ -76,6 +77,11 @@ class ConlluUDParser:
                 probing_data[value].append(s_text)
         return probing_data
 
+    def filter_labels_after_split(self, labels: List[Any]) -> List[Any]:
+        labels_repeat_dict = Counter(labels)
+        n_repeat = 1 # threshold to overcome further split problem
+        return [label for label, count in labels_repeat_dict.items() if count > n_repeat]
+
     def subsamples_split(
         self,
         probing_data: Dict,
@@ -94,37 +100,37 @@ class ConlluUDParser:
             shuffle: if sentences should be randomly shuffled
             split: parts that data should be split to
         """
+        parts = {}
         data, labels = map(np.array, zip(*probing_data))
         X_train, X_test, y_train, y_test = train_test_split(
             data, labels, stratify=labels, train_size=partition[0],
             shuffle=self.shuffle, random_state=random_seed
         )
+
         if len(partition) == 2:
             parts = {
                 split[0]: [X_train, y_train],
                 split[1]: [X_test, y_test]
             }
         else:
-            label = [y for y, count in zip(*np.unique(y_test, return_counts=True)) if count > 1]
-            X_train = X_train[np.isin(y_train, label)]
-            y_train = y_train[np.isin(y_train, label)]
-            X_test = X_test[np.isin(y_test, label)]
-            y_test = y_test[np.isin(y_test, label)]
+            filtered_labels = self.filter_labels_after_split(y_test)
+            if len(filtered_labels) >= 2:
+                X_train = X_train[np.isin(y_train, filtered_labels)]
+                y_train = y_train[np.isin(y_train, filtered_labels)]
+                X_test = X_test[np.isin(y_test, filtered_labels)]
+                y_test = y_test[np.isin(y_test, filtered_labels)]
 
-            val_size = partition[1] / (1 - partition[0])
-
-            if y_test.size != 0:
-                X_val, X_test, y_val, y_test = train_test_split(
-                    X_test, y_test, stratify=y_test, train_size=val_size,
-                    shuffle=self.shuffle, random_state=random_seed
-                )
-                parts = {
-                    split[0]: [X_train, y_train],
-                    split[1]: [X_test, y_test],
-                    split[2]: [X_val, y_val]
-                }
-            else:
-                parts = {}
+                val_size = partition[1] / (1 - partition[0])
+                if y_test.size != 0:
+                    X_val, X_test, y_val, y_test = train_test_split(
+                        X_test, y_test, stratify=y_test, train_size=val_size,
+                        shuffle=self.shuffle, random_state=random_seed
+                    )
+                    parts = {
+                        split[0]: [X_train, y_train],
+                        split[1]: [X_test, y_test],
+                        split[2]: [X_val, y_val]
+                    }
         return parts
 
     def generate_probing_file(
@@ -140,32 +146,32 @@ class ConlluUDParser:
         Args:
             conllu: a string in CONLLU format with the data
             category: a grammatical category to split by
-            split: parts that the data are to split to
+            splits: parts that the data are to split to
             partitions: a percentage of splits
             shuffle: if the data should be randomly shuffles
             random_seed: a random seed for spliting
         """
         sentences = parse_tree(conllu)
         classified_sentences = self.classify(sentences, category)
-        num_classes = len(classified_sentences)
+        num_classes = len(classified_sentences.keys())
+
         if num_classes == 1:
-            logging.warning(f"Category \"{category}\" has only one class.")
+            logging.warning(f"Category \"{category}\" has only one class")
             return {}
         elif num_classes == 0:
-            logging.warning(f"This file does not contain examples of category \"{category}\".")
+            logging.warning(f"This file does not contain examples of category \"{category}\"")
             return {}
 
         if len(splits) == 1:
-            data = [(v, key) for key, value in classified_sentences.items() for v in value]
+            data = [(s, class_name) for class_name, sentences in classified_sentences.items() for s in sentences]
             parts = {splits[0]: list(zip(*data))}
             return parts
 
-        data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_classes for v in value]
-        if data:
-            parts = self.subsamples_split(data, partitions, random_seed, splits)
-        else:
-            parts = {}
-            logging.warning(f"Not enough data of category \"{category}\" for stratified split.")
+        data = [(s, class_name) for class_name, sentences in classified_sentences.items() if len(sentences) > 1 for s in sentences]
+        parts = self.subsamples_split(data, partitions, random_seed, splits)
+
+        if not parts:
+            logging.warning(f"Not enough data of category \"{category}\" for stratified split")
         return parts
 
     def writer(self, result_path: os.PathLike, partition_sets: Dict):
@@ -195,9 +201,9 @@ class ConlluUDParser:
             val_categories_set = set(parts['va'][1])
             te_categories_set = set(parts['te'][1])
             if tr_categories_set != val_categories_set:
-                logging.warning(f"The classes in train and validation parts are different for category \"{category}\".")
+                logging.warning(f"The classes in train and validation parts are different for category \"{category}\"")
             elif val_categories_set != te_categories_set:
-                logging.warning(f"The classes in train and test parts are different for category \"{category}\".")
+                logging.warning(f"The classes in train and test parts are different for category \"{category}\"")
             save_path_file = Path(self.save_path_dir.resolve(), f'{self.language}_{category}.csv')
             self.writer(save_path_file, parts)
         return None

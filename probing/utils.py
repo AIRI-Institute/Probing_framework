@@ -86,7 +86,7 @@ def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tens
     mask[rows_to_exclude, :] = False
     new_num_rows = tensor_shape[0] - len(rows_to_exclude)
     if new_num_rows == 0:
-        logging.warning(f"All samples were excluded due to long sentences truncation.")
+        logging.warning(f"All samples were excluded due to long sentences truncation")
         return tensor[mask]
     output = tensor[mask].view(new_num_rows, -1)
     return output

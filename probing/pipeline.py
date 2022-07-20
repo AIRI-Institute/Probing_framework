@@ -160,6 +160,7 @@ class ProbingPipeline:
         self.log_info['params']['encoded_labels'] = train.encoded_labels
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
+        self.log_info['results']['elapsed_time(sec)'] = 0
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
