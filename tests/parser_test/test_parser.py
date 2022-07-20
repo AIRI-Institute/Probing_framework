@@ -104,7 +104,7 @@ class TestUDParser(unittest.TestCase):
 
     def test_generate_probing_file(self):
         parser = ConlluUDParser()
-        log_1 = "Category \"Degree\" has only one class."
+        log_1 = "Category \"Degree\" has only one class"
         with self.assertLogs("", "DEBUG") as experiment_1:
             parts_1 = parser.generate_probing_file(self.text_testfile1, "Degree",
                                                    splits=["tr", "va", "te"],
@@ -113,12 +113,12 @@ class TestUDParser(unittest.TestCase):
         parts_2 = parser.generate_probing_file(self.text_testfile1, "Number",
                                                splits=["tr"], partitions=[1.0])
 
-        log_2 = "Not enough data of category \"Voice\" for stratified split."
+        log_2 = "Not enough data of category \"Voice\" for stratified split"
         with self.assertLogs("", "DEBUG") as experiment_2:
             parts_3 = parser.generate_probing_file(self.text_testfile2, "Voice",
                                                splits=["tr", "va", "te"], partitions=[0.8, 0.1, 0.1])
 
-        log_3 = "This file does not contain examples of category \"Number\"."
+        log_3 = "This file does not contain examples of category \"Number\""
         with self.assertLogs('', 'DEBUG') as experiment_3:
             parts_4 = parser.generate_probing_file(self.text_testfile2, "Number",
                                                splits=["tr", "va", "te"], partitions=[0.8, 0.1, 0.1])
@@ -141,6 +141,12 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual({}, parts_6)
 
     def test_generate(self):
+        parser = ConlluUDParser()
+        data = parser.generate_(paths=[self.path_testfile1], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
+        self.assertEqual(14, len(data.keys()))
+        self.assertEqual([{}, ] * 14, list(data.values()))
+
+    def test_num_classes(self):
         parser = ConlluUDParser()
         data = parser.generate_(paths=[self.path_testfile1], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
         self.assertEqual(14, len(data.keys()))

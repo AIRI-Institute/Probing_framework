@@ -167,10 +167,11 @@ class ConlluUDParser:
             parts = {splits[0]: list(zip(*data))}
             return parts
 
-        data = [(s, class_name) for class_name, sentences in classified_sentences.items() if len(sentences) > 1 for s in sentences]
-        parts = self.subsamples_split(data, partitions, random_seed, splits)
-
-        if not parts:
+        data = [(s, class_name) for class_name, sentences in classified_sentences.items() if len(sentences) > num_classes for s in sentences]
+        if data:
+            parts = self.subsamples_split(data, partitions, random_seed, splits)
+        else:
+            parts = {}
             logging.warning(f"Not enough data of category \"{category}\" for stratified split")
         return parts
 
