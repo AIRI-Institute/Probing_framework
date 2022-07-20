@@ -2,7 +2,7 @@ import pytest
 import unittest
 from pathlib import Path
 
-from probing.data_former import DataFormer
+from probing.data_former import DataFormer, EncodeLoader
 from probing.config import data_folder
 
 
