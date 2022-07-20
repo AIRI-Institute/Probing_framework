@@ -135,7 +135,7 @@ class ConlluUDParser:
 
     def generate_probing_file(
         self,
-        conllu: os.PathLike,
+        conllu_text: str,
         category: Enum,
         splits: List[Enum],
         partitions: List[float],
@@ -144,14 +144,14 @@ class ConlluUDParser:
         """
         Generates a split following given arguments
         Args:
-            conllu: a string in CONLLU format with the data
+            conllu_text: a string in CONLLU format with the data
             category: a grammatical category to split by
             splits: parts that the data are to split to
             partitions: a percentage of splits
             shuffle: if the data should be randomly shuffles
             random_seed: a random seed for spliting
         """
-        sentences = parse_tree(conllu)
+        sentences = parse_tree(conllu_text)
         classified_sentences = self.classify(sentences, category)
         num_classes = len(classified_sentences.keys())
 
@@ -255,8 +255,8 @@ class ConlluUDParser:
     def generate_(
         self,
         paths: List[os.PathLike],
-        splits: List[List[Enum]] = None,
-        partitions: List[List[float]] = None
+        splits: List[List[Enum]],
+        partitions: List[List[float]]
     ) -> None:
         """
         Generates files for all categories
@@ -276,7 +276,7 @@ class ConlluUDParser:
             parts = {}
             for text, split, partion in zip(texts, splits, partitions):
                 part = self.generate_probing_file(
-                    conllu=text, splits=split,
+                    conllu_text=text, splits=split,
                     partitions=partion, category=category
                 )
                 parts.update(part)

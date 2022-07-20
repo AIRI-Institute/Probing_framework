@@ -145,9 +145,3 @@ class TestUDParser(unittest.TestCase):
         data = parser.generate_(paths=[self.path_testfile1], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
         self.assertEqual(14, len(data.keys()))
         self.assertEqual([{}, ] * 14, list(data.values()))
-
-    def test_num_classes(self):
-        parser = ConlluUDParser()
-        data = parser.generate_(paths=[self.path_testfile1], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
-        self.assertEqual(14, len(data.keys()))
-        self.assertEqual([{}, ] * 14, list(data.values()))
