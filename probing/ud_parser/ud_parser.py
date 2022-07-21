@@ -267,8 +267,8 @@ class ConlluUDParser:
         paths: List[os.PathLike],
         splits: List[List[Enum]],
         partitions: List[List[float]],
-        language: str,
-        save_path_dir: os.PathLike
+        language: Optional[str],
+        save_path_dir: Optional[os.PathLike]
     ) -> Dict[str, Dict[Enum, List[str]]]:
         """
         Generates files for all categories
@@ -280,7 +280,6 @@ class ConlluUDParser:
         data = defaultdict(dict)
         language = self.__extract_lang_from_udfile_path(paths[0], language)
         save_path_dir = self.__determine_ud_savepath(Path(paths[0]).parent, save_path_dir)
-
         list_texts, categories = self.get_text_and_categories(paths)
 
         if len(categories) == 0:
@@ -296,10 +295,10 @@ class ConlluUDParser:
                 )
                 category_parts.update(part)
             is_full_parts = self.check_parts(category_parts, category)
+            data[category] = category_parts
             if is_full_parts:
                 save_path_file = Path(save_path_dir.resolve(), f'{language}_{category}.csv')
                 self.writer(save_path_file, category_parts)
-            data[category] = category_parts
         return data
 
     def process_paths(
@@ -307,7 +306,7 @@ class ConlluUDParser:
         tr_path: os.PathLike = None,
         va_path: os.PathLike = None,
         te_path: os.PathLike = None,
-        language: str = None,
+        language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None
     ) -> None:
         known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
@@ -359,10 +358,10 @@ class ConlluUDParser:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
-        if dir_conllu_path is None:
-            self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
-        else:
+        if dir_conllu_path:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
             assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
             assert len(paths) <= 3, too_much_files_err_str.format(len(paths))
             self.process_paths(*paths, language=language, save_path_dir=save_path_dir)
+        else:
+            self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
