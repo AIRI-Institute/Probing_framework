@@ -37,26 +37,27 @@ class TestUDParser(unittest.TestCase):
     def test_check(self):
         parser = ConlluUDParser()
         category = "Animacy"
+        language = "russian"
+        save_path_dir = Path("")
 
         set_2 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a"]],
                  "te": [[1, 2], ["a", "b"]], }
-        parser.save_path_dir = Path("")
-        parser.language = "russian"
+
         with self.assertLogs('', 'DEBUG') as experiment_2:
-            parser.check(set_2, category)
+            parser.check(set_2, category, language, save_path_dir)
         log_2 = f"The classes in train and validation parts are different for category \"{category}\""
 
         set_3 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a", "b"]],
                  "te": [[1, 2], ["a"]], }
         with self.assertLogs('', 'DEBUG') as experiment_3:
-            parser.check(set_3, category)
+            parser.check(set_3, category, language, save_path_dir)
         log_3 = f"The classes in train and test parts are different for category \"{category}\""
 
         self.assertIn(log_2, experiment_2.output[0])
         self.assertIn(log_3, experiment_3.output[0])
-        os.remove(f"{parser.language}_{category}.csv")
+        os.remove(f"{language}_{category}.csv")
 
     def test_writer(self):
         parser = ConlluUDParser()
@@ -141,7 +142,15 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual({}, parts_6)
 
     def test_generate(self):
+        language = 'test'
+        save_path_dir = ""
         parser = ConlluUDParser()
-        data = parser.generate_(paths=[self.path_testfile1], splits=(["tr", "va", "te"],), partitions=([0.8, 0.1, 0.1],))
+        data = parser.generate_data(
+            paths=[self.path_testfile1],
+            splits=(["tr", "va", "te"],),
+            partitions=([0.8, 0.1, 0.1],),
+            language=language,
+            save_path_dir=save_path_dir
+        )
         self.assertEqual(14, len(data.keys()))
         self.assertEqual([{}, ] * 14, list(data.values()))
