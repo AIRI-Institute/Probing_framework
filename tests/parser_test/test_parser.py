@@ -20,7 +20,7 @@ class TestUDParser(unittest.TestCase):
         parser = ConlluUDParser()
         categories = sorted(["Animacy", "Case", "Gender", "Number", "Degree", "Aspect", "Tense",
                              "VerbForm", "Voice", "PronType", "Person", "Mood", "Variant", "Poss"])
-        found_categories = parser.find_categories(self.text_testfile1)
+        texts, found_categories = parser.get_text_and_categories([self.path_testfile1])
         self.assertEqual(categories, found_categories)
         self.assertEqual(list, type(found_categories))
 
@@ -43,21 +43,19 @@ class TestUDParser(unittest.TestCase):
         set_2 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a"]],
                  "te": [[1, 2], ["a", "b"]], }
-
         with self.assertLogs('', 'DEBUG') as experiment_2:
-            parser.check(set_2, category, language, save_path_dir)
+            answer = parser.check_parts(set_2, category)
         log_2 = f"The classes in train and validation parts are different for category \"{category}\""
 
         set_3 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a", "b"]],
                  "te": [[1, 2], ["a"]], }
         with self.assertLogs('', 'DEBUG') as experiment_3:
-            parser.check(set_3, category, language, save_path_dir)
+            answer = parser.check_parts(set_3, category)
         log_3 = f"The classes in train and test parts are different for category \"{category}\""
 
         self.assertIn(log_2, experiment_2.output[0])
         self.assertIn(log_3, experiment_3.output[0])
-        os.remove(f"{language}_{category}.csv")
 
     def test_writer(self):
         parser = ConlluUDParser()
@@ -145,7 +143,7 @@ class TestUDParser(unittest.TestCase):
         language = 'test'
         save_path_dir = ""
         parser = ConlluUDParser()
-        data = parser.generate_data(
+        data = parser.generate_data_by_categories(
             paths=[self.path_testfile1],
             splits=(["tr", "va", "te"],),
             partitions=([0.8, 0.1, 0.1],),

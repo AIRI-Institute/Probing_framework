@@ -6,7 +6,7 @@ import logging
 from collections import Counter
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Dict, List, Any
+from typing import Tuple, Optional, Dict, List, Any
 from collections import defaultdict
 from conllu import parse_tree, parse
 from conllu.models import TokenTree, Token
@@ -32,6 +32,21 @@ class ConlluUDParser:
         with open(path, encoding='utf-8') as f:
             conllu_file = f.read()
         return conllu_file 
+
+    def writer(self, result_path: os.PathLike, partition_sets: Dict):
+        """
+        Writes to a file
+        Args:
+             result_path: a filename that will be generated
+             partition_sets: the data split into 3 parts
+        """
+        print(f'Writing to file: {result_path}\n')
+        with open(result_path, 'w', encoding='utf-8') as newf:
+            my_writer = csv.writer(newf, delimiter='\t', lineterminator='\n')
+            for part in partition_sets:
+                for sentence, value in zip(*partition_sets[part]):
+                    my_writer.writerow([part, value, sentence])
+        return None
 
     def find_category_token(
         self,
@@ -79,8 +94,30 @@ class ConlluUDParser:
 
     def filter_labels_after_split(self, labels: List[Any]) -> List[Any]:
         labels_repeat_dict = Counter(labels)
-        n_repeat = 1 # threshold to overcome further split problem
+        n_repeat = 1 # threshold to overcome further splitting problem
         return [label for label, count in labels_repeat_dict.items() if count > n_repeat]
+
+    def check_parts(
+        self,
+        parts: Dict,
+        category: Enum
+    ) -> bool:
+        """
+        Checks if the data are not empty and have a train set
+        Args:
+            parts: train, val and test sets
+            category: a grammatical value
+        """
+        if len(parts) == 3:
+            tr_categories_set = set(parts['tr'][1])
+            val_categories_set = set(parts['va'][1])
+            te_categories_set = set(parts['te'][1])
+            if tr_categories_set != val_categories_set:
+                logging.warning(f"The classes in train and validation parts are different for category \"{category}\"")
+            elif val_categories_set != te_categories_set:
+                logging.warning(f"The classes in train and test parts are different for category \"{category}\"")
+            return True
+        return False
 
     def subsamples_split(
         self,
@@ -177,55 +214,17 @@ class ConlluUDParser:
             logging.warning(f"Not enough data of category \"{category}\" for stratified split")
         return parts
 
-    def writer(self, result_path: os.PathLike, partition_sets: Dict):
-        """
-        Writes to a file
-        Args:
-             result_path: a filename that will be generated
-             partition_sets: the data split into 3 parts
-        """
-        print(f'Writing to file: {result_path}\n')
-        with open(result_path, 'w', encoding='utf-8') as newf:
-            my_writer = csv.writer(newf, delimiter='\t', lineterminator='\n')
-            for part in partition_sets:
-                for sentence, value in zip(*partition_sets[part]):
-                    my_writer.writerow([part, value, sentence])
-        return None
-
-    def check(
-        self,
-        parts: Dict,
-        category: Enum,
-        language: str,
-        save_path_dir: Path
-    ):
-        """
-        Checks if the data are not empty and have a train set
-        Args:
-            parts: train, val and test sets
-            category: a grammatical value
-        """
-        if len(parts) == 3:
-            tr_categories_set = set(parts['tr'][1])
-            val_categories_set = set(parts['va'][1])
-            te_categories_set = set(parts['te'][1])
-            if tr_categories_set != val_categories_set:
-                logging.warning(f"The classes in train and validation parts are different for category \"{category}\"")
-            elif val_categories_set != te_categories_set:
-                logging.warning(f"The classes in train and test parts are different for category \"{category}\"")
-            save_path_file = Path(save_path_dir.resolve(), f'{language}_{category}.csv')
-            self.writer(save_path_file, parts)
-        return None
-    
-    def find_categories(self, text_data: str) -> List[Enum]:
+    def get_text_and_categories(self, paths: List[os.PathLike]) -> Tuple[List[str], List[Enum]]:
         set_of_values = set()
+        list_texts = [self.read(p) for p in paths]
+        text_data = "\n".join(list_texts)
         token_lists = parse(text_data)
         for token_list in token_lists:
             for token in token_list:
                 feats = token['feats']
                 if feats:
                     set_of_values.update(feats.keys())
-        return sorted(set_of_values)
+        return list_texts, sorted(set_of_values)
     
     def get_filepaths_from_dir(self, dir_path: os.PathLike) -> List[os.PathLike]:
         dir_path = Path(dir_path).resolve() if dir_path is not None else None 
@@ -241,7 +240,11 @@ class ConlluUDParser:
                 re.match(".*-(train|dev|test).*\.conllu", p)]
         return sorted(filepaths, key=sorting_parts_func)
 
-    def __extract_lang_from_udfile_path(self, ud_file_path: os.PathLike, language: str) -> str:
+    def __extract_lang_from_udfile_path(
+        self,
+        ud_file_path: os.PathLike,
+        language: Optional[str]
+    ) -> str:
         if not language:
             return Path(ud_file_path).stem.split('-')[0]
         return language
@@ -249,7 +252,7 @@ class ConlluUDParser:
     def __determine_ud_savepath(
         self,
         path_from_files: os.PathLike,
-        save_path_dir: os.PathLike
+        save_path_dir: Optional[os.PathLike]
     ) -> Path:
         final_path = None
         if not save_path_dir:
@@ -259,7 +262,7 @@ class ConlluUDParser:
         os.makedirs(final_path, exist_ok=True)
         return Path(final_path)
 
-    def generate_data(
+    def generate_data_by_categories(
         self,
         paths: List[os.PathLike],
         splits: List[List[Enum]],
@@ -274,25 +277,29 @@ class ConlluUDParser:
             splits: the way how the data should be split
             partitions: the percentage of different splits
         """
+        data = defaultdict(dict)
         language = self.__extract_lang_from_udfile_path(paths[0], language)
         save_path_dir = self.__determine_ud_savepath(Path(paths[0]).parent, save_path_dir)
-        texts = [self.read(p) for p in paths]
-        categories = self.find_categories("\n".join(texts))
-        data = defaultdict(dict)
+
+        list_texts, categories = self.get_text_and_categories(paths)
+
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
             logging.warning(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
 
         for category in categories:
-            parts = {}
-            for text, split, partion in zip(texts, splits, partitions):
+            category_parts = {}
+            for text, split, part in zip(list_texts, splits, partitions):
                 part = self.generate_probing_file(
                     conllu_text=text, splits=split,
-                    partitions=partion, category=category
+                    partitions=part, category=category
                 )
-                parts.update(part)
-            self.check(parts, category, language, save_path_dir)
-            data[category] = parts
+                category_parts.update(part)
+            is_full_parts = self.check_parts(category_parts, category)
+            if is_full_parts:
+                save_path_file = Path(save_path_dir.resolve(), f'{language}_{category}.csv')
+                self.writer(save_path_file, category_parts)
+            data[category] = category_parts
         return data
 
     def process_paths(
@@ -304,11 +311,11 @@ class ConlluUDParser:
         save_path_dir: Optional[os.PathLike] = None
     ) -> None:
         known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
-        assert len(known_paths) > 0, "None paths were provided."
-        assert tr_path is not None, "At least the path to train data should be provided."
+        assert len(known_paths) > 0, "None paths were provided"
+        assert tr_path is not None, "At least the path to train data should be provided"
 
         if len(known_paths) == 1:
-            self.generate_data(
+            _ = self.generate_data_by_categories(
                 paths=[tr_path],
                 partitions=partitions_by_files["one_file"],
                 splits = [["tr", "va", "te"]],
@@ -317,7 +324,7 @@ class ConlluUDParser:
             )
         elif len(known_paths) == 2:
             second_path = te_path if te_path is not None else va_path
-            self.generate_data(
+            _ = self.generate_data_by_categories(
                 paths=[tr_path, second_path],
                 partitions=partitions_by_files["two_files"],
                 splits = [["tr"], ["va", "te"]],
@@ -325,7 +332,7 @@ class ConlluUDParser:
                 save_path_dir = save_path_dir
             )
         elif len(known_paths) == 3:
-            self.generate_data(
+            _ = self.generate_data_by_categories(
                 paths=[tr_path, va_path, te_path],
                 partitions=partitions_by_files["three_files"],
                 splits = [["tr"], ["va"], ["te"]],
