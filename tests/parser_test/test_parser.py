@@ -59,12 +59,11 @@ class TestUDParser(unittest.TestCase):
 
     def test_writer(self):
         parser = ConlluUDParser()
-        result_path = "ru_animacy.csv"
         set_1 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a"]],
                  "te": [[1, 2], ["a", "b"]], }
-        parser.writer(result_path, set_1)
-        self.assertIn(result_path, os.listdir())
+        result_path = parser.writer(set_1, "", "animacy", "ru")
+        self.assertIn(result_path.name, os.listdir())
         os.remove(result_path)
 
     def test_find_tokens(self):

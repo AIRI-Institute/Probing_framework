@@ -33,20 +33,21 @@ class ConlluUDParser:
             conllu_file = f.read()
         return conllu_file 
 
-    def writer(self, result_path: os.PathLike, partition_sets: Dict):
+    def writer(self, partition_sets: Dict, save_path_dir: os.PathLike, category: Enum, language: str) -> Path:
         """
         Writes to a file
         Args:
              result_path: a filename that will be generated
              partition_sets: the data split into 3 parts
         """
+        result_path = Path(Path(save_path_dir).resolve(), f'{language}_{category}.csv')
         print(f'Writing to file: {result_path}\n')
         with open(result_path, 'w', encoding='utf-8') as newf:
             my_writer = csv.writer(newf, delimiter='\t', lineterminator='\n')
             for part in partition_sets:
                 for sentence, value in zip(*partition_sets[part]):
                     my_writer.writerow([part, value, sentence])
-        return None
+        return result_path
 
     def find_category_token(
         self,
@@ -294,11 +295,11 @@ class ConlluUDParser:
                     partitions=part, category=category
                 )
                 category_parts.update(part)
-            is_full_parts = self.check_parts(category_parts, category)
+
             data[category] = category_parts
-            if is_full_parts:
-                save_path_file = Path(save_path_dir.resolve(), f'{language}_{category}.csv')
-                self.writer(save_path_file, category_parts)
+            are_full_parts = self.check_parts(category_parts, category)
+            if are_full_parts:
+                output_path = self.writer(category_parts, save_path_dir, category, language)
         return data
 
     def process_paths(
@@ -347,7 +348,7 @@ class ConlluUDParser:
         va_path: Optional[os.PathLike] = None,
         te_path: Optional[os.PathLike] = None,
         dir_conllu_path: Optional[os.PathLike] = None,
-        language: str = None,
+        language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None
     ) -> None:
         """
