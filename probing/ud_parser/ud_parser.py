@@ -13,7 +13,7 @@ from conllu.models import TokenTree, Token
 from sklearn.model_selection import train_test_split
 from nltk.tokenize import wordpunct_tokenize
 
-from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str
+from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str, splits_by_files
 
 
 class ConlluUDParser:
@@ -265,8 +265,8 @@ class ConlluUDParser:
     def generate_data_by_categories(
         self,
         paths: List[os.PathLike],
-        splits: List[List[Enum]],
-        partitions: List[List[float]]
+        partitions: Optional[List[List[float]]] = None,
+        splits: Optional[List[List[Enum]]] = None
     ) -> Dict[str, Dict[Enum, List[str]]]:
         """
         Generates files for all categories
@@ -284,6 +284,11 @@ class ConlluUDParser:
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
             logging.warning(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
+
+        if partitions is None:
+            partitions = partitions_by_files[len(paths)]
+        if splits is None:
+            splits = splits_by_files[len(paths)]
 
         for category in categories:
             category_parts = {}
@@ -315,22 +320,16 @@ class ConlluUDParser:
 
         if len(known_paths) == 1:
             files_data = self.generate_data_by_categories(
-                paths=[tr_path],
-                partitions=partitions_by_files["one_file"],
-                splits = [["tr", "va", "te"]]
+                paths=[tr_path]
             )
         elif len(known_paths) == 2:
             second_path = te_path if te_path is not None else va_path
             files_data = self.generate_data_by_categories(
-                paths=[tr_path, second_path],
-                partitions=partitions_by_files["two_files"],
-                splits = [["tr"], ["va", "te"]]
+                paths=[tr_path, second_path]
             )
         elif len(known_paths) == 3:
             files_data = self.generate_data_by_categories(
-                paths=[tr_path, va_path, te_path],
-                partitions=partitions_by_files["three_files"],
-                splits = [["tr"], ["va"], ["te"]]
+                paths=[tr_path, va_path, te_path]
             )
         else:
             raise NotImplementedError(too_much_files_err_str.format(len(known_paths)))
@@ -363,8 +362,9 @@ class ConlluUDParser:
 
         final_folders = set()
         for category, category_data in data.items():
-            output_path = self.writer(category_data, category, language, save_path_dir)
-            if self.verbose:
-                print(f'Writing to file: {output_path}')
-            final_folders.add(str(output_path.parent))
+            if category_data:
+                output_path = self.writer(category_data, category, language, save_path_dir)
+                final_folders.add(str(output_path.parent))
+                if self.verbose:
+                    print(f'Writing to file: {output_path}')
         print(f"Results were saved into folders: {final_folders}")

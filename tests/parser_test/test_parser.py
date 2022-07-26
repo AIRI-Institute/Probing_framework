@@ -138,9 +138,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(set(cases), set(parts_5["te"][1]))
         self.assertEqual({}, parts_6)
 
-    def test_generate(self):
-        language = 'test'
-        save_path_dir = ""
+    def test_generate1(self):
         parser = ConlluUDParser()
         data = parser.generate_data_by_categories(
             paths=[self.path_testfile1],
@@ -149,3 +147,23 @@ class TestUDParser(unittest.TestCase):
         )
         self.assertEqual(14, len(data.keys()))
         self.assertEqual([{}, ] * 14, list(data.values()))
+
+    def test_generate2(self):
+        parser = ConlluUDParser(verbose=False)
+
+        folder_path = Path(__file__).resolve().parent
+        test_file_path = Path(folder_path, "hi_pud-ud-test.conllu")
+        data = parser.generate_data_by_categories(
+            paths=[test_file_path]
+        )
+        self.assertEqual(len(data), 17)
+
+        empty_cats = ["Foreign", "Mood", "NumType", "Polarity", "Polite", "PronType", "VerbForm"]
+        notempty_cats = ["Animacy", "Aspect", "Definite", "Gender", "Gender[psor]", "Number", "Number[psor]", "Person", "Tense"]
+        for c in empty_cats:
+            print(c)
+            self.assertEqual(data[c], {})
+        
+        for c in notempty_cats:
+            print(c)
+            self.assertTrue(data[c]!={})
