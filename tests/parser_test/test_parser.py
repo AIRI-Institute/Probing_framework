@@ -62,7 +62,7 @@ class TestUDParser(unittest.TestCase):
         set_1 = {"tr": [[1, 2], ["a", "b"]],
                  "va": [[1], ["a"]],
                  "te": [[1, 2], ["a", "b"]], }
-        result_path = parser.writer(set_1, "", "animacy", "ru")
+        result_path = parser.writer(set_1,"animacy", "ru", "")
         self.assertIn(result_path.name, os.listdir())
         os.remove(result_path)
 
@@ -145,9 +145,7 @@ class TestUDParser(unittest.TestCase):
         data = parser.generate_data_by_categories(
             paths=[self.path_testfile1],
             splits=(["tr", "va", "te"],),
-            partitions=([0.8, 0.1, 0.1],),
-            language=language,
-            save_path_dir=save_path_dir
+            partitions=([0.8, 0.1, 0.1],)
         )
         self.assertEqual(14, len(data.keys()))
         self.assertEqual([{}, ] * 14, list(data.values()))

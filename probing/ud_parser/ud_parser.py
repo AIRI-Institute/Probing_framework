@@ -19,9 +19,11 @@ from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_
 class ConlluUDParser:
     def __init__(
         self,
-        shuffle: bool = True
+        shuffle: bool = True,
+        verbose: bool = True
     ):
         self.shuffle = shuffle
+        self.verbose = verbose
 
     def read(self, path: str) -> str:
         """
@@ -33,7 +35,7 @@ class ConlluUDParser:
             conllu_file = f.read()
         return conllu_file 
 
-    def writer(self, partition_sets: Dict, save_path_dir: os.PathLike, category: Enum, language: str) -> Path:
+    def writer(self, partition_sets: Dict, category: Enum, language: str, save_path_dir: os.PathLike) -> Path:
         """
         Writes to a file
         Args:
@@ -41,7 +43,6 @@ class ConlluUDParser:
              partition_sets: the data split into 3 parts
         """
         result_path = Path(Path(save_path_dir).resolve(), f'{language}_{category}.csv')
-        print(f'Writing to file: {result_path}\n')
         with open(result_path, 'w', encoding='utf-8') as newf:
             my_writer = csv.writer(newf, delimiter='\t', lineterminator='\n')
             for part in partition_sets:
@@ -102,7 +103,7 @@ class ConlluUDParser:
         self,
         parts: Dict,
         category: Enum
-    ) -> bool:
+    ) -> None:
         """
         Checks if the data are not empty and have a train set
         Args:
@@ -117,8 +118,6 @@ class ConlluUDParser:
                 logging.warning(f"The classes in train and validation parts are different for category \"{category}\"")
             elif val_categories_set != te_categories_set:
                 logging.warning(f"The classes in train and test parts are different for category \"{category}\"")
-            return True
-        return False
 
     def subsamples_split(
         self,
@@ -267,9 +266,7 @@ class ConlluUDParser:
         self,
         paths: List[os.PathLike],
         splits: List[List[Enum]],
-        partitions: List[List[float]],
-        language: Optional[str],
-        save_path_dir: Optional[os.PathLike]
+        partitions: List[List[float]]
     ) -> Dict[str, Dict[Enum, List[str]]]:
         """
         Generates files for all categories
@@ -279,9 +276,10 @@ class ConlluUDParser:
             partitions: the percentage of different splits
         """
         data = defaultdict(dict)
-        language = self.__extract_lang_from_udfile_path(paths[0], language)
-        save_path_dir = self.__determine_ud_savepath(Path(paths[0]).parent, save_path_dir)
         list_texts, categories = self.get_text_and_categories(paths)
+
+        if self.verbose:
+            print(f"{len(categories)} categories were found")
 
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
@@ -296,10 +294,8 @@ class ConlluUDParser:
                 )
                 category_parts.update(part)
 
+            self.check_parts(category_parts, category)
             data[category] = category_parts
-            are_full_parts = self.check_parts(category_parts, category)
-            if are_full_parts:
-                output_path = self.writer(category_parts, save_path_dir, category, language)
         return data
 
     def process_paths(
@@ -309,38 +305,36 @@ class ConlluUDParser:
         te_path: os.PathLike = None,
         language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None
-    ) -> None:
+    ) -> Tuple[Dict[str, Dict[Enum, List[str]]], str, os.PathLike]:
         known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
         assert len(known_paths) > 0, "None paths were provided"
         assert tr_path is not None, "At least the path to train data should be provided"
 
+        language = self.__extract_lang_from_udfile_path(known_paths[0], language)
+        save_path_dir = self.__determine_ud_savepath(Path(known_paths[0]).parent, save_path_dir)
+
         if len(known_paths) == 1:
-            _ = self.generate_data_by_categories(
+            files_data = self.generate_data_by_categories(
                 paths=[tr_path],
                 partitions=partitions_by_files["one_file"],
-                splits = [["tr", "va", "te"]],
-                language = language,
-                save_path_dir = save_path_dir
+                splits = [["tr", "va", "te"]]
             )
         elif len(known_paths) == 2:
             second_path = te_path if te_path is not None else va_path
-            _ = self.generate_data_by_categories(
+            files_data = self.generate_data_by_categories(
                 paths=[tr_path, second_path],
                 partitions=partitions_by_files["two_files"],
-                splits = [["tr"], ["va", "te"]],
-                language = language,
-                save_path_dir = save_path_dir
+                splits = [["tr"], ["va", "te"]]
             )
         elif len(known_paths) == 3:
-            _ = self.generate_data_by_categories(
+            files_data = self.generate_data_by_categories(
                 paths=[tr_path, va_path, te_path],
                 partitions=partitions_by_files["three_files"],
-                splits = [["tr"], ["va"], ["te"]],
-                language = language,
-                save_path_dir = save_path_dir
+                splits = [["tr"], ["va"], ["te"]]
             )
         else:
             raise NotImplementedError(too_much_files_err_str.format(len(known_paths)))
+        return files_data, language, save_path_dir
 
     def convert(
         self,
@@ -363,6 +357,14 @@ class ConlluUDParser:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
             assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
             assert len(paths) <= 3, too_much_files_err_str.format(len(paths))
-            self.process_paths(*paths, language=language, save_path_dir=save_path_dir)
+            data, language, save_path_dir = self.process_paths(*paths, language=language, save_path_dir=save_path_dir)
         else:
-            self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
+            data, language, save_path_dir = self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
+
+        final_folders = set()
+        for category, category_data in data.items():
+            output_path = self.writer(category_data, category, language, save_path_dir)
+            if self.verbose:
+                print(f'Writing to file: {output_path}')
+            final_folders.add(str(output_path.parent))
+        print(f"Results were saved into folders: {final_folders}")
