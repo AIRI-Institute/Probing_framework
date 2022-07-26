@@ -1,3 +1,4 @@
+from time import time
 from enum import Enum
 from typing import Optional, Callable, Union, List, Tuple
 import os
@@ -6,7 +7,7 @@ import numpy as np
 import torch
 from collections import defaultdict
 from torch.utils.data import DataLoader
-from transformers import AdamW
+from torch.optim import AdamW
 
 from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
@@ -137,6 +138,7 @@ class ProbingPipeline:
 
         self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         self.log_info['params']['probing_task'] = probe_task
+        self.log_info['params']['file_path'] = path_to_file_for_probing
         self.log_info['params']['task_language'] = task_language
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
@@ -150,6 +152,7 @@ class ProbingPipeline:
             print('=' * 100)
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
+        start_time = time()
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
         train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size, shuffle = self.shuffle)
         val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size, shuffle = self.shuffle)
@@ -157,6 +160,7 @@ class ProbingPipeline:
         self.log_info['params']['encoded_labels'] = train.encoded_labels
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
+        self.log_info['results']['elapsed_time(sec)'] = 0
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
@@ -173,7 +177,8 @@ class ProbingPipeline:
             _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
 
             self.log_info['results']['test_score'][layer].append(epoch_test_score)
-
+        
+        self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
         if verbose:
             print(f"Experiments were saved in the folder: {output_path}")

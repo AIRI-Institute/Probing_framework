@@ -3,24 +3,27 @@ import os
 import csv
 import numpy as np
 import logging
+from collections import Counter
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Tuple, Optional, Dict, List, Any
 from collections import defaultdict
 from conllu import parse_tree, parse
 from conllu.models import TokenTree, Token
 from sklearn.model_selection import train_test_split
 from nltk.tokenize import wordpunct_tokenize
 
-from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str
+from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str, splits_by_files
 
 
 class ConlluUDParser:
     def __init__(
         self,
-        shuffle: bool = True
+        shuffle: bool = True,
+        verbose: bool = True
     ):
         self.shuffle = shuffle
+        self.verbose = verbose
 
     def read(self, path: str) -> str:
         """
@@ -31,6 +34,21 @@ class ConlluUDParser:
         with open(path, encoding='utf-8') as f:
             conllu_file = f.read()
         return conllu_file 
+
+    def writer(self, partition_sets: Dict, category: Enum, language: str, save_path_dir: os.PathLike) -> Path:
+        """
+        Writes to a file
+        Args:
+             result_path: a filename that will be generated
+             partition_sets: the data split into 3 parts
+        """
+        result_path = Path(Path(save_path_dir).resolve(), f'{language}_{category}.csv')
+        with open(result_path, 'w', encoding='utf-8') as newf:
+            my_writer = csv.writer(newf, delimiter='\t', lineterminator='\n')
+            for part in partition_sets:
+                for sentence, value in zip(*partition_sets[part]):
+                    my_writer.writerow([part, value, sentence])
+        return result_path
 
     def find_category_token(
         self,
@@ -76,6 +94,31 @@ class ConlluUDParser:
                 probing_data[value].append(s_text)
         return probing_data
 
+    def filter_labels_after_split(self, labels: List[Any]) -> List[Any]:
+        labels_repeat_dict = Counter(labels)
+        n_repeat = 1 # threshold to overcome further splitting problem
+        return [label for label, count in labels_repeat_dict.items() if count > n_repeat]
+
+    def check_parts(
+        self,
+        parts: Dict,
+        category: Enum
+    ) -> None:
+        """
+        Checks if the data are not empty and have a train set
+        Args:
+            parts: train, val and test sets
+            category: a grammatical value
+        """
+        if len(parts) == 3:
+            tr_categories_set = set(parts['tr'][1])
+            val_categories_set = set(parts['va'][1])
+            te_categories_set = set(parts['te'][1])
+            if tr_categories_set != val_categories_set:
+                logging.warning(f"The classes in train and validation parts are different for category \"{category}\"")
+            elif val_categories_set != te_categories_set:
+                logging.warning(f"The classes in train and test parts are different for category \"{category}\"")
+
     def subsamples_split(
         self,
         probing_data: Dict,
@@ -94,42 +137,42 @@ class ConlluUDParser:
             shuffle: if sentences should be randomly shuffled
             split: parts that data should be split to
         """
+        parts = {}
         data, labels = map(np.array, zip(*probing_data))
         X_train, X_test, y_train, y_test = train_test_split(
             data, labels, stratify=labels, train_size=partition[0],
             shuffle=self.shuffle, random_state=random_seed
         )
+
         if len(partition) == 2:
             parts = {
                 split[0]: [X_train, y_train],
                 split[1]: [X_test, y_test]
             }
         else:
-            label = [y for y, count in zip(*np.unique(y_test, return_counts=True)) if count > 1]
-            X_train = X_train[np.isin(y_train, label)]
-            y_train = y_train[np.isin(y_train, label)]
-            X_test = X_test[np.isin(y_test, label)]
-            y_test = y_test[np.isin(y_test, label)]
+            filtered_labels = self.filter_labels_after_split(y_test)
+            if len(filtered_labels) >= 2:
+                X_train = X_train[np.isin(y_train, filtered_labels)]
+                y_train = y_train[np.isin(y_train, filtered_labels)]
+                X_test = X_test[np.isin(y_test, filtered_labels)]
+                y_test = y_test[np.isin(y_test, filtered_labels)]
 
-            val_size = partition[1] / (1 - partition[0])
-
-            if y_test.size != 0:
-                X_val, X_test, y_val, y_test = train_test_split(
-                    X_test, y_test, stratify=y_test, train_size=val_size,
-                    shuffle=self.shuffle, random_state=random_seed
-                )
-                parts = {
-                    split[0]: [X_train, y_train],
-                    split[1]: [X_test, y_test],
-                    split[2]: [X_val, y_val]
-                }
-            else:
-                parts = {}
+                val_size = partition[1] / (1 - partition[0])
+                if y_test.size != 0:
+                    X_val, X_test, y_val, y_test = train_test_split(
+                        X_test, y_test, stratify=y_test, train_size=val_size,
+                        shuffle=self.shuffle, random_state=random_seed
+                    )
+                    parts = {
+                        split[0]: [X_train, y_train],
+                        split[1]: [X_test, y_test],
+                        split[2]: [X_val, y_val]
+                    }
         return parts
 
     def generate_probing_file(
         self,
-        conllu: os.PathLike,
+        conllu_text: str,
         category: Enum,
         splits: List[Enum],
         partitions: List[float],
@@ -138,81 +181,53 @@ class ConlluUDParser:
         """
         Generates a split following given arguments
         Args:
-            conllu: a string in CONLLU format with the data
+            conllu_text: a string in CONLLU format with the data
             category: a grammatical category to split by
-            split: parts that the data are to split to
+            splits: parts that the data are to split to
             partitions: a percentage of splits
             shuffle: if the data should be randomly shuffles
             random_seed: a random seed for spliting
         """
-        sentences = parse_tree(conllu)
+        sentences = parse_tree(conllu_text)
         classified_sentences = self.classify(sentences, category)
-        num_classes = len(classified_sentences)
+        num_classes = len(classified_sentences.keys())
+
         if num_classes == 1:
-            logging.warning(f"Category \"{category}\" has only one class.")
+            logging.warning(f"Category \"{category}\" has only one class")
             return {}
         elif num_classes == 0:
-            logging.warning(f"This file does not contain examples of category \"{category}\".")
+            logging.warning(f"This file does not contain examples of category \"{category}\"")
             return {}
 
         if len(splits) == 1:
-            data = [(v, key) for key, value in classified_sentences.items() for v in value]
+            data = [(s, class_name) for class_name, sentences in classified_sentences.items() for s in sentences]
             parts = {splits[0]: list(zip(*data))}
             return parts
 
-        data = [(v, key) for key, value in classified_sentences.items() if len(value) > num_classes for v in value]
+        data = [(s, class_name) for class_name, sentences in classified_sentences.items() if len(sentences) > num_classes for s in sentences]
         if data:
             parts = self.subsamples_split(data, partitions, random_seed, splits)
         else:
             parts = {}
-            logging.warning(f"Not enough data of category \"{category}\" for stratified split.")
+        
+        if not parts:
+            logging.warning(f"Not enough data of category \"{category}\" for stratified split")
         return parts
 
-    def writer(self, result_path: os.PathLike, partition_sets: Dict):
-        """
-        Writes to a file
-        Args:
-             result_path: a filename that will be generated
-             partition_sets: the data split into 3 parts
-        """
-        print(f'Writing to file: {result_path}\n')
-        with open(result_path, 'w', encoding='utf-8') as newf:
-            my_writer = csv.writer(newf, delimiter='\t', lineterminator='\n')
-            for part in partition_sets:
-                for sentence, value in zip(*partition_sets[part]):
-                    my_writer.writerow([part, value, sentence])
-        return None
-
-    def check(self, parts: Dict, category: Enum):
-        """
-        Checks if the data are not empty and have a train set
-        Args:
-            parts: train, val and test sets
-            category: a grammatical value
-        """
-        if len(parts) == 3:
-            tr_categories_set = set(parts['tr'][1])
-            val_categories_set = set(parts['va'][1])
-            te_categories_set = set(parts['te'][1])
-            if tr_categories_set != val_categories_set:
-                logging.warning(f"The classes in train and validation parts are different for category \"{category}\".")
-            elif val_categories_set != te_categories_set:
-                logging.warning(f"The classes in train and test parts are different for category \"{category}\".")
-            save_path_file = Path(self.save_path_dir.resolve(), f'{self.language}_{category}.csv')
-            self.writer(save_path_file, parts)
-        return None
-    
-    def find_categories(self, text_data: str) -> List[Enum]:
+    def get_text_and_categories(self, paths: List[os.PathLike]) -> Tuple[List[str], List[Enum]]:
         set_of_values = set()
+        list_texts = [self.read(p) for p in paths]
+        text_data = "\n".join(list_texts)
         token_lists = parse(text_data)
         for token_list in token_lists:
             for token in token_list:
                 feats = token['feats']
                 if feats:
                     set_of_values.update(feats.keys())
-        return sorted(set_of_values)
+        return list_texts, sorted(set_of_values)
     
-    def get_filepaths_from_dir(self, dir_path: os.PathLike) -> List[os.PathLike]:        
+    def get_filepaths_from_dir(self, dir_path: os.PathLike) -> List[os.PathLike]:
+        dir_path = Path(dir_path).resolve() if dir_path is not None else None 
         def sorting_parts_func(p: os.PathLike) -> int:
             p = str(p)
             if 'train' in p:
@@ -225,16 +240,20 @@ class ConlluUDParser:
                 re.match(".*-(train|dev|test).*\.conllu", p)]
         return sorted(filepaths, key=sorting_parts_func)
 
-    def __extract_lang_from_udfile(self, ud_file_path: Path, language: str) -> str:
+    def __extract_lang_from_udfile_path(
+        self,
+        ud_file_path: os.PathLike,
+        language: Optional[str]
+    ) -> str:
         if not language:
-            return ud_file_path.stem.split('-')[0]
+            return Path(ud_file_path).stem.split('-')[0]
         return language
     
     def __determine_ud_savepath(
         self,
         path_from_files: os.PathLike,
-        save_path_dir: os.PathLike
-    ) -> os.PathLike:
+        save_path_dir: Optional[os.PathLike]
+    ) -> Path:
         final_path = None
         if not save_path_dir:
             final_path = path_from_files
@@ -243,12 +262,12 @@ class ConlluUDParser:
         os.makedirs(final_path, exist_ok=True)
         return Path(final_path)
 
-    def generate_(
+    def generate_data_by_categories(
         self,
         paths: List[os.PathLike],
-        splits: List[List[Enum]] = None,
-        partitions: List[List[float]] = None
-    ) -> None:
+        partitions: Optional[List[List[float]]] = None,
+        splits: Optional[List[List[Enum]]] = None
+    ) -> Dict[str, Dict[Enum, List[str]]]:
         """
         Generates files for all categories
         Args:
@@ -256,23 +275,32 @@ class ConlluUDParser:
             splits: the way how the data should be split
             partitions: the percentage of different splits
         """
-        texts = [self.read(p) for p in paths]
-        categories = self.find_categories("\n".join(texts))
         data = defaultdict(dict)
+        list_texts, categories = self.get_text_and_categories(paths)
+
+        if self.verbose:
+            print(f"{len(categories)} categories were found")
+
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
             logging.warning(f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}")
 
+        if partitions is None:
+            partitions = partitions_by_files[len(paths)]
+        if splits is None:
+            splits = splits_by_files[len(paths)]
+
         for category in categories:
-            parts = {}
-            for text, split, partion in zip(texts, splits, partitions):
+            category_parts = {}
+            for text, split, part in zip(list_texts, splits, partitions):
                 part = self.generate_probing_file(
-                    conllu=text, splits=split,
-                    partitions=partion, category=category
+                    conllu_text=text, splits=split,
+                    partitions=part, category=category
                 )
-                parts.update(part)
-            self.check(parts, category)
-            data[category] = parts
+                category_parts.update(part)
+
+            self.check_parts(category_parts, category)
+            data[category] = category_parts
         return data
 
     def process_paths(
@@ -280,36 +308,32 @@ class ConlluUDParser:
         tr_path: os.PathLike = None,
         va_path: os.PathLike = None,
         te_path: os.PathLike = None,
-        language: str = None,
+        language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None
-    ) -> None:
+    ) -> Tuple[Dict[str, Dict[Enum, List[str]]], str, os.PathLike]:
         known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
-        assert len(known_paths) > 0, "None paths were provided."
-        assert tr_path is not None, "At least the path to train data should be provided."
-        self.language = self.__extract_lang_from_udfile(known_paths[0], language)
-        self.save_path_dir = self.__determine_ud_savepath(known_paths[0].parent, save_path_dir)
+        assert len(known_paths) > 0, "None paths were provided"
+        assert tr_path is not None, "At least the path to train data should be provided"
+
+        language = self.__extract_lang_from_udfile_path(known_paths[0], language)
+        save_path_dir = self.__determine_ud_savepath(Path(known_paths[0]).parent, save_path_dir)
 
         if len(known_paths) == 1:
-            self.generate_(
-                paths=[tr_path],
-                partitions=partitions_by_files["one_file"],
-                splits = [["tr", "va", "te"]]
+            files_data = self.generate_data_by_categories(
+                paths=[tr_path]
             )
         elif len(known_paths) == 2:
             second_path = te_path if te_path is not None else va_path
-            self.generate_(
-                paths=[tr_path, second_path],
-                partitions=partitions_by_files["two_files"],
-                splits = [["tr"], ["va", "te"]]
+            files_data = self.generate_data_by_categories(
+                paths=[tr_path, second_path]
             )
         elif len(known_paths) == 3:
-            self.generate_(
-                paths=[tr_path, va_path, te_path],
-                partitions=partitions_by_files["three_files"],
-                splits = [["tr"], ["va"], ["te"]]
+            files_data = self.generate_data_by_categories(
+                paths=[tr_path, va_path, te_path]
             )
         else:
             raise NotImplementedError(too_much_files_err_str.format(len(known_paths)))
+        return files_data, language, save_path_dir
 
     def convert(
         self,
@@ -317,7 +341,7 @@ class ConlluUDParser:
         va_path: Optional[os.PathLike] = None,
         te_path: Optional[os.PathLike] = None,
         dir_conllu_path: Optional[os.PathLike] = None,
-        language: str = None,
+        language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None
     ) -> None:
         """
@@ -328,15 +352,19 @@ class ConlluUDParser:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
-        dir_conllu_path = Path(dir_conllu_path).resolve() if dir_conllu_path is not None else None
-        if dir_conllu_path is None:
-            self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
-        else:
+        if dir_conllu_path:
             paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
             assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
             assert len(paths) <= 3, too_much_files_err_str.format(len(paths))
+            data, language, save_path_dir = self.process_paths(*paths, language=language, save_path_dir=save_path_dir)
+        else:
+            data, language, save_path_dir = self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
 
-            self.language = self.__extract_lang_from_udfile(paths[0], language)
-            self.save_path_dir = self.__determine_ud_savepath(dir_conllu_path, save_path_dir)
-
-            self.process_paths(*paths, language=self.language, save_path_dir=self.save_path_dir)
+        final_folders = set()
+        for category, category_data in data.items():
+            if category_data:
+                output_path = self.writer(category_data, category, language, save_path_dir)
+                final_folders.add(str(output_path.parent))
+                if self.verbose:
+                    print(f'Writing to file: {output_path}')
+        print(f"Results were saved into folders: {final_folders}")

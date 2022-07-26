@@ -72,6 +72,8 @@ class EncodeLoader:
         le = preprocessing.LabelEncoder()
         le.fit(array)
         self.encoded_labels = dict(zip(le.classes_, le.transform(le.classes_)))
+        if len(self.encoded_labels) < 2:
+            logging.warning("Provided data contains only one class")
         return le.transform(array)
     
     def __get_sampled_data(self) -> Tuple[List[str], List[int]]:
@@ -107,7 +109,7 @@ class EncodeLoader:
             all_excluded_rows.extend(row_ids_to_exclude)
 
         if all_excluded_rows:
-            logging.warning(f"Since you decided not to truncate long sentences, {len(all_excluded_rows)} samples were excluded.")
+            logging.warning(f"Since you decided not to truncate long sentences, {len(all_excluded_rows)} samples were excluded")
 
         return DataLoader(
             dataset=dataset,
