@@ -87,7 +87,8 @@ class ProbingPipeline:
             
             loss.backward()
             self.optimizer.step()
-            self.scheduler.step()
+            if self.scheduler:
+                self.scheduler.step()
             self.optimizer.zero_grad()
 
         epoch_loss = np.mean(epoch_train_losses)
@@ -128,6 +129,7 @@ class ProbingPipeline:
         probe_task: Union[Enum, str],
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
+        is_scheduler: bool = False,
         save_checkpoints: bool = False,
         verbose: bool = True
     ) -> None:
@@ -166,11 +168,12 @@ class ProbingPipeline:
             self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
+
             self.scheduler = get_linear_schedule_with_warmup(
                 self.optimizer,
                 num_warmup_steps=2000,
                 num_training_steps=len(train) // train_epochs
-                )
+                ) if is_scheduler else None
 
 
             for epoch in range(train_epochs):
