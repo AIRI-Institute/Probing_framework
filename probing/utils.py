@@ -64,6 +64,7 @@ def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum
         ratio_by_classes[class_name] = dict(Counter(class_labels_all))
     return ratio_by_classes
 
+
 def lang_category_extraction(file_path: os.PathLike) -> Tuple[Optional[str], Optional[str]]:
     if '_' in file_path:   
         path = str(Path(file_path).stem)           
@@ -90,3 +91,13 @@ def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tens
         return tensor[mask]
     output = tensor[mask].view(new_num_rows, -1)
     return output
+
+
+class ProbingLog(dict):
+    """Implementation of our log"""
+    def __getitem__(self, item):
+        try:
+            return dict.__getitem__(self, item)
+        except KeyError:
+            value = self[item] = type(self)()
+            return value
