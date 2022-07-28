@@ -177,13 +177,16 @@ class ProbingPipeline:
                 self.log_info['results']['val_loss'][layer].append(epoch_val_loss)
 
                 for m in self.metric_names:
+                    if layer not in self.log_info['results']['val_score'][m]:
+                        self.log_info['results']['val_score'][m][layer] = []
                     self.log_info['results']['val_score'][m][layer].append(epoch_val_score[m])
 
             _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
 
             for m in self.metric_names:
+                if layer not in self.log_info['results']['test_score'][m]:
+                    self.log_info['results']['test_score'][m][layer] = []
                 self.log_info['results']['test_score'][m][layer].append(epoch_test_score[m])
-            self.log_info['results']['test_score'][layer].append(epoch_test_score)
         
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
