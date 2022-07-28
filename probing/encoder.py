@@ -9,7 +9,7 @@ from probing.utils import exclude_rows
 class TransformersLoader:
     def __init__(
         self,
-        model_name: Enum,
+        model_name: Optional[Enum] = None,
         device: Optional[Enum] = None,
         truncation: bool = False,
         padding: Enum = "longest",
@@ -23,13 +23,13 @@ class TransformersLoader:
         self.config = AutoConfig.from_pretrained(
             model_name, output_hidden_states=output_hidden_states, 
             output_attentions=output_attentions
-            )
+            ) if model_name else None
         self.model = AutoModel.from_pretrained(
             model_name, config=self.config
-            )
+            ) if model_name else None
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, config=self.config
-            )
+            ) if model_name else None
 
         self.truncation = truncation 
         self.padding = padding
