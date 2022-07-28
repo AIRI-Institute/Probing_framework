@@ -5,9 +5,9 @@ import os
 from tqdm.notebook import trange
 import numpy as np
 import torch
-from collections import defaultdict
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup
 
 from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
@@ -87,6 +87,7 @@ class ProbingPipeline:
             
             loss.backward()
             self.optimizer.step()
+            scheduler.step()
             self.optimizer.zero_grad()
 
         epoch_loss = np.mean(epoch_train_losses)
@@ -165,6 +166,12 @@ class ProbingPipeline:
             self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
+            self.scheduler = get_linear_schedule_with_warmup(
+                self.optimizer,
+                num_warmup_steps=2000,
+                num_training_steps=len(train) // train_epochs
+                )
+
 
             for epoch in range(train_epochs):
                 epoch_train_loss = self.train(train.dataset, layer)
