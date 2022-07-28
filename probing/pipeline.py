@@ -5,7 +5,6 @@ import os
 from tqdm.notebook import trange
 import numpy as np
 import torch
-from collections import defaultdict
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 
@@ -13,7 +12,7 @@ from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction
+from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction, ProbingLog
 
 
 class ProbingPipeline:
@@ -136,7 +135,7 @@ class ProbingPipeline:
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
 
-        self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))
+        self.log_info = ProbingLog()
         self.log_info['params']['probing_task'] = probe_task
         self.log_info['params']['file_path'] = path_to_file_for_probing
         self.log_info['params']['task_language'] = task_language
@@ -162,7 +161,11 @@ class ProbingPipeline:
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         self.log_info['results']['elapsed_time(sec)'] = 0
         for layer in probing_iter_range:
-            self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
+            self.classifier = self.get_classifier(
+                self.classifier_name,
+                num_classes,
+                self.transformer_model.config.hidden_size
+                )
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
 
