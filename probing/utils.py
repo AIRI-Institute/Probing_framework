@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
-from collections import Counter
+from collections import Counter, defaultdict
 import os
 import glob
 import logging
@@ -93,11 +93,14 @@ def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tens
     return output
 
 
-class ProbingLog(dict):
-    """Implementation of our log"""
-    def __getitem__(self, item):
-        try:
-            return dict.__getitem__(self, item)
-        except KeyError:
-            value = self[item] = type(self)()
-            return value
+class ProbingLog(defaultdict):
+    def __init__(self, *args, **kwargs):
+        super(ProbingLog, self).__init__(ProbingLog, *args, **kwargs)
+
+    def __repr__(self):
+        return repr(dict(self))
+
+    def add(self, key, value):
+        if key not in self:
+            self[key] = []
+        self[key].append(value)

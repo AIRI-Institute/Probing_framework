@@ -5,6 +5,7 @@ import os
 from tqdm.notebook import trange
 import numpy as np
 import torch
+from collections import defaultdict
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 
@@ -135,7 +136,7 @@ class ProbingPipeline:
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
 
-        self.log_info = ProbingLog()
+        self.log_info = ProbingLog
         self.log_info['params']['probing_task'] = probe_task
         self.log_info['params']['file_path'] = path_to_file_for_probing
         self.log_info['params']['task_language'] = task_language
@@ -161,11 +162,7 @@ class ProbingPipeline:
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         self.log_info['results']['elapsed_time(sec)'] = 0
         for layer in probing_iter_range:
-            self.classifier = self.get_classifier(
-                self.classifier_name,
-                num_classes,
-                self.transformer_model.config.hidden_size
-                )
+            self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
 
@@ -173,20 +170,16 @@ class ProbingPipeline:
                 epoch_train_loss = self.train(train.dataset, layer)
                 epoch_val_loss, epoch_val_score = self.evaluate(val.dataset, layer, save_checkpoints)
 
-                self.log_info['results']['train_loss'][layer].append(epoch_train_loss)
-                self.log_info['results']['val_loss'][layer].append(epoch_val_loss)
+                self.log_info['results']['train_loss'].add(layer, epoch_train_loss)
+                self.log_info['results']['val_loss'].add(layer, epoch_val_loss)
 
                 for m in self.metric_names:
-                    if layer not in self.log_info['results']['val_score'][m]:
-                        self.log_info['results']['val_score'][m][layer] = []
-                    self.log_info['results']['val_score'][m][layer].append(epoch_val_score[m])
+                    self.log_info['results']['val_score'][m].add(layer, epoch_val_score[m])
 
             _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
 
             for m in self.metric_names:
-                if layer not in self.log_info['results']['test_score'][m]:
-                    self.log_info['results']['test_score'][m][layer] = []
-                self.log_info['results']['test_score'][m][layer].append(epoch_test_score[m])
+                self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])
         
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
