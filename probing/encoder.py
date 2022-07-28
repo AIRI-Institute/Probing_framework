@@ -38,15 +38,18 @@ class TransformersLoader:
         self.return_dict = return_dict
         self.max_length = max_length
 
-        if device:
-            self.device = device
-            self.model.to(torch.device(self.device))
-        elif torch.cuda.is_available():
-            self.model.cuda()
-            self.device = self.model.device
+        if self.model:
+            if device:
+                self.device = device
+                self.model.to(torch.device(self.device))
+            elif torch.cuda.is_available():
+                self.model.cuda()
+                self.device = self.model.device
+            else:
+                self.device = "cpu"
+                self.model.to(torch.device(self.device))
         else:
-            self.device = "cpu"
-            self.model.to(torch.device(self.device))
+            self.device = None
 
     def _get_output_tensors(self, encoded_text: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor, List[int]]:
         input_ids = encoded_text["input_ids"]

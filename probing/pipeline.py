@@ -5,15 +5,15 @@ import os
 from tqdm.notebook import trange
 import numpy as np
 import torch
-from collections import defaultdict
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup
 
 from probing.classifier import LogReg, MLP
 from probing.data_former import DataFormer, EncodeLoader
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction
+from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction, ProbingLog
 
 
 class ProbingPipeline:
@@ -23,7 +23,7 @@ class ProbingPipeline:
         probing_type: Optional[Enum] = "layer",
         device: Optional[Enum] = None,
         classifier_name: Enum = "logreg",
-        metric_name: Enum = "accuracy",
+        metric_names: Union[Enum, List[Enum]] = "accuracy",
         embedding_type: Enum = "cls",
         batch_size: Optional[int] = 64,
         dropout_rate: float = 0.2,
@@ -38,10 +38,10 @@ class ProbingPipeline:
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
         self.classifier_name = classifier_name
-        self.metric_name = metric_name
+        self.metric_names = metric_names
         self.embedding_type = embedding_type
 
-        self.metric = Metric(metric_name)
+        self.metrics = Metric(metric_names)
         self.transformer_model = TransformersLoader(
             model_name = hf_model_name,
             device = device,
@@ -87,6 +87,8 @@ class ProbingPipeline:
             
             loss.backward()
             self.optimizer.step()
+            if self.scheduler:
+                self.scheduler.step()
             self.optimizer.zero_grad()
 
         epoch_loss = np.mean(epoch_train_losses)
@@ -118,7 +120,7 @@ class ProbingPipeline:
                 epoch_predictions += prediction.data.max(1).indices.cpu()
                 epoch_true_labels += y.cpu()
 
-        epoch_metric_score = self.metric(epoch_predictions, epoch_true_labels).item()
+        epoch_metric_score = self.metrics(epoch_predictions, epoch_true_labels)
         epoch_loss = np.mean(epoch_losses)
         return epoch_loss, epoch_metric_score
 
@@ -127,6 +129,7 @@ class ProbingPipeline:
         probe_task: Union[Enum, str],
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
+        is_scheduler: bool = False,
         save_checkpoints: bool = False,
         verbose: bool = True
     ) -> None:
@@ -136,7 +139,7 @@ class ProbingPipeline:
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
 
-        self.log_info = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+        self.log_info = ProbingLog()
         self.log_info['params']['probing_task'] = probe_task
         self.log_info['params']['file_path'] = path_to_file_for_probing
         self.log_info['params']['task_language'] = task_language
@@ -145,7 +148,7 @@ class ProbingPipeline:
         self.log_info['params']['batch_size'] = self.batch_size
         self.log_info['params']['hf_model_name'] = self.hf_model_name
         self.log_info['params']['classifier_name'] = self.classifier_name
-        self.log_info['params']['metric_name'] = self.metric_name
+        self.log_info['params']['metric_names'] = self.metric_names
         self.log_info['params']['original_classes_ratio'] = get_ratio_by_classes(task_dataset)
 
         if verbose:
@@ -166,17 +169,27 @@ class ProbingPipeline:
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
 
+            self.scheduler = get_linear_schedule_with_warmup(
+                self.optimizer,
+                num_warmup_steps=2000,
+                num_training_steps=len(train) // train_epochs
+                ) if is_scheduler else None
+
+
             for epoch in range(train_epochs):
                 epoch_train_loss = self.train(train.dataset, layer)
                 epoch_val_loss, epoch_val_score = self.evaluate(val.dataset, layer, save_checkpoints)
 
-                self.log_info['results']['train_loss'][layer].append(epoch_train_loss)
-                self.log_info['results']['val_loss'][layer].append(epoch_val_loss)
-                self.log_info['results']['val_score'][layer].append(epoch_val_score)
+                self.log_info['results']['train_loss'].add(layer, epoch_train_loss)
+                self.log_info['results']['val_loss'].add(layer, epoch_val_loss)
+
+                for m in self.metric_names:
+                    self.log_info['results']['val_score'][m].add(layer, epoch_val_score[m])
 
             _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
 
-            self.log_info['results']['test_score'][layer].append(epoch_test_score)
+            for m in self.metric_names:
+                self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])
         
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)

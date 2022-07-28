@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
-from collections import Counter
+from collections import Counter, defaultdict
 import os
 import glob
 import logging
@@ -64,6 +64,7 @@ def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum
         ratio_by_classes[class_name] = dict(Counter(class_labels_all))
     return ratio_by_classes
 
+
 def lang_category_extraction(file_path: os.PathLike) -> Tuple[Optional[str], Optional[str]]:
     if '_' in file_path:   
         path = str(Path(file_path).stem)           
@@ -90,3 +91,16 @@ def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tens
         return tensor[mask]
     output = tensor[mask].view(new_num_rows, -1)
     return output
+
+
+class ProbingLog(defaultdict):
+    def __init__(self, *args, **kwargs):
+        super(ProbingLog, self).__init__(ProbingLog, *args, **kwargs)
+
+    def __repr__(self):
+        return repr(dict(self))
+
+    def add(self, key, value):
+        if key not in self:
+            self[key] = []
+        self[key].append(value)
