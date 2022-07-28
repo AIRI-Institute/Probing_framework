@@ -19,7 +19,7 @@ from probing.utils import save_log, get_ratio_by_classes, lang_category_extracti
 class ProbingPipeline:
     def __init__(
         self,
-        hf_model_name: Enum,
+        hf_model_name: Optional[Enum] = None,
         probing_type: Optional[Enum] = "layer",
         device: Optional[Enum] = None,
         classifier_name: Enum = "logreg",
