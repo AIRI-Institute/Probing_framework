@@ -47,7 +47,7 @@ class ProbingPipeline:
             device = device,
             truncation = truncation
             )
-        self.device = self.transformer_model.device if self.transformer_model else None
+        self.device = self.transformer_model.device
 
     def get_classifier(
         self,

@@ -48,6 +48,8 @@ class TransformersLoader:
             else:
                 self.device = "cpu"
                 self.model.to(torch.device(self.device))
+        else:
+            self.device = None
 
     def _get_output_tensors(self, encoded_text: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor, List[int]]:
         input_ids = encoded_text["input_ids"]
