@@ -23,7 +23,7 @@ class ProbingPipeline:
         probing_type: Optional[Enum] = "layer",
         device: Optional[Enum] = None,
         classifier_name: Enum = "logreg",
-        metric_name: Enum = "accuracy",
+        metric_names: Union[Enum, List[Enum]] = "accuracy",
         embedding_type: Enum = "cls",
         batch_size: Optional[int] = 64,
         dropout_rate: float = 0.2,
@@ -38,10 +38,10 @@ class ProbingPipeline:
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
         self.classifier_name = classifier_name
-        self.metric_name = metric_name
+        self.metric_names = metric_names
         self.embedding_type = embedding_type
 
-        self.metric = Metric(metric_name)
+        self.metrics = Metric(metric_names)
         self.transformer_model = TransformersLoader(
             model_name = hf_model_name,
             device = device,
@@ -118,7 +118,7 @@ class ProbingPipeline:
                 epoch_predictions += prediction.data.max(1).indices.cpu()
                 epoch_true_labels += y.cpu()
 
-        epoch_metric_score = self.metric(epoch_predictions, epoch_true_labels).item()
+        epoch_metric_score = self.metrics(epoch_predictions, epoch_true_labels)
         epoch_loss = np.mean(epoch_losses)
         return epoch_loss, epoch_metric_score
 
@@ -145,7 +145,7 @@ class ProbingPipeline:
         self.log_info['params']['batch_size'] = self.batch_size
         self.log_info['params']['hf_model_name'] = self.hf_model_name
         self.log_info['params']['classifier_name'] = self.classifier_name
-        self.log_info['params']['metric_name'] = self.metric_name
+        self.log_info['params']['metric_names'] = self.metric_names
         self.log_info['params']['original_classes_ratio'] = get_ratio_by_classes(task_dataset)
 
         if verbose:
@@ -172,10 +172,14 @@ class ProbingPipeline:
 
                 self.log_info['results']['train_loss'][layer].append(epoch_train_loss)
                 self.log_info['results']['val_loss'][layer].append(epoch_val_loss)
-                self.log_info['results']['val_score'][layer].append(epoch_val_score)
+
+                for m in self.metric_names:
+                    self.log_info['results']['val_score'][m][layer].append(epoch_val_score[m])
 
             _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
 
+            for m in self.metric_names:
+                self.log_info['results']['test_score'][m][layer].append(epoch_test_score[m])
             self.log_info['results']['test_score'][layer].append(epoch_test_score)
         
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
