@@ -87,7 +87,7 @@ class ProbingPipeline:
             
             loss.backward()
             self.optimizer.step()
-            scheduler.step()
+            self.scheduler.step()
             self.optimizer.zero_grad()
 
         epoch_loss = np.mean(epoch_train_losses)
