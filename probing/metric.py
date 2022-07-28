@@ -21,7 +21,7 @@ class Metric:
     def f1_score(self, predictions: List[int], true_labels: List[int]) -> float:
         return f1(true_labels, predictions, average='weighted')
 
-    def get_metric(self, metric_names: Union[List[Enum], Enum]) -> Dict[Callable]:
+    def get_metric(self, metric_names: Union[List[Enum], Enum]) -> Dict[Enum, Callable]:
         metrics = {}
         if "accuracy" in metric_names:
             metrics["accuracy"] = self.accuracy
