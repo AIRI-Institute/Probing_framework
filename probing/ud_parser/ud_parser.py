@@ -360,11 +360,8 @@ class ConlluUDParser:
         else:
             data, language, save_path_dir = self.process_paths(tr_path, va_path, te_path, language, save_path_dir)
 
-        final_folders = set()
         for category, category_data in data.items():
             if category_data:
                 output_path = self.writer(category_data, category, language, save_path_dir)
-                final_folders.add(str(output_path.parent))
                 if self.verbose:
                     print(f'Writing to file: {output_path}')
-        print(f"Results were saved into folders: {final_folders}")
