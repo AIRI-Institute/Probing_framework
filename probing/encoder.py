@@ -48,7 +48,7 @@ class TransformersLoader:
             else:
                 self.device = "cpu"
                 self.model.to(torch.device(self.device))
-            self.model.eval()
+            self.model = self.model.eval()
         else:
             self.device = None
 
