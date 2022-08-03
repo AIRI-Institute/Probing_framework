@@ -78,10 +78,10 @@ class ProbingPipeline:
         epoch_train_losses = []
         self.classifier.train()
         for x, y in train_loader:
-            x = torch.squeeze(x[layer], 0).to(self.device)
+            x = torch.squeeze(x[layer], 0).to(self.device).float()
             y = torch.tensor(y).to(self.device)
 
-            prediction = self.classifier(x.type(torch.float32))
+            prediction = self.classifier(x)
             loss = self.criterion(prediction, y)
             epoch_train_losses.append(loss.item())
             
@@ -107,10 +107,10 @@ class ProbingPipeline:
         self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
-                x = torch.squeeze(x[layer], 0).to(self.device)
+                x = torch.squeeze(x[layer], 0).to(self.device).float()
                 y = torch.tensor(y).to(self.device)
 
-                prediction = self.classifier(x.type(torch.float32))
+                prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
                 epoch_losses.append(loss.item())
 
