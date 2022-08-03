@@ -48,6 +48,7 @@ class TransformersLoader:
             else:
                 self.device = "cpu"
                 self.model.to(torch.device(self.device))
+            self.model.eval()
         else:
             self.device = None
 
@@ -100,7 +101,6 @@ class TransformersLoader:
         )
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
         with torch.no_grad():
-
             # In case of encoder-decoder model, for embeddings we use only encoder 
             if hasattr(self.model, 'encoder') and hasattr(self.model, 'decoder'):
                 model_outputs = self.model.encoder(

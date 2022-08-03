@@ -81,7 +81,7 @@ class ProbingPipeline:
             x = torch.squeeze(x[layer], 0).to(self.device)
             y = torch.tensor(y).to(self.device)
 
-            prediction = self.classifier(x)
+            prediction = self.classifier(x.type(torch.float32))
             loss = self.criterion(prediction, y)
             epoch_train_losses.append(loss.item())
             
@@ -110,7 +110,7 @@ class ProbingPipeline:
                 x = torch.squeeze(x[layer], 0).to(self.device)
                 y = torch.tensor(y).to(self.device)
 
-                prediction = self.classifier(x)
+                prediction = self.classifier(x.type(torch.float32))
                 loss = self.criterion(prediction, y)
                 epoch_losses.append(loss.item())
 
@@ -146,7 +146,7 @@ class ProbingPipeline:
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
         self.log_info['params']['batch_size'] = self.batch_size
-        self.log_info['params']['hf_model_name'] = self.hf_model_name
+        self.log_info['params']['hf_model_name'] = self.hf_model_name if self.hf_model_name else self.transformer_model.config._name_or_path
         self.log_info['params']['classifier_name'] = self.classifier_name
         self.log_info['params']['metric_names'] = self.metric_names
         self.log_info['params']['original_classes_ratio'] = get_ratio_by_classes(task_dataset)
