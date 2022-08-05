@@ -61,7 +61,7 @@ class TransformersLoader:
             if "bigscience/bloom" in self.tokenizer.name_or_path:
                 row_ids_to_exclude = torch.where(input_ids[:, 0] != pad_token_id)
             else:
-                row_ids_to_exclude = torch.where(input_ids[:, 512 - 1] != pad_token_id)
+                row_ids_to_exclude = torch.where(input_ids[:, self.max_length - 1] != pad_token_id)
             if isinstance(row_ids_to_exclude, tuple):
                 row_ids_to_exclude = row_ids_to_exclude[0]
 
