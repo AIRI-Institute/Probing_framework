@@ -29,7 +29,8 @@ class ProbingPipeline:
         dropout_rate: float = 0.2,
         hidden_size: int = 256,
         shuffle: bool = True,
-        truncation: bool = False
+        truncation: bool = False,
+        max_length: Optional[int] = None
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
@@ -45,7 +46,8 @@ class ProbingPipeline:
         self.transformer_model = TransformersLoader(
             model_name = hf_model_name,
             device = device,
-            truncation = truncation
+            truncation = truncation,
+            max_length=max_length
             )
         self.device = self.transformer_model.device
 
