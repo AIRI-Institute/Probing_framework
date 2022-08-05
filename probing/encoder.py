@@ -18,7 +18,7 @@ class TransformersLoader:
         return_dict: bool = True,
         output_hidden_states: bool = True,
         output_attentions: bool = True,
-        max_length: int = 512
+        max_length: Optional[int] = None
     ):
         self.config = AutoConfig.from_pretrained(
             model_name, output_hidden_states=output_hidden_states, 
@@ -36,7 +36,7 @@ class TransformersLoader:
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
-        self.max_length = max_length
+        self.max_length = max_length if max_length else self.tokenizer.model_max_length
 
         if self.model:
             if device:
@@ -58,7 +58,10 @@ class TransformersLoader:
         row_ids_to_exclude = []
         if not self.truncation and input_ids.size()[1] > self.max_length:
             pad_token_id = self.tokenizer.pad_token_id
-            row_ids_to_exclude = torch.where(input_ids[:, self.max_length - 1] != pad_token_id)
+            if "bigscience/bloom" in self.tokenizer.name_or_path:
+                row_ids_to_exclude = torch.where(input_ids[:, 0] != pad_token_id)
+            else:
+                row_ids_to_exclude = torch.where(input_ids[:, self.max_length - 1] != pad_token_id)
             if isinstance(row_ids_to_exclude, tuple):
                 row_ids_to_exclude = row_ids_to_exclude[0]
 
