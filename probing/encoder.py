@@ -100,8 +100,7 @@ class TransformersLoader:
             add_special_tokens = self.add_special_tokens,
             truncation = self.truncation
         )
-
-        self.device = self.init_device()
+        self.init_device()
 
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
         input_ids, attention_mask = input_ids.to(self.device), attention_mask.to(self.device)
