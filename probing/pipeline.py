@@ -29,8 +29,7 @@ class ProbingPipeline:
         dropout_rate: float = 0.2,
         hidden_size: int = 256,
         shuffle: bool = True,
-        truncation: bool = False,
-        max_length: Optional[int] = None
+        truncation: bool = False
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
@@ -46,8 +45,7 @@ class ProbingPipeline:
         self.transformer_model = TransformersLoader(
             model_name = hf_model_name,
             device = device,
-            truncation = truncation,
-            max_length=max_length
+            truncation = truncation
             )
         self.device = self.transformer_model.device
 
@@ -61,14 +59,14 @@ class ProbingPipeline:
             return LogReg(
                 input_dim = embed_dim,
                 num_classes = num_classes
-                ).to(self.device)
+                )
         elif classifier_name == "mlp":
             return MLP(
                 input_dim = embed_dim,
                 num_classes = num_classes,
                 hidden_size =  self.hidden_size,
                 dropout_rate = self.dropout_rate
-                ).to(self.device)
+                )
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")
 
@@ -167,7 +165,11 @@ class ProbingPipeline:
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         self.log_info['results']['elapsed_time(sec)'] = 0
         for layer in probing_iter_range:
-            self.classifier = self.get_classifier(self.classifier_name, num_classes, self.transformer_model.config.hidden_size)
+            self.classifier = self.get_classifier(
+                self.classifier_name,
+                num_classes,
+                self.transformer_model.config.hidden_size
+                ).to(self.device)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
 

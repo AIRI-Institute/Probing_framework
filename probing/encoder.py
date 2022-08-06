@@ -17,8 +17,7 @@ class TransformersLoader:
         add_special_tokens: bool = True,
         return_dict: bool = True,
         output_hidden_states: bool = True,
-        output_attentions: bool = True,
-        max_length: Optional[int] = None
+        output_attentions: bool = True
     ):
         self.config = AutoConfig.from_pretrained(
             model_name, output_hidden_states=output_hidden_states, 
@@ -36,7 +35,6 @@ class TransformersLoader:
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
-        self.max_length = max_length if max_length else self.tokenizer.model_max_length
 
         if self.model:
             if device:
@@ -56,17 +54,17 @@ class TransformersLoader:
         input_ids = encoded_text["input_ids"]
         attention_mask = encoded_text["attention_mask"]
         row_ids_to_exclude = []
-        if not self.truncation and input_ids.size()[1] > self.max_length:
+        if not self.truncation and input_ids.size()[1] > self.tokenizer.model_max_length:
             pad_token_id = self.tokenizer.pad_token_id
             if "bigscience/bloom" in self.tokenizer.name_or_path:
                 row_ids_to_exclude = torch.where(input_ids[:, 0] != pad_token_id)
             else:
-                row_ids_to_exclude = torch.where(input_ids[:, self.max_length - 1] != pad_token_id)
+                row_ids_to_exclude = torch.where(input_ids[:, self.tokenizer.model_max_length - 1] != pad_token_id)
             if isinstance(row_ids_to_exclude, tuple):
                 row_ids_to_exclude = row_ids_to_exclude[0]
 
-            input_ids = exclude_rows(input_ids, row_ids_to_exclude)[:, :self.max_length]
-            attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[:, :self.max_length]
+            input_ids = exclude_rows(input_ids, row_ids_to_exclude)[:, :self.tokenizer.model_max_length]
+            attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[:, :self.tokenizer.model_max_length]
             row_ids_to_exclude = row_ids_to_exclude.tolist()
         return input_ids.to(self.device), attention_mask.to(self.device), row_ids_to_exclude
 
