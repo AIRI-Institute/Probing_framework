@@ -36,9 +36,11 @@ class TransformersLoader:
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
 
+        self.device = device
+
+    def init_device(self):
         if self.model:
-            if device:
-                self.device = device
+            if self.device:
                 self.model.to(torch.device(self.device))
             elif torch.cuda.is_available():
                 self.model.cuda()
@@ -46,7 +48,6 @@ class TransformersLoader:
             else:
                 self.device = "cpu"
                 self.model.to(torch.device(self.device))
-            self.model = self.model.eval()
         else:
             self.device = None
 
@@ -66,7 +67,7 @@ class TransformersLoader:
             input_ids = exclude_rows(input_ids, row_ids_to_exclude)[:, :self.tokenizer.model_max_length]
             attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[:, :self.tokenizer.model_max_length]
             row_ids_to_exclude = row_ids_to_exclude.tolist()
-        return input_ids.to(self.device), attention_mask.to(self.device), row_ids_to_exclude
+        return input_ids, attention_mask, row_ids_to_exclude
 
     def _get_embeddings_by_layers(self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum) -> List[torch.Tensor]:
         layers_outputs = []
@@ -100,9 +101,13 @@ class TransformersLoader:
             max_length = self.max_length,
             truncation = self.truncation
         )
+
+        self.device = self.init_device()
+
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
+        input_ids, attention_mask = input_ids.to(self.device), attention_mask.to(self.device)
+        self.model = self.model.eval()
         with torch.no_grad():
-            self.model = self.model.eval()
             # In case of encoder-decoder model, for embeddings we use only encoder 
             if hasattr(self.model, 'encoder') and hasattr(self.model, 'decoder'):
                 model_outputs = self.model.encoder(
