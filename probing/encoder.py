@@ -98,7 +98,6 @@ class TransformersLoader:
             padding=self.padding,
             return_tensors=self.return_tensors,
             add_special_tokens = self.add_special_tokens,
-            max_length = self.max_length,
             truncation = self.truncation
         )
 
