@@ -47,7 +47,6 @@ class ProbingPipeline:
             device = device,
             truncation = truncation
             )
-        self.device = self.transformer_model.device
 
     def get_classifier(
         self,
@@ -78,8 +77,8 @@ class ProbingPipeline:
         epoch_train_losses = []
         self.classifier.train()
         for x, y in train_loader:
-            x = torch.squeeze(x[layer], 0).to(self.device).float()
-            y = torch.tensor(y).to(self.device)
+            x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
+            y = torch.tensor(y).to(self.transformer_model.device)
 
             prediction = self.classifier(x)
             loss = self.criterion(prediction, y)
@@ -107,8 +106,8 @@ class ProbingPipeline:
         self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
-                x = torch.squeeze(x[layer], 0).to(self.device).float()
-                y = torch.tensor(y).to(self.device)
+                x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
+                y = torch.tensor(y).to(self.transformer_model.device)
 
                 prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
@@ -169,7 +168,7 @@ class ProbingPipeline:
                 self.classifier_name,
                 num_classes,
                 self.transformer_model.config.hidden_size
-                ).to(self.device)
+                ).to(self.transformer_model.device)
             self.criterion = torch.nn.CrossEntropyLoss()
             self.optimizer = AdamW(self.classifier.parameters())
 
