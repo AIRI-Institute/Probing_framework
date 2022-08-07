@@ -37,11 +37,15 @@ class TransformersLoader:
         self.return_dict = return_dict
 
         self.device = device
+        self.init_device()
 
     def init_device(self):
         if self.model:
-            if self.device:
+            model_device = self.model.device
+            if self.device and model_device.type == "cpu":
                 self.model.to(torch.device(self.device))
+            elif self.device is None and model_device.type != "cpu":
+                self.device = model_device
             elif torch.cuda.is_available():
                 self.model.cuda()
                 self.device = self.model.device
@@ -100,7 +104,6 @@ class TransformersLoader:
             add_special_tokens = self.add_special_tokens,
             truncation = self.truncation
         )
-        self.init_device()
 
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
         input_ids, attention_mask = input_ids.to(self.device), attention_mask.to(self.device)
