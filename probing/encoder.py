@@ -36,11 +36,17 @@ class TransformersLoader:
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
 
-        self.device = device
+        if device:
+            self.device = device
+        else:
+            self.init_device()
 
     def init_device(self):
         if self.model:
             if self.device:
+                self.model.to(torch.device(self.device))
+            elif self.model.device:
+                self.device = self.model.device
                 self.model.to(torch.device(self.device))
             elif torch.cuda.is_available():
                 self.model.cuda()
@@ -100,7 +106,9 @@ class TransformersLoader:
             add_special_tokens = self.add_special_tokens,
             truncation = self.truncation
         )
-        self.init_device()
+
+        if not hasattr(self.model, "hf_device_map"):
+            self.init_device()
 
         input_ids, attention_mask, row_ids_to_exclude = self._get_output_tensors(encoded_text)
         input_ids, attention_mask = input_ids.to(self.device), attention_mask.to(self.device)
