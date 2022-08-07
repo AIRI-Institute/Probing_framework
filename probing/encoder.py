@@ -41,10 +41,11 @@ class TransformersLoader:
 
     def init_device(self):
         if self.model:
-            if self.model.device.type != "cpu":
-                self.device = self.model.device
-            elif self.device:
+            model_device = self.model.device
+            if self.device and model_device.type == "cpu":
                 self.model.to(torch.device(self.device))
+            elif self.device is None and model_device.type != "cpu":
+                self.device = model_device
             elif torch.cuda.is_available():
                 self.model.cuda()
                 self.device = self.model.device
