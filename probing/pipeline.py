@@ -172,17 +172,16 @@ class ProbingPipeline:
             # self.criterion = torch.nn.CrossEntropyLoss(
             #     weight=torch.Tensor(list(self.log_info['params']['original_classes_ratio']['tr'].values()))
             #     ).to(self.transformer_model.device)
-            self.criterion = torch.nn.CrossEntropyLoss()#.to(self.transformer_model.device)
+            self.criterion = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
             self.optimizer = AdamW(self.classifier.parameters())
-
+            
             self.scheduler = get_linear_schedule_with_warmup(
                 self.optimizer,
                 num_warmup_steps=2000,
                 num_training_steps=len(train) // train_epochs
                 ) if is_scheduler else None
 
-
-            for epoch in range(train_epochs):
+            for epoch in trange(train_epochs):
                 epoch_train_loss = self.train(train.dataset, layer)
                 epoch_val_loss, epoch_val_score = self.evaluate(val.dataset, layer, save_checkpoints)
 
