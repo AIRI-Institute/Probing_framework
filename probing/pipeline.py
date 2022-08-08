@@ -181,7 +181,7 @@ class ProbingPipeline:
                 num_training_steps=len(train) // train_epochs
                 ) if is_scheduler else None
 
-            for epoch in trange(train_epochs):
+            for epoch in range(train_epochs):
                 epoch_train_loss = self.train(train.dataset, layer)
                 epoch_val_loss, epoch_val_score = self.evaluate(val.dataset, layer, save_checkpoints)
 
