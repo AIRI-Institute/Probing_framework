@@ -169,7 +169,10 @@ class ProbingPipeline:
                 num_classes,
                 self.transformer_model.config.hidden_size
                 ).to(self.transformer_model.device)
-            self.criterion = torch.nn.CrossEntropyLoss()
+            # self.criterion = torch.nn.CrossEntropyLoss(
+            #     weight=torch.Tensor(list(self.log_info['params']['original_classes_ratio']['tr'].values()))
+            #     ).to(self.transformer_model.device)
+            self.criterion = torch.nn.CrossEntropyLoss()#.to(self.transformer_model.device)
             self.optimizer = AdamW(self.classifier.parameters())
 
             self.scheduler = get_linear_schedule_with_warmup(
