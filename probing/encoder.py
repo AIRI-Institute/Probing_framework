@@ -97,7 +97,7 @@ class TransformersLoader:
             # otherwise the tokenizer and model tensors won't match up
             self.model.resize_token_embeddings(len(self.tokenizer))
 
-        if self.device is None:
+        if self.device is None or self.model.device.type == "cpu":
             self.init_device()
 
         encoded_text = self.tokenizer(

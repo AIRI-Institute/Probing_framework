@@ -61,7 +61,8 @@ def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum
     ratio_by_classes = {}
     for class_name in samples:
         class_labels_all = [i[1] for i in samples[class_name]]
-        ratio_by_classes[class_name] = dict(Counter(class_labels_all))
+        dict_ratio_sorted = dict(sorted(dict(Counter(class_labels_all)).items()))
+        ratio_by_classes[class_name] = dict_ratio_sorted
     return ratio_by_classes
 
 
