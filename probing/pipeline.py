@@ -10,7 +10,7 @@ from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
 
 from probing.classifier import LogReg, MLP
-from probing.data_former import DataFormer, EncodeLoader
+from probing.data_former import TextFormer, EncodeLoader
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
 from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction, ProbingLog
@@ -23,9 +23,10 @@ class ProbingPipeline:
         probing_type: Optional[Enum] = "layer",
         device: Optional[Enum] = None,
         classifier_name: Enum = "logreg",
-        metric_names: Union[Enum, List[Enum]] = "accuracy",
+        metric_names: Union[Enum, List[Enum]] = "f1",
         embedding_type: Enum = "cls",
-        batch_size: Optional[int] = 64,
+        encode_batch_size: Optional[int] = 64,
+        probing_batch_size: Optional[int] = 64,
         dropout_rate: float = 0.2,
         hidden_size: int = 256,
         shuffle: bool = True,
@@ -33,7 +34,8 @@ class ProbingPipeline:
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
-        self.batch_size = batch_size
+        self.encode_batch_size = encode_batch_size
+        self.probing_batch_size = probing_batch_size
         self.shuffle = shuffle
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
@@ -77,8 +79,9 @@ class ProbingPipeline:
         epoch_train_losses = []
         self.classifier.train()
         for x, y in train_loader:
+            x = x.permute(1,0,2)
             x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
-            y = torch.tensor(y).to(self.transformer_model.device)
+            y = y.to(self.transformer_model.device)
 
             prediction = self.classifier(x)
             loss = self.criterion(prediction, y)
@@ -106,8 +109,9 @@ class ProbingPipeline:
         self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
+                x = x.permute(1,0,2)
                 x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
-                y = torch.tensor(y).to(self.transformer_model.device)
+                y = y.to(self.transformer_model.device)
 
                 prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
@@ -133,7 +137,7 @@ class ProbingPipeline:
         verbose: bool = True
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
-        task_data = DataFormer(probe_task, path_to_task_file)
+        task_data = TextFormer(probe_task, path_to_task_file)
         task_dataset, num_classes = task_data.samples, task_data.num_classes
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
@@ -144,7 +148,7 @@ class ProbingPipeline:
         self.log_info['params']['task_language'] = task_language
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
-        self.log_info['params']['batch_size'] = self.batch_size
+        self.log_info['params']['batch_size'] = self.encode_batch_size
         self.log_info['params']['hf_model_name'] = self.transformer_model.config._name_or_path
         self.log_info['params']['classifier_name'] = self.classifier_name
         self.log_info['params']['metric_names'] = self.metric_names
@@ -156,10 +160,16 @@ class ProbingPipeline:
 
         start_time = time()
         encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
-        train = EncodeLoader(task_dataset["tr"], encode_func, self.batch_size, shuffle = self.shuffle)
-        val = EncodeLoader(task_dataset["va"], encode_func, self.batch_size, shuffle = self.shuffle)
-        test = EncodeLoader(task_dataset["te"], encode_func, self.batch_size, shuffle = self.shuffle)
-        self.log_info['params']['encoded_labels'] = train.encoded_labels
+        probing_loader = EncodeLoader(
+            encode_func = encode_func,
+            encode_batch_size = self.encode_batch_size,
+            probing_batch_size = self.probing_batch_size,
+            shuffle = self.shuffle
+            )
+        tr_dataset = probing_loader(task_dataset["tr"])
+        self.log_info['params']['encoded_labels'] = probing_loader.encoded_labels_dict
+        val_dataset = probing_loader(task_dataset["va"])
+        te_dataset = probing_loader(task_dataset["te"])
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         self.log_info['results']['elapsed_time(sec)'] = 0
@@ -178,12 +188,12 @@ class ProbingPipeline:
             self.scheduler = get_linear_schedule_with_warmup(
                 self.optimizer,
                 num_warmup_steps=2000,
-                num_training_steps=len(train) // train_epochs
+                num_training_steps=len(tr_dataset) // train_epochs
                 ) if is_scheduler else None
 
             for epoch in range(train_epochs):
-                epoch_train_loss = self.train(train.dataset, layer)
-                epoch_val_loss, epoch_val_score = self.evaluate(val.dataset, layer, save_checkpoints)
+                epoch_train_loss = self.train(tr_dataset, layer)
+                epoch_val_loss, epoch_val_score = self.evaluate(val_dataset, layer, save_checkpoints)
 
                 self.log_info['results']['train_loss'].add(layer, epoch_train_loss)
                 self.log_info['results']['val_loss'].add(layer, epoch_val_loss)
@@ -191,7 +201,7 @@ class ProbingPipeline:
                 for m in self.metric_names:
                     self.log_info['results']['val_score'][m].add(layer, epoch_val_score[m])
 
-            _, epoch_test_score = self.evaluate(test.dataset, layer, save_checkpoints)
+            _, epoch_test_score = self.evaluate(te_dataset, layer, save_checkpoints)
 
             for m in self.metric_names:
                 self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])

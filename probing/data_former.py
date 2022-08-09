@@ -2,8 +2,7 @@ from enum import Enum
 from typing import Tuple, Dict, Optional, List, Union, Callable
 import os
 from tqdm.notebook import tqdm
-from torch.utils.data import DataLoader
-from torch.utils.data import BatchSampler
+from torch.utils.data import DataLoader, Dataset, BatchSampler
 import torch
 import logging
 import numpy as np
@@ -12,7 +11,7 @@ from sklearn import preprocessing
 from probing.utils import get_probe_task_path, exclude_rows
 
 
-class DataFormer:
+class TextFormer:
     def __init__(
         self,
         probe_task: Union[Enum, str],
@@ -49,36 +48,60 @@ class DataFormer:
         return samples_dict, unique_labels
 
 
+class VectorFormer(Dataset):
+    def __init__(self, text_vectors, label_vectors):
+        self.label_vectors = label_vectors
+        self.text_vectors = text_vectors
+
+    def __len__(self):
+        return len(self.label_vectors)
+
+    def __getitem__(self, idx):
+        label = self.label_vectors[idx]
+        text = self.text_vectors[idx]
+        sample = (text, label)
+        return sample
+
+
 class EncodeLoader:
     def __init__(
         self,
-        list_texts_labels: List[Tuple[str, Enum]],
         encode_func: Callable,
-        batch_size: int = 64,
+        encode_batch_size: int = 64,
+        probing_batch_size: int = 64,
         drop_last: bool = False,
         shuffle: bool = True
     ):  
         self.encode_func = encode_func
-        self.list_texts_labels = list_texts_labels
-        self.batch_size = batch_size
+        self.encode_batch_size = encode_batch_size
+        self.probing_batch_size = probing_batch_size
         self.drop_last = drop_last
         self.shuffle = shuffle
-        self.dataset = self.__form_dataloader()
-    
+
+    def __call__(self, list_texts_labels: List[Tuple[str, Enum]]) -> DataLoader:
+        return self.__form_dataloader(list_texts_labels)
+
     def __len__(self):
         return len(self.dataset)
     
     def __label_encoder(self, array: List[str]) -> List[int]:
         le = preprocessing.LabelEncoder()
         le.fit(array)
-        self.encoded_labels = dict(zip(le.classes_, le.transform(le.classes_)))
-        if len(self.encoded_labels) < 2:
+        self.encoded_labels_dict = dict(zip(le.classes_, le.transform(le.classes_)))
+        if len(self.encoded_labels_dict) < 2:
             logging.warning("Provided data contains only one class")
         return le.transform(array)
-    
-    def __get_sampled_data(self) -> Tuple[List[str], List[int]]:
+
+    def __batch_sampler(self, list_data) -> BatchSampler:
+        return BatchSampler(
+            list_data,
+            batch_size = self.encode_batch_size,
+            drop_last = self.drop_last
+        )
+
+    def __get_sampled_data(self, list_texts_labels: List[Tuple[str, Enum]]) -> Tuple[List[str], List[int]]:
         texts, labels = [], []
-        for sample in self.list_texts_labels:
+        for sample in list_texts_labels:
             texts.append(sample[0])
             labels.append(sample[1])
         
@@ -86,17 +109,11 @@ class EncodeLoader:
         sampled_texts = self.__batch_sampler(texts)
         sampled_labels = self.__batch_sampler(encoded_labels)
         return sampled_texts, sampled_labels
-    
-    def __batch_sampler(self, list_data) -> BatchSampler:
-        return BatchSampler(
-            list_data,
-            batch_size = self.batch_size,
-            drop_last = self.drop_last
-        )
 
-    def __form_dataloader(self) -> DataLoader:
-        sampled_texts, sampled_labels = self.__get_sampled_data()
-        dataset = []
+    def __form_dataloader(self, list_texts_labels: List[Tuple[str, Enum]]) -> DataLoader:
+        sampled_texts, sampled_labels = self.__get_sampled_data(list_texts_labels)
+        text_vectors = []
+        label_vectors = []
         all_excluded_rows = []
         for batch_text, batch_label in tqdm(
             zip(sampled_texts, sampled_labels), 
@@ -104,14 +121,20 @@ class EncodeLoader:
             desc='Data encoding'
         ):
             encoded_batch_text, row_ids_to_exclude = self.encode_func(batch_text)
+            encoded_batch_text_permuted = encoded_batch_text.permute(1,0,2)
             fixed_labels = exclude_rows(torch.tensor(batch_label), row_ids_to_exclude).view(-1).tolist()
-            dataset.append((encoded_batch_text, fixed_labels))
             all_excluded_rows.extend(row_ids_to_exclude)
+
+            text_vectors.append(encoded_batch_text_permuted)
+            label_vectors.extend(fixed_labels)
 
         if all_excluded_rows:
             logging.warning(f"Since you decided not to truncate long sentences, {len(all_excluded_rows)} samples were excluded")
-
+        
+        vectors_tensor = torch.cat(text_vectors, dim=0)
+        probe_dataset = VectorFormer(vectors_tensor, label_vectors)
         return DataLoader(
-            dataset=dataset,
-            shuffle=self.shuffle
+            dataset=probe_dataset,
+            shuffle=self.shuffle,
+            batch_size = self.probing_batch_size
         )
