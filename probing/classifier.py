@@ -11,9 +11,11 @@ class LogReg(torch.nn.Module):
         self.input_dim = input_dim
         self.num_classes = num_classes
         self.fc = torch.nn.Linear(self.input_dim, self.num_classes)
+        self.activation = torch.nn.Sigmoid()
 
     def forward(self, x: torch.Tensor):
         x = self.fc(x)
+        x = self.activation(x)
         return x
 
 
