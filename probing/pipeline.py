@@ -77,6 +77,7 @@ class ProbingPipeline:
         layer: int
     ) -> float:
         epoch_train_losses = []
+        self.classifier.train()
         for x, y in train_loader:
             x = x.permute(1,0,2)
             x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
@@ -105,6 +106,7 @@ class ProbingPipeline:
         epoch_predictions = []
         epoch_true_labels = []
 
+        self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
                 x = x.permute(1,0,2)
@@ -190,9 +192,7 @@ class ProbingPipeline:
                 ) if is_scheduler else None
 
             for epoch in range(train_epochs):
-                self.classifier.train()
                 epoch_train_loss = self.train(tr_dataset, layer)
-                self.classifier.eval()
                 epoch_val_loss, epoch_val_score = self.evaluate(val_dataset, layer, save_checkpoints)
 
                 self.log_info['results']['train_loss'].add(layer, epoch_train_loss)

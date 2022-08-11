@@ -68,7 +68,7 @@ class EncodeLoader:
         self,
         encode_func: Callable,
         encode_batch_size: int = 64,
-        probing_batch_size: int = 64,
+        probing_batch_size: int = 1024,
         drop_last: bool = False,
         shuffle: bool = True
     ):  
@@ -135,6 +135,6 @@ class EncodeLoader:
         probe_dataset = VectorFormer(vectors_tensor, label_vectors)
         return DataLoader(
             dataset=probe_dataset,
-            shuffle=self.shuffle,
-            batch_size = self.probing_batch_size
+            batch_size = self.probing_batch_size,
+            pin_memory = True
         )
