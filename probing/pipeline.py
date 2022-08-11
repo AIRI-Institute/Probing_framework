@@ -168,6 +168,7 @@ class ProbingPipeline:
             )
         tr_dataset = probing_loader(task_dataset["tr"])
         self.log_info['params']['encoded_labels'] = probing_loader.encoded_labels_dict
+        tr_dataset = len(tr_dataset)
         val_dataset = probing_loader(task_dataset["va"])
         te_dataset = probing_loader(task_dataset["te"])
 
@@ -193,6 +194,7 @@ class ProbingPipeline:
 
             for epoch in range(train_epochs):
                 epoch_train_loss = self.train(tr_dataset, layer)
+
                 epoch_val_loss, epoch_val_score = self.evaluate(val_dataset, layer, save_checkpoints)
 
                 self.log_info['results']['train_loss'].add(layer, epoch_train_loss)
@@ -206,6 +208,7 @@ class ProbingPipeline:
             for m in self.metric_names:
                 self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])
         
+        del tr_dataset
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
         if verbose:

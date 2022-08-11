@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Tuple, Dict, Optional, List, Union, Callable
 import os
 from tqdm.notebook import tqdm
-from torch.utils.data import DataLoader, Dataset, BatchSampler
+from torch.utils.data import DataLoader, Dataset, BatchSampler, SequentialSampler
 import torch
 import logging
 import numpy as np
@@ -68,7 +68,7 @@ class EncodeLoader:
         self,
         encode_func: Callable,
         encode_batch_size: int = 64,
-        probing_batch_size: int = 1024,
+        probing_batch_size: int = 64,
         drop_last: bool = False,
         shuffle: bool = True
     ):  
@@ -134,7 +134,7 @@ class EncodeLoader:
         vectors_tensor = torch.cat(text_vectors, dim=0)
         probe_dataset = VectorFormer(vectors_tensor, label_vectors)
         return DataLoader(
-            dataset=probe_dataset,
+            dataset = probe_dataset,
             batch_size = self.probing_batch_size,
             pin_memory = True
         )
