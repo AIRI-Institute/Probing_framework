@@ -168,7 +168,7 @@ class ProbingPipeline:
             )
         tr_dataset = probing_loader(task_dataset["tr"])
         self.log_info['params']['encoded_labels'] = probing_loader.encoded_labels_dict
-        tr_dataset = len(tr_dataset)
+        tr_dataset = list(tr_dataset)
         val_dataset = probing_loader(task_dataset["va"])
         te_dataset = probing_loader(task_dataset["te"])
 
