@@ -2,16 +2,16 @@ import pytest
 import unittest
 from pathlib import Path
 
-from probing.data_former import DataFormer, EncodeLoader
+from probing.data_former import TextFormer, EncodeLoader
 from probing.config import data_folder
 
 
 @pytest.mark.data_former
-class TestDataFormer(unittest.TestCase):
+class TestTextFormer(unittest.TestCase):
 
     def test1(self):
         task_name = 'sent_len'
-        data = DataFormer(
+        data = TextFormer(
                 probe_task=task_name
             )
         task_path = Path(data.data_path)

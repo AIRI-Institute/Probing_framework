@@ -24,7 +24,7 @@ class TransformersLoader:
             output_attentions=output_attentions
             ) if model_name else None
         self.model = AutoModel.from_pretrained(
-            model_name, config=self.config
+            model_name, config=self.config, torch_dtype=torch.bfloat16
             ) if model_name else None
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, config=self.config
@@ -61,7 +61,7 @@ class TransformersLoader:
         row_ids_to_exclude = []
         if not self.truncation and input_ids.size()[1] > self.tokenizer.model_max_length:
             pad_token_id = self.tokenizer.pad_token_id
-            if "bigscience/bloom" in self.tokenizer.name_or_path:
+            if self.tokenizer.padding_side == "left":
                 row_ids_to_exclude = torch.where(input_ids[:, 0] != pad_token_id)
             else:
                 row_ids_to_exclude = torch.where(input_ids[:, self.tokenizer.model_max_length - 1] != pad_token_id)
@@ -133,4 +133,4 @@ class TransformersLoader:
                 else model_outputs["encoder_hidden_states"]
             )
             layers_outputs = self._get_embeddings_by_layers(model_outputs, embedding_type)
-            return layers_outputs, row_ids_to_exclude
+            return torch.stack(layers_outputs), row_ids_to_exclude
