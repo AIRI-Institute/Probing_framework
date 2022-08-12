@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Tuple, Dict, Optional, List, Union, Callable
 import os
-from tqdm.notebook import tqdm
-from torch.utils.data import DataLoader, Dataset, BatchSampler, SequentialSampler
+from tqdm import tqdm
+from torch.utils.data import DataLoader, Dataset, BatchSampler
 import torch
 import logging
 import numpy as np
