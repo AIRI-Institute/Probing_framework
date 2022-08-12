@@ -2,7 +2,7 @@ from time import time
 from enum import Enum
 from typing import Optional, Callable, Union, List, Tuple
 import os
-from tqdm.notebook import trange
+from tqdm import trange
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
