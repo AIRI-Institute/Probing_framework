@@ -76,52 +76,12 @@ experiment.transformer_model.tokenizer = AutoTokenizer.from_pretrained(
 
 experiment.transformer_model.device = "cuda:0"
 
-bloom_langs = ['Chi Tumbuka',
- 'Kikuyu',
- 'Bambara',
- 'Akan',
- 'Xitsonga',
- 'Sesotho',
- 'Chi Chewa',
- 'Twi',
- 'Setswana',
- 'Lingala',
- 'Northern Sotho',
- 'Fon',
- 'Kirundi',
- 'Wolof',
- 'Luganda',
- 'Chi Shona',
- 'Isi Zulu',
- 'Igbo',
- 'Xhosa',
- 'Kinyarwanda',
- 'Yoruba',
- 'Swahili',
- 'Assamese',
- 'Odia',
- 'Gujarati',
- 'Marathi',
- 'Punjabi',
- 'Kannada',
- 'Nepali',
- 'Telugu',
- 'Malayalam',
- 'Urdu',
- 'Tamil',
- 'Bengali',
- 'Hindi',
- 'Basque',
- 'Indonesian',
- 'Catalan',
- 'Vietnamese',
- 'Arabic',
- 'Portuguese',
- 'Spanish',
- 'Code',
- 'French',
- 'Chinese',
- 'English']
+bloom_langs = [
+    'Bambara', 'Wolof', 'Yoruba', 'Marathi',
+    'Urdu', 'Tamil', 'Bengali', 'Hindi', 'Basque',
+    'Indonesian', 'Catalan', 'Arabic', 'Portuguese',
+    'Spanish', 'French', 'Chinese', 'English'
+    ]
 
 
 langs = bloom_langs
