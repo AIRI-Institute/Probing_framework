@@ -24,7 +24,7 @@ class TransformersLoader:
             output_attentions=output_attentions
             ) if model_name else None
         self.model = AutoModel.from_pretrained(
-            model_name, config=self.config, torch_dtype=torch.bfloat16
+            model_name, config=self.config
             ) if model_name else None
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, config=self.config

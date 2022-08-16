@@ -272,7 +272,7 @@ class ConlluUDParser:
         Generates files for all categories
         Args:
             paths: files with data in CONLLU format
-            splits: the way how the data should be split
+            splits: the way how the data should be splitted
             partitions: the percentage of different splits
         """
         data = defaultdict(dict)
@@ -290,17 +290,22 @@ class ConlluUDParser:
         if splits is None:
             splits = splits_by_files[len(paths)]
 
-        for category in categories:
+        for category_name in categories:
             category_parts = {}
             for text, split, part in zip(list_texts, splits, partitions):
                 part = self.generate_probing_file(
                     conllu_text=text, splits=split,
-                    partitions=part, category=category
+                    partitions=part, category=category_name
                 )
+                # means that some part within tr, va, te wasn't satisfied to the conditions
+                if part == {}:
+                    category_parts = {}
+                    break
                 category_parts.update(part)
 
-            self.check_parts(category_parts, category)
-            data[category] = category_parts
+            if category_parts:
+                self.check_parts(category_parts, category_name)
+            data[category_name] = category_parts
         return data
 
     def process_paths(
