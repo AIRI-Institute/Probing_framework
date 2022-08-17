@@ -112,6 +112,7 @@ class ProbingPipeline:
             for x, y in dataloader:
                 x = x.permute(1,0,2)
                 x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
+                x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
                 y = y.to(self.transformer_model.device)
 
                 prediction = self.classifier(x)
