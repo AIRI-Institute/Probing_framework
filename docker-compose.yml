@@ -1,0 +1,7 @@
+services:
+  backend:
+    build:
+      context: .
+    ports:
+      - 8890:8000
+version: '3.7'
