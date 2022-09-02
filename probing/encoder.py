@@ -119,11 +119,11 @@ class TransformersLoader:
     def _get_embeddings_by_layers(self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:
-            if embedding_type == 'cls':
+            if embedding_type == "cls":
                 sent_vector = output[:, 0, :]
-            elif embedding_type == 'sum':
+            elif embedding_type == "sum":
                 sent_vector = torch.sum(output, dim=1)
-            elif embedding_type == 'avg':
+            elif embedding_type == "avg":
                 sent_vector = torch.mean(output, dim=1)
             else:
                 raise NotImplementedError(
@@ -134,7 +134,7 @@ class TransformersLoader:
 
     def get_tokenized_datasets(self, task_dataset: Dict[Enum, np.ndarray]) -> Tuple[Dict[Enum, TokenizedVectorFormer], Dict[Enum, int]]:
         if self.tokenizer.pad_token is None:
-            self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+            self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
             # this step is necessary because we've added some tokens (pad_token) to the embeddings
             # otherwise the tokenizer and model tensors won't match up
@@ -170,9 +170,9 @@ class TransformersLoader:
             encoded_stage_labels_dict[stage] = dict(zip(label_encoder.classes_, label_encoder.transform(label_encoder.classes_)))
             encoded_stage_data_dict[stage] = {"input_ids": input_ids, "attention_mask": attention_mask, "labels": fixed_labels}
 
-        tokenized_tr_data = TokenizedVectorFormer(encoded_stage_data_dict['tr'])
-        tokenized_va_data = TokenizedVectorFormer(encoded_stage_data_dict['va'])
-        tokenized_te_data = TokenizedVectorFormer(encoded_stage_data_dict['te'])
+        tokenized_tr_data = TokenizedVectorFormer(encoded_stage_data_dict["tr"])
+        tokenized_va_data = TokenizedVectorFormer(encoded_stage_data_dict["va"])
+        tokenized_te_data = TokenizedVectorFormer(encoded_stage_data_dict["te"])
         tokenized_datasets = {"tr": tokenized_tr_data,"va": tokenized_va_data,"te": tokenized_te_data}
         return tokenized_datasets, encoded_stage_labels_dict
 
@@ -263,9 +263,9 @@ class TransformersLoader:
         va_dataloader_tokenized = DataLoader(tokenized_datasets["va"], batch_size=batch_size)
         te_dataloader_tokenized = DataLoader(tokenized_datasets["te"], batch_size=batch_size)
 
-        tr_tokenized = self.encode_data(tr_dataloader_tokenized, "tr", embedding_type, verbose)
-        va_tokenized = self.encode_data(va_dataloader_tokenized, "va", embedding_type, verbose)
-        te_tokenized = self.encode_data(te_dataloader_tokenized, "te", embedding_type, verbose)
+        tr_tokenized = self.encode_data(tr_dataloader_tokenized, "train", embedding_type, verbose)
+        va_tokenized = self.encode_data(va_dataloader_tokenized, "val", embedding_type, verbose)
+        te_tokenized = self.encode_data(te_dataloader_tokenized, "test", embedding_type, verbose)
 
         tr_dataloader_encoded = DataLoader(tr_tokenized, batch_size=batch_size, shuffle=shuffle)
         va_dataloader_encoded = DataLoader(va_tokenized, batch_size=batch_size, shuffle=shuffle)
