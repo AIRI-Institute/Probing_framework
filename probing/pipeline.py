@@ -165,7 +165,8 @@ class ProbingPipeline:
             task_dataset,
             self.batch_size,
             self.shuffle,
-            self.embedding_type
+            self.embedding_type,
+            verbose
             )
         self.log_info['params']['encoded_labels'] = encoded_labels_dict
         tr_dataset = probing_dataloaders["tr"]

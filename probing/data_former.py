@@ -1,12 +1,9 @@
 from enum import Enum
 from typing import Tuple, Dict, Optional, List, Union, Callable
 import os
-from tqdm import tqdm
 from torch.utils.data import Dataset
 import torch
-import logging
 import numpy as np
-from sklearn import preprocessing
 
 from probing.utils import get_probe_task_path
 
@@ -35,10 +32,10 @@ class TextFormer:
         unique_labels = []
         f = open(self.data_path)
         for line in list(f):
-            data_type, label, text = line.strip().split("\t")
-            if data_type not in samples_dict:
-                samples_dict[data_type] = []
-            samples_dict[data_type].append((text, label))
+            stage, label, text = line.strip().split("\t")
+            if stage not in samples_dict:
+                samples_dict[stage] = []
+            samples_dict[stage].append((text, label))
             if label not in unique_labels:
                 unique_labels.append(label)
 
