@@ -38,7 +38,6 @@ class TransformersLoader:
             ) if model_name else None
 
         self.cache = {}
-        self.label_encoder = LabelEncoder()
         self.truncation = truncation 
         self.padding = padding
         self.return_tensors = return_tensors
@@ -146,7 +145,15 @@ class TransformersLoader:
 
         encoded_stage_data_dict = {}
         encoded_stage_labels_dict = {}
-        for stage, text_label_data in task_dataset.items():
+
+        tr_text_label_data = task_dataset["tr"]
+        va_text_label_data = task_dataset["va"]
+        te_text_label_data = task_dataset["te"]
+
+        for stage, text_label_data in zip(
+            ["tr", "va", "te"],
+            [tr_text_label_data, va_text_label_data, te_text_label_data]
+        ):
             tokenized_text = self.tokenize_text(text_label_data[:,0].tolist())
 
             if stage == "tr":
