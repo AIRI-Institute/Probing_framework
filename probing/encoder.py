@@ -38,6 +38,7 @@ class TransformersLoader:
             ) if model_name else None
 
         self.cache = {}
+        self.label_encoder = LabelEncoder()
         self.truncation = truncation 
         self.padding = padding
         self.return_tensors = return_tensors
@@ -149,17 +150,17 @@ class TransformersLoader:
             tokenized_text = self.tokenize_text(text_label_data[:,0].tolist())
 
             if stage == "tr":
-                le = LabelEncoder()
-                le.fit(text_label_data[:,1])
+                self.label_encoder = LabelEncoder()
+                self.label_encoder.fit(text_label_data[:,1])
 
             input_ids, attention_mask, row_ids_to_exclude = self._fix_tokenized_tensors(tokenized_text)
-            labels = le.transform(text_label_data[:,1])
+            labels = self.label_encoder.transform(text_label_data[:,1])
             fixed_labels = exclude_rows(torch.tensor(labels), row_ids_to_exclude).view(-1).tolist()
 
             if row_ids_to_exclude:
                 logging.warning(f"Since you decided not to truncate long sentences, {len(row_ids_to_exclude)} sample(s) were excluded")
 
-            encoded_stage_labels_dict[stage] = dict(zip(le.classes_, le.transform(le.classes_)))
+            encoded_stage_labels_dict[stage] = dict(zip(self.label_encoder.classes_, self.label_encoder.transform(self.label_encoder.classes_)))
             encoded_stage_data_dict[stage] = {"input_ids": input_ids, "attention_mask": attention_mask, "labels": fixed_labels}
 
         tokenized_tr_data = TokenizedVectorFormer(encoded_stage_data_dict['tr'])
@@ -202,7 +203,7 @@ class TransformersLoader:
                 input_ids_in = batch_input_ids[in_cache_ids].to(self.device)
 
                 attention_mask_out = batch_attention_mask[out_cache_ids].to(self.device)
-                attention_mask_in = batch_attention_mask[in_cache_ids].to(self.device)
+                # attention_mask_in = batch_attention_mask[in_cache_ids].to(self.device)
 
                 labels_out = batch_labels[out_cache_ids]
                 labels_in = batch_labels[in_cache_ids]
@@ -250,4 +251,4 @@ class TransformersLoader:
         tr_dataloader_encoded = DataLoader(self.encode_data(tr_dataloader_tokenized, "train", embedding_type), batch_size=batch_size, shuffle=shuffle)
         va_dataloader_encoded = DataLoader(self.encode_data(va_dataloader_tokenized, "val", embedding_type), batch_size=batch_size, shuffle=shuffle)
         te_dataloader_encoded = DataLoader(self.encode_data(te_dataloader_tokenized, "test", embedding_type), batch_size=batch_size, shuffle=shuffle)
-        return ({"tr": va_dataloader_encoded, "va": va_dataloader_encoded, "te": te_dataloader_encoded}, encoded_labels)
+        return ({"tr": tr_dataloader_encoded, "va": va_dataloader_encoded, "te": te_dataloader_encoded}, encoded_labels)
