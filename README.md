@@ -1,9 +1,9 @@
 # Probing-framework
 Framework for probing tasks.
 
-### Firstly
+### Install requirements and appropriate torch version 
 ```
-pip install -r requirements.txt
+bash cuda_install_requirements.sh
 ```
 
 ### Example of how SentEval Converter works:
