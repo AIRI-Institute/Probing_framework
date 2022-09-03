@@ -39,9 +39,9 @@ class ProbingPipeline:
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
         self.classifier_name = classifier_name
-        self.metric_names = metric_names if isinstance(metric_names, list) else [metric_names]
         self.embedding_type = embedding_type
 
+        self.metric_names = metric_names if isinstance(metric_names, list) else [metric_names]
         self.metrics = Metric(metric_names)
         self.transformer_model = TransformersLoader(
             model_name = hf_model_name,
