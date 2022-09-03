@@ -39,7 +39,7 @@ class ProbingPipeline:
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
         self.classifier_name = classifier_name
-        self.metric_names = metric_names
+        self.metric_names = metric_names if isinstance(metric_names, list) else [metric_names]
         self.embedding_type = embedding_type
 
         self.metrics = Metric(metric_names)
