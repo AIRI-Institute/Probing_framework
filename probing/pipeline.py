@@ -209,7 +209,6 @@ class ProbingPipeline:
             for m in self.metric_names:
                 self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])
         
-        del tr_dataset
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
         if verbose:
