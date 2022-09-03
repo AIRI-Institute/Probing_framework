@@ -8,7 +8,6 @@ import torch
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
-from sklearn.preprocessing import LabelEncoder
 
 from probing.classifier import LogReg, MLP
 from probing.encoder import TransformersLoader
