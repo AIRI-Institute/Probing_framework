@@ -2,7 +2,7 @@ import pytest
 import unittest
 from pathlib import Path
 
-from probing.data_former import TextFormer, EncodeLoader
+from probing.data_former import TextFormer
 from probing.config import data_folder
 
 
