@@ -48,6 +48,14 @@ class TransformersLoader:
         self.init_device()
 
     def init_device(self):
+        """
+        To define the device in case it is not passed. This device is used for probing
+        computational.
+
+        If a device is None or CPU, it is trying to detect the model's device.
+        For such a big model laying on several GPUs, you must pass the device directly
+        to prevent `CUDA out-of-memory error.
+        """
         if self.model:
             model_device = self.model.device
             if self.device and model_device.type == "cpu":
@@ -255,21 +263,22 @@ class TransformersLoader:
     def get_encoded_dataloaders(
         self,
         task_dataset: Dict[Enum, np.ndarray],
-        batch_size: int = 64,
+        encoding_batch_size: int = 64,
+        classifier_batch_size: int = 64,
         shuffle: bool = True,
         embedding_type: Enum = "cls",
         verbose: bool = True
     ) -> Tuple[Dict[Enum, DataLoader], Dict[Enum, int]]:
         tokenized_datasets, encoded_labels = self.get_tokenized_datasets(task_dataset)
-        tr_dataloader_tokenized = DataLoader(tokenized_datasets["tr"], batch_size=batch_size)
-        va_dataloader_tokenized = DataLoader(tokenized_datasets["va"], batch_size=batch_size)
-        te_dataloader_tokenized = DataLoader(tokenized_datasets["te"], batch_size=batch_size)
+        tr_dataloader_tokenized = DataLoader(tokenized_datasets["tr"], batch_size=encoding_batch_size)
+        va_dataloader_tokenized = DataLoader(tokenized_datasets["va"], batch_size=encoding_batch_size)
+        te_dataloader_tokenized = DataLoader(tokenized_datasets["te"], batch_size=encoding_batch_size)
 
         tr_tokenized = self.encode_data(tr_dataloader_tokenized, "train", embedding_type, verbose)
         va_tokenized = self.encode_data(va_dataloader_tokenized, "val", embedding_type, verbose)
         te_tokenized = self.encode_data(te_dataloader_tokenized, "test", embedding_type, verbose)
 
-        tr_dataloader_encoded = DataLoader(tr_tokenized, batch_size=batch_size, shuffle=shuffle)
-        va_dataloader_encoded = DataLoader(va_tokenized, batch_size=batch_size, shuffle=shuffle)
-        te_dataloader_encoded = DataLoader(te_tokenized, batch_size=batch_size, shuffle=shuffle)
+        tr_dataloader_encoded = DataLoader(tr_tokenized, batch_size=classifier_batch_size, shuffle=shuffle)
+        va_dataloader_encoded = DataLoader(va_tokenized, batch_size=classifier_batch_size, shuffle=shuffle)
+        te_dataloader_encoded = DataLoader(te_tokenized, batch_size=classifier_batch_size, shuffle=shuffle)
         return {"tr": tr_dataloader_encoded, "va": va_dataloader_encoded, "te": te_dataloader_encoded}, encoded_labels

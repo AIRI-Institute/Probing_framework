@@ -25,7 +25,8 @@ class ProbingPipeline:
         classifier_name: Enum = "logreg",
         metric_names: Union[Enum, List[Enum]] = "f1",
         embedding_type: Enum = "cls",
-        batch_size: Optional[int] = 32,
+        encoding_batch_size: int = 32,
+        classifier_batch_size: int = 64,
         dropout_rate: float = 0.2,
         hidden_size: int = 256,
         shuffle: bool = True,
@@ -33,7 +34,8 @@ class ProbingPipeline:
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
-        self.batch_size = batch_size
+        self.encoding_batch_size = encoding_batch_size
+        self.classifier_batch_size = classifier_batch_size
         self.shuffle = shuffle
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
@@ -148,7 +150,8 @@ class ProbingPipeline:
         self.log_info['params']['task_language'] = task_language
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
-        self.log_info['params']['batch_size'] = self.batch_size
+        self.log_info['params']['encoding_batch_size'] = self.encoding_batch_size
+        self.log_info['params']['classifier_batch_size'] = self.classifier_batch_size
         self.log_info['params']['hf_model_name'] = self.transformer_model.config._name_or_path
         self.log_info['params']['classifier_name'] = self.classifier_name
         self.log_info['params']['metric_names'] = self.metric_names
@@ -162,7 +165,8 @@ class ProbingPipeline:
 
         probing_dataloaders, encoded_labels_dict = self.transformer_model.get_encoded_dataloaders(
             task_dataset,
-            self.batch_size,
+            self.encoding_batch_size,
+            self.classifier_batch_size,
             self.shuffle,
             self.embedding_type,
             verbose
