@@ -1,9 +1,9 @@
 # Probing-framework
 Framework for probing tasks.
 
-### Firstly
+### Install requirements and appropriate torch version 
 ```
-pip install -r requirements.txt
+bash cuda_install_requirements.sh
 ```
 
 ### Example of how SentEval Converter works:
@@ -22,13 +22,27 @@ pip install -r requirements.txt
 
 * __OUTPUT__:
     ```
-    0%|          | 0/1 [00:00<?, ?it/s]WARNING:root:Category "Case" has only one class.
-    WARNING:root:Category "Mood" has only one class.
-    WARNING:root:Category "NumType" has only one class.
-    WARNING:root:Category "Polarity" has only one class.
-    WARNING:root:Category "VerbForm" has only one class.
-    100%|██████████| 1/1 [00:00<00:00, 38.07it/s]
-    Writing to file: /home/test/data/UD/UD_Soi-AHA/soj_aha_Number.csv
+    WARNING:root:Category "Abbr" has only one class
+    WARNING:root:Category "AdpType" has only one class
+    WARNING:root:The classes in train and validation parts are different for category "Case"
+    WARNING:root:Category "Degree" has only one class
+    WARNING:root:Category "Foreign" has only one class
+    WARNING:root:Category "PartType" has only one class
+    WARNING:root:Category "Poss" has only one class
+    WARNING:root:The classes in train and test parts are different for category "PronType"
+    WARNING:root:Category "Reflex" has only one class
+    WARNING:root:The classes in train and validation parts are different for category "Tense"
+    WARNING:root:Category "Variant" has only one class
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Case.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Definite.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Gender.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Mood.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_NumForm.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_NumType.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Number.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Number[psor].csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Person.csv
+    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Polarity.csv
     ```
 
 

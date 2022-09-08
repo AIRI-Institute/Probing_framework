@@ -345,7 +345,7 @@ class ConlluUDParser:
         tr_path: Optional[os.PathLike] = None,
         va_path: Optional[os.PathLike] = None,
         te_path: Optional[os.PathLike] = None,
-        dir_conllu_path: Optional[os.PathLike] = None,
+        path_dir_conllu: Optional[os.PathLike] = None,
         language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None
     ) -> None:
@@ -357,9 +357,14 @@ class ConlluUDParser:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
-        if dir_conllu_path:
-            paths = [Path(p) for p in self.get_filepaths_from_dir(dir_conllu_path)]
-            assert len(paths) > 0, f"Empty folder: {dir_conllu_path}"
+        if self.verbose:
+            print('=' * 100)
+            paths_str = "\n".join([p for p in [tr_path, va_path, te_path, path_dir_conllu] if p is not None])
+            print(f"In progress:\n{paths_str}")
+
+        if path_dir_conllu:
+            paths = [Path(p) for p in self.get_filepaths_from_dir(path_dir_conllu)]
+            assert len(paths) > 0, f"Empty folder: {path_dir_conllu}"
             assert len(paths) <= 3, too_much_files_err_str.format(len(paths))
             data, language, save_path_dir = self.process_paths(*paths, language=language, save_path_dir=save_path_dir)
         else:
