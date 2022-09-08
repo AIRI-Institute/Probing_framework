@@ -4,7 +4,6 @@ from pathlib import Path
 import random
 import numpy as np
 import traceback
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 import torch
 import fire
 import uuid
