@@ -20,7 +20,7 @@ bash cuda_install_requirements.sh
     splitter.convert(tr_path=..., va_path=..., te_path=...)
     ```
 
-* __OUTPUT__:
+* __Output__:
     ```
     WARNING:root:Category "Abbr" has only one class
     WARNING:root:Category "AdpType" has only one class
@@ -47,10 +47,10 @@ bash cuda_install_requirements.sh
 
 
 ### Example of how Probing Engine works:
-Check out ```probing/scripts``` for the samples how to launch
+Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_framework/tree/main/scripts) for the samples how to launch
 
 
-* __OUTPUT__:
+* __Output__:
     ```
     Task in progress: sent_len.
     Path to data: /home/jovyan/test/TEST/Probing_framework/data/sent_len.txt
