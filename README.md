@@ -46,7 +46,7 @@ bash cuda_install_requirements.sh
     ```
 
 
-### Example of how Probing Engine works:
+### Usage examples:
 Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_framework/tree/main/scripts) for the samples how to launch
 
 
