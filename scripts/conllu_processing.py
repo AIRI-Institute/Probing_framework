@@ -9,12 +9,13 @@ def main(
     va_path: Optional[os.PathLike] = None,
     te_path: Optional[os.PathLike] = None,
     dir_conllu_path: Optional[os.PathLike] = None,
-    language: str = "",
+    language: Optional[str] = None,
+    save_path_dir: Optional[os.PathLike] = None,
     shuffle: bool = True,
-    save_path_dir: Optional[os.PathLike] = None
+    verbose: bool = True
 ) -> None:
-    converter = ConlluUDParser(language, shuffle, save_path_dir)
-    converter.convert(tr_path, va_path, te_path, dir_conllu_path)
+    converter = ConlluUDParser(shuffle, verbose)
+    converter.convert(tr_path, va_path, te_path, dir_conllu_path, language, save_path_dir)
 
 
 if __name__ == "__main__":
