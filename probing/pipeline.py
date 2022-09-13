@@ -136,7 +136,8 @@ class ProbingPipeline:
         train_epochs: int = 10,
         is_scheduler: bool = False,
         save_checkpoints: bool = False,
-        verbose: bool = True
+        verbose: bool = True,
+        mode: str = None
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
@@ -169,7 +170,8 @@ class ProbingPipeline:
             self.classifier_batch_size,
             self.shuffle,
             self.embedding_type,
-            verbose
+            verbose,
+            mode=mode
             )
         self.log_info['params']['encoded_labels'] = encoded_labels_dict
         tr_dataset = probing_dataloaders["tr"]
