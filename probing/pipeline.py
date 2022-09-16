@@ -10,8 +10,8 @@ from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
 
 from probing.classifier import LogReg, MLP
-from probing.data_former import TextFormer, EncodeLoader
 from probing.encoder import TransformersLoader
+from probing.data_former import TextFormer
 from probing.metric import Metric
 from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction, ProbingLog
 
@@ -25,8 +25,8 @@ class ProbingPipeline:
         classifier_name: Enum = "logreg",
         metric_names: Union[Enum, List[Enum]] = "f1",
         embedding_type: Enum = "cls",
-        encode_batch_size: Optional[int] = 64,
-        probing_batch_size: Optional[int] = 64,
+        encoding_batch_size: int = 32,
+        classifier_batch_size: int = 64,
         dropout_rate: float = 0.2,
         hidden_size: int = 256,
         shuffle: bool = True,
@@ -34,15 +34,15 @@ class ProbingPipeline:
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
-        self.encode_batch_size = encode_batch_size
-        self.probing_batch_size = probing_batch_size
+        self.encoding_batch_size = encoding_batch_size
+        self.classifier_batch_size = classifier_batch_size
         self.shuffle = shuffle
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
         self.classifier_name = classifier_name
-        self.metric_names = metric_names
         self.embedding_type = embedding_type
 
+        self.metric_names = metric_names if isinstance(metric_names, list) else [metric_names]
         self.metrics = Metric(metric_names)
         self.transformer_model = TransformersLoader(
             model_name = hf_model_name,
@@ -84,7 +84,7 @@ class ProbingPipeline:
             x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
             y = y.to(self.transformer_model.device)
 
-            self.classifier.zero_grad(set_to_none=True)
+            self.classifier.zero_grad()
             prediction = self.classifier(x)
             loss = self.criterion(prediction, y)
             epoch_train_losses.append(loss.item())
@@ -112,6 +112,7 @@ class ProbingPipeline:
             for x, y in dataloader:
                 x = x.permute(1,0,2)
                 x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
+                x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
                 y = y.to(self.transformer_model.device)
 
                 prediction = self.classifier(x)
@@ -139,7 +140,7 @@ class ProbingPipeline:
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
-        task_dataset, num_classes = task_data.samples, task_data.num_classes
+        task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
         path_to_file_for_probing = task_data.data_path
         task_language, task_category = lang_category_extraction(path_to_file_for_probing)
 
@@ -149,7 +150,8 @@ class ProbingPipeline:
         self.log_info['params']['task_language'] = task_language
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
-        self.log_info['params']['batch_size'] = self.encode_batch_size
+        self.log_info['params']['encoding_batch_size'] = self.encoding_batch_size
+        self.log_info['params']['classifier_batch_size'] = self.classifier_batch_size
         self.log_info['params']['hf_model_name'] = self.transformer_model.config._name_or_path
         self.log_info['params']['classifier_name'] = self.classifier_name
         self.log_info['params']['metric_names'] = self.metric_names
@@ -160,18 +162,20 @@ class ProbingPipeline:
             print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
         start_time = time()
-        encode_func =  lambda x: self.transformer_model.encode_text(x, self.embedding_type)
-        probing_loader = EncodeLoader(
-            encode_func = encode_func,
-            encode_batch_size = self.encode_batch_size,
-            probing_batch_size = self.probing_batch_size,
-            shuffle = self.shuffle
+
+        probing_dataloaders, encoded_labels_dict = self.transformer_model.get_encoded_dataloaders(
+            task_dataset,
+            self.encoding_batch_size,
+            self.classifier_batch_size,
+            self.shuffle,
+            self.embedding_type,
+            verbose
             )
-        tr_dataset = probing_loader(task_dataset["tr"])
-        self.log_info['params']['encoded_labels'] = probing_loader.encoded_labels_dict
-        tr_dataset = list(tr_dataset)
-        val_dataset = probing_loader(task_dataset["va"])
-        te_dataset = probing_loader(task_dataset["te"])
+        self.log_info['params']['encoded_labels'] = encoded_labels_dict
+        tr_dataset = probing_dataloaders["tr"]
+        val_dataset = probing_dataloaders["va"]
+        te_dataset = probing_dataloaders["te"]
+
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         self.log_info['results']['elapsed_time(sec)'] = 0
@@ -209,7 +213,6 @@ class ProbingPipeline:
             for m in self.metric_names:
                 self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])
         
-        del tr_dataset
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
         if verbose:

@@ -1,9 +1,8 @@
-# sklearn
-# transformers==4.21.0
-# torch>=1.12.0
+sklearn
+transformers==4.21.0
 fire
 conllu
-# accelerate==0.12.0
+accelerate==0.12.0
 pydantic==1.8.2
 uvicorn[standard]==0.14.0
 fastapi==0.68.0
