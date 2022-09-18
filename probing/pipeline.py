@@ -8,12 +8,16 @@ import torch
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
+import logging
 
 from probing.classifier import LogReg, MLP
 from probing.encoder import TransformersLoader
 from probing.data_former import TextFormer
 from probing.metric import Metric
 from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction, ProbingLog
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class ProbingPipeline:
@@ -158,8 +162,7 @@ class ProbingPipeline:
         self.log_info['params']['original_classes_ratio'] = get_ratio_by_classes(task_dataset)
 
         if verbose:
-            print('=' * 100)
-            print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
+            logging.info(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
 
         start_time = time()
 
@@ -216,4 +219,4 @@ class ProbingPipeline:
         self.log_info['results']['elapsed_time(sec)'] = time() - start_time
         output_path = save_log(self.log_info, probe_task)
         if verbose:
-            print(f"Experiments were saved in the folder: {output_path}")
+            logging.info(f"Experiments were saved in the folder: {output_path}")

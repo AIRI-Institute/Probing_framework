@@ -16,6 +16,9 @@ from nltk.tokenize import wordpunct_tokenize
 from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str, splits_by_files
 
 
+logging.basicConfig(level=logging.DEBUG)
+
+
 class ConlluUDParser:
     def __init__(
         self,
@@ -279,7 +282,7 @@ class ConlluUDParser:
         list_texts, categories = self.get_text_and_categories(paths)
 
         if self.verbose:
-            print(f"{len(categories)} categories were found")
+            logging.info(f"{len(categories)} categories were found")
 
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
@@ -358,9 +361,8 @@ class ConlluUDParser:
             dir_path: a path to a directory with all files
         """
         if self.verbose:
-            print('=' * 100)
             paths_str = "\n".join([p for p in [tr_path, va_path, te_path, path_dir_conllu] if p is not None])
-            print(f"In progress:\n{paths_str}")
+            logging.info(f"In progress: {paths_str}")
 
         if path_dir_conllu:
             paths = [Path(p) for p in self.get_filepaths_from_dir(path_dir_conllu)]
@@ -374,4 +376,4 @@ class ConlluUDParser:
             if category_data:
                 output_path = self.writer(category_data, category, language, save_path_dir)
                 if self.verbose:
-                    print(f'Writing to file: {output_path}')
+                    logging.info(f'Writing to file: {output_path}')
