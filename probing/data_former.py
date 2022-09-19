@@ -1,9 +1,10 @@
 from enum import Enum
-from typing import Tuple, Dict, Optional, List, Union, Callable
+from typing import Tuple, Dict, Optional, List, Union, Callable, Set, DefaultDict
 import os
 from torch.utils.data import Dataset
 import torch
 import numpy as np
+from collections import defaultdict
 
 from probing.utils import get_probe_task_path
 
@@ -27,20 +28,17 @@ class TextFormer:
     def __getitem__(self, idx):
         return self.samples[idx]
 
-    def form_data(self) -> Tuple[Dict[Enum, Tuple[Enum, str]], List[str]]:
-        samples_dict = {}
-        unique_labels = []
+    def form_data(self) -> Tuple[DefaultDict[str, Tuple[str, str]], Set[str]]:
+        samples_dict = defaultdict(list)
+        unique_labels = set()
         f = open(self.data_path)
         for line in list(f):
             stage, label, text = line.strip().split("\t")
-            if stage not in samples_dict:
-                samples_dict[stage] = []
             samples_dict[stage].append((text, label))
-            if label not in unique_labels:
-                unique_labels.append(label)
+            unique_labels.add(label)
 
         if self.shuffle:
-            samples_dict = {k: np.random.permutation(v) for k, v in samples_dict.items()}
+            samples_dict = {k: list(map(tuple, np.random.permutation(v))) for k, v in samples_dict.items()}
         return samples_dict, unique_labels
 
 
