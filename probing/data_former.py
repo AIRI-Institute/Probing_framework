@@ -28,17 +28,17 @@ class TextFormer:
     def __getitem__(self, idx):
         return self.samples[idx]
 
-    def form_data(self) -> Tuple[DefaultDict[str, Tuple[str, str]], Set[str]]:
+    def form_data(self) -> Tuple[DefaultDict[Enum, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
         f = open(self.data_path)
         for line in list(f):
             stage, label, text = line.strip().split("\t")
-            samples_dict[stage].append((text, label))
+            samples_dict[stage].append(np.array((text, label)))
             unique_labels.add(label)
 
         if self.shuffle:
-            samples_dict = {k: list(map(tuple, np.random.permutation(v))) for k, v in samples_dict.items()}
+            samples_dict = {k: np.random.permutation(v) for k, v in samples_dict.items()}
         return samples_dict, unique_labels
 
 

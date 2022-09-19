@@ -41,7 +41,9 @@ def myconverter(obj: Any) -> Any:
         return float(obj)
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
-    elif isinstance(obj, datetime.datetime):
+    elif isinstance(obj, datetime):
+        return obj.__str__()
+    elif isinstance(obj, pathlib.PosixPath):
         return obj.__str__()
     return obj
 
@@ -49,11 +51,12 @@ def myconverter(obj: Any) -> Any:
 def save_log(log: Dict, probe_task: str) -> None:
     date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
     experiments_path = pathlib.Path(config.results_folder, f'{date}_{probe_task}')
-    os.makedirs(experiments_path, exist_ok=True)
-    
-    log_path = pathlib.Path(experiments_path, "log.json")
-    with open(log_path, "w") as outfile:
-        json.dump(log, outfile, indent = 4, default = myconverter)
+    if not probe_task.startswith("test_"):
+        os.makedirs(experiments_path, exist_ok=True)
+        log_path = pathlib.Path(experiments_path, "log.json")
+
+        with open(log_path, "w") as outfile:
+            json.dump(log, outfile, indent = 4, default = myconverter)
     return str(experiments_path)
 
 
@@ -67,7 +70,7 @@ def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum
 
 
 def lang_category_extraction(file_path: os.PathLike) -> Tuple[Optional[str], Optional[str]]:
-    if '_' in file_path:   
+    if '_' in str(file_path):   
         path = str(Path(file_path).stem)           
         task_language = path.split('_')[0]
         task_category = path.split('_')[-1]
