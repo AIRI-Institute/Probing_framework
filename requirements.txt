@@ -3,3 +3,4 @@ transformers==4.21.0
 fire
 conllu
 accelerate==0.12.0
+nltk==3.7
