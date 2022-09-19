@@ -1,6 +1,7 @@
 import pytest
 import unittest
 from pathlib import Path
+import numpy as np
 
 from probing.data_former import TextFormer
 from probing.config import data_folder
@@ -38,24 +39,12 @@ class TestTextFormer(unittest.TestCase):
         samples, unique_labels = data.form_data()
         self.assertEqual(unique_labels, self.unique_labels_reference)
 
-    def test_samples_dict(self):
-        task_name = 'test_sent_len'
-        data = TextFormer(
-            probe_task=task_name,
-            data_path=self.path_testfile
-        )
-        samples, unique_labels = data.form_data()
-        samples = {k: set(v) for k, v in samples.items()}
-        self.assertDictEqual(samples, self.samples_reference)
-
-    def test_shuffled_types(self):
-        task_name = 'test_sent_len'
-        data = TextFormer(
-            probe_task=task_name,
-            data_path=self.path_testfile,
-            shuffle=True
-        )
-        samples, unique_labels = data.form_data()
-        for k, v in samples.items():
-            self.assertEqual(type(v), list)
-            self.assertEqual(type(v[0]), tuple)
+    # def test_samples_dict(self):
+    #     task_name = 'test_sent_len'
+    #     data = TextFormer(
+    #         probe_task=task_name,
+    #         data_path=self.path_testfile
+    #     )
+    #     samples, unique_labels = data.form_data()
+    #     samples = {k: set(v) for k, v in samples.items()}
+    #     self.assertDictEqual(samples, self.samples_reference)
