@@ -34,11 +34,13 @@ class TextFormer:
         f = open(self.data_path)
         for line in list(f):
             stage, label, text = line.strip().split("\t")
-            samples_dict[stage].append(np.array((text, label)))
+            samples_dict[stage].append((text, label))
             unique_labels.add(label)
 
         if self.shuffle:
             samples_dict = {k: np.random.permutation(v) for k, v in samples_dict.items()}
+        else:
+            samples_dict = {k: np.array(v) for k, v in samples_dict.items()}
         return samples_dict, unique_labels
 
 
