@@ -38,6 +38,8 @@ def subsamples_split(
     num_classes = len(probing_dict.keys())
     probing_data = [(s, class_name) for class_name, sentences in probing_dict.items() if
                     len(sentences) > num_classes for s in sentences]
+    if not probing_data:
+        raise Exception('Some class has less sentences than the number of classes')
     parts = {}
     data, labels = map(np.array, zip(*probing_data))
     X_train, X_test, y_train, y_test = train_test_split(
@@ -120,3 +122,12 @@ def determine_ud_savepath(
         final_path = save_path_dir
     os.makedirs(final_path, exist_ok=True)
     return Path(final_path)
+
+
+def delete_duplicates(probing_dict):
+    all_sent = [s for cl_sent in probing_dict.values() for s in cl_sent]
+    duplicates = [item for item, count in Counter(all_sent).items() if count > 1]
+    new_probing_dict = {}
+    for cl in probing_dict:
+        new_probing_dict[cl] = [s for s in probing_dict[cl] if s not in duplicates]
+    return new_probing_dict
