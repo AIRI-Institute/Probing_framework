@@ -1,11 +1,13 @@
+from probing.ud_filter.sentence_filter import SentenceFilter
+from probing.ud_filter.utils import subsamples_split, read, writer, extract_lang_from_udfile_path, determine_ud_savepath, delete_duplicates
+
+import logging
 import os
 import re
 from conllu import parse
 from pathlib import Path
 from typing import Tuple, Optional, List
 from nltk.tokenize import wordpunct_tokenize
-from probing.ud_filter.sentence_filter import SentenceFilter
-from probing.ud_filter.utils import subsamples_split, read, writer, extract_lang_from_udfile_path, determine_ud_savepath
 
 
 class ProbingConlluFilter:
@@ -15,7 +17,7 @@ class ProbingConlluFilter:
 
     Attributes:
         paths: list of paths to conllu files
-        sentences: list of sentences represented as TokenTrees
+        sentences: list of sentences represented as TokenList
         classes: probing task classes based on user's queries {class_label: (node_pattern, constraints)}
         probing_dict: dictionary of classified sentences {class_label: [sentences]}
         parts_data: dictionary of classified sentences divided into tr, val, te parts {part: [[sentences], [labels]]}
@@ -25,7 +27,6 @@ class ProbingConlluFilter:
     def __init__(self, shuffle: bool = True):
 
         self.shuffle = shuffle
-
         self.paths = None
         self.language = None
         self.sentences = []
@@ -44,11 +45,10 @@ class ProbingConlluFilter:
             dir_path = Path(dir_conllu_path).resolve()
             self.paths = [Path(dir_path, p) for p in os.listdir(dir_path) if re.match(r".*\.conllu", p)]
             assert len(self.paths) > 0, f"Empty folder: {dir_conllu_path}"
+        elif conllu_paths:
+            self.paths = [p for p in conllu_paths]
         else:
-            if conllu_paths:
-                self.paths = [p for p in conllu_paths]
-            else:
-                raise Exception('pass at least one conllu_path or dir_conllu_path')
+            raise Exception('pass at least one conllu_path or dir_conllu_path')
 
         list_texts = [read(p) for p in self.paths]
         conllu_data = "\n".join(list_texts)
@@ -61,8 +61,10 @@ class ProbingConlluFilter:
 
         self.matching = []
         self.not_matching = []
+
         node_pattern = self.classes[class_label][0]
         constraints = self.classes[class_label][1]
+
         if not self.sentences:
             raise Exception('You haven\'t uploaded your files yet. Call \'upload_files\' with appropriate arguments '
                             'before using this method')
@@ -93,15 +95,32 @@ class ProbingConlluFilter:
         Returns:
             path to the result file
         """
+
+        if sum(partition) != 1.0:
+            logging.warning(f"Your parts in {partition} doesn't add up to 1, so it was automatically changed to {[[0.8, 0.1, 0.1]]}")
+            partition = [0.8, 0.1, 0.1]
+
         self.classes = {label: query for label, query in queries.items()}
+        if not self.classes:
+            raise TypeError(f'You have to pass at least one UD query')
+
+        for cl in self.classes:
+            const_nodes = set([n for p in self.classes[cl][1] for n in p])
+            nodes = set(self.classes[cl][0].keys())
+            if not const_nodes <= nodes:
+                raise ValueError(f'Not all nodes from the constraints are set in node_pattern in class {cl}')
+
         self.probing_dict = {label: self._filter_conllu(label) for label in self.classes}
         if len(self.classes) == 1:
             self.probing_dict['not_' + list(self.classes.keys())[0]] = self.not_matching
+        self.probing_dict = delete_duplicates(self.probing_dict)
+
         self.parts_data = subsamples_split(self.probing_dict,
                                            partition=partition,
                                            random_seed=3,
                                            shuffle=self.shuffle,
                                            split=["tr", "va", "te"])
+
         save_dir = determine_ud_savepath(Path(self.paths[0]).parent, save_path_dir=save_dir_path)
         output_path = writer(self.parts_data, task_name, self.language, save_path_dir=save_dir)
 
