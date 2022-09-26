@@ -7,6 +7,10 @@ from probing.data_former import TextFormer
 from probing.config import data_folder
 
 
+def sort_dict(dictionary):
+    dictionary = {k: np.sort(v, axis=0) for k, v in dictionary.items()}
+    return dictionary
+
 @pytest.mark.data_former
 class TestTextFormer(unittest.TestCase):
     path_testfile = Path(Path(__file__).parent.resolve(), "test_sent_len.txt")
@@ -20,11 +24,6 @@ class TestTextFormer(unittest.TestCase):
                                          ('Я стала другой : терпимой , спокойной и дружелюбной ко всем .', '2')
                                          ])
                          }
-
-    @staticmethod
-    def sort_dict(dictionary):
-        dictionary = {k: np.sort(v, axis=0) for k, v in dictionary.items()}
-        return dictionary
 
     def test_data_path(self):
         task_name = 'sent_len'
@@ -52,8 +51,8 @@ class TestTextFormer(unittest.TestCase):
         )
         samples, unique_labels = data.form_data()
 
-        samples = self.sort_dict(samples)
-        self.samples_reference = self.sort_dict(self.samples_reference)
+        samples = sort_dict(samples)
+        self.samples_reference = sort_dict(self.samples_reference)
 
         samples_keys = set(samples.keys())
         self.samples_ref_keys = set(self.samples_reference.keys())
