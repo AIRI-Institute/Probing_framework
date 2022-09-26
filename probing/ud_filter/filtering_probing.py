@@ -6,7 +6,7 @@ import os
 import re
 from conllu import parse
 from pathlib import Path
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Dict
 from nltk.tokenize import wordpunct_tokenize
 
 
@@ -35,7 +35,7 @@ class ProbingConlluFilter:
         self.parts_data = None
 
     def upload_files(self,
-                     *conllu_paths: Optional[os.PathLike],
+                     conllu_paths: List[Optional[os.PathLike]] = None,
                      dir_conllu_path: Optional[os.PathLike] = None,
                      language: str = None
                      ):
@@ -46,7 +46,8 @@ class ProbingConlluFilter:
             self.paths = [Path(dir_path, p) for p in os.listdir(dir_path) if re.match(r".*\.conllu", p)]
             assert len(self.paths) > 0, f"Empty folder: {dir_conllu_path}"
         elif conllu_paths:
-            self.paths = [p for p in conllu_paths]
+            self.paths = [Path(p).resolve() for p in conllu_paths if re.match(r".*\.conllu", p)]
+            assert len(self.paths) > 0, f'None of the files are with .conllu extension'
         else:
             raise Exception('pass at least one conllu_path or dir_conllu_path')
 
@@ -59,8 +60,8 @@ class ProbingConlluFilter:
     def _filter_conllu(self, class_label: str):
         """Filters sentences by class's query and saves the result to the relevant fields"""
 
-        self.matching = []
-        self.not_matching = []
+        matching = []
+        not_matching = []
 
         node_pattern = self.classes[class_label][0]
         constraints = self.classes[class_label][1]
@@ -72,25 +73,23 @@ class ProbingConlluFilter:
             sf = SentenceFilter(sentence)
             tokenized_sentence = ' '.join(wordpunct_tokenize(sentence.metadata['text']))
             if sf.filter_sentence(node_pattern, constraints):
-                self.matching.append(tokenized_sentence)
+                matching.append(tokenized_sentence)
             else:
-                self.not_matching.append(tokenized_sentence)
-        return self.matching
+                not_matching.append(tokenized_sentence)
+        return matching, not_matching
 
     def filter_and_convert(self,
+                           queries: Dict[str, Tuple[dict, dict]],
                            save_dir_path: Optional[os.PathLike] = None,
                            task_name: str = 'CustomTask',
-                           partition: List[float] = [0.8, 0.1, 0.1],
-                           **queries: Tuple[dict, dict]):
+                           partition: List[float] = [0.8, 0.1, 0.1]):
         """
         Uses user's queries to create a probing task from uploaded conllu files
         Args:
             save_dir_path: where to save a result file (if None saves in the same directory with conllu files
             task_name: name for the probing task (will be used in a result file name)
             partition: a partition for train, validation and test parts
-            **queries: key - class label, value - a query as a tuple of node_pattern and constraints dictionaries.
-            if there is only one query the second class in a probing task will consist of all sentences that doesn't
-            match that query. if there are more than 1 query each query will be accountable for its own class.
+            queries: {class_label: (node_pattern, constraints)}
 
         Returns:
             path to the result file
@@ -101,18 +100,13 @@ class ProbingConlluFilter:
             partition = [0.8, 0.1, 0.1]
 
         self.classes = {label: query for label, query in queries.items()}
-        if not self.classes:
-            raise TypeError(f'You have to pass at least one UD query')
-
-        for cl in self.classes:
-            const_nodes = set([n for p in self.classes[cl][1] for n in p])
-            nodes = set(self.classes[cl][0].keys())
-            if not const_nodes <= nodes:
-                raise ValueError(f'Not all nodes from the constraints are set in node_pattern in class {cl}')
 
         self.probing_dict = {label: self._filter_conllu(label) for label in self.classes}
-        if len(self.classes) == 1:
-            self.probing_dict['not_' + list(self.classes.keys())[0]] = self.not_matching
+        for label in self.classes:
+            matching, not_matching = self._filter_conllu(label)
+            self.probing_dict[label] = matching
+            if len(self.classes) == 1:
+                self.probing_dict['not_' + list(self.classes.keys())[0]] = not_matching
         self.probing_dict = delete_duplicates(self.probing_dict)
 
         self.parts_data = subsamples_split(self.probing_dict,
