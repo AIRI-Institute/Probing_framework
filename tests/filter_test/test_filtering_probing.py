@@ -32,6 +32,6 @@ class TestProbingConlluFilter(unittest.TestCase):
                                 'Masha bought a frying pan , and the boys bought vegetables']
         ADPdistance_res = ['This would have to be determined on a case by case basis .']
 
-        self.assertEqual(probing_filter._filter_conllu('by_passive'), by_passive_res)
-        self.assertEqual(probing_filter._filter_conllu('SOmatchingNumber'), SOmatchingNumber_res)
-        self.assertEqual(probing_filter._filter_conllu('ADPdistance'), ADPdistance_res)
+        self.assertEqual(probing_filter._filter_conllu('by_passive')[0], by_passive_res)
+        self.assertEqual(probing_filter._filter_conllu('SOmatchingNumber')[0], SOmatchingNumber_res)
+        self.assertEqual(probing_filter._filter_conllu('ADPdistance')[0], ADPdistance_res)

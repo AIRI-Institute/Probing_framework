@@ -182,3 +182,6 @@ class TestSentenceFilter(unittest.TestCase):
         sf = SentenceFilter(self.trees_testfile[7])
         self.assertFalse(sf.filter_sentence(by_passive[0], by_passive[1]))
         self.assertFalse(sf.filter_sentence(ADPdistance[0], ADPdistance[1]))
+
+        # find only tokens without constraints
+        self.assertTrue(sf.filter_sentence({'be': {'lemma': 'be'}}, {}))
