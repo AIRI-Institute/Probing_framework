@@ -3,30 +3,30 @@ from conllu import models
 from itertools import product
 from collections import defaultdict
 import networkx as nx
+from utils import check_query
 
 
 class SentenceFilter:
     """
         Checks if a sentence matches patterns
 
-        Attributes: sentence: sentence represented as TokenList node_pattern: a dictionary with a node_label as a key
-        and a dictionary of feature restrictions as a value.
-        sample_node_pattern = { node_label: {
-                                field_or_category: pattern,
-                                'exclude': [exclude categories]
-                                } }
-        constraints: a dictionary with a node_pair as a key and a dictionary with different
-        constraints on node_pair
-        sample_constraints = { ('N', 'M'): {
-                                'deprels': 'some_regexp',
-                                'fconstraint': {
-                                    'disjoint': ['feature1', 'feature2'],
-                                    'intersec': ['feature1', 'feature2'] },
-                                'lindist': (1, 10) } }
-        sent_deprels: a dictionary of all relations and pairs with these relations {relation: [(head, dependent)]}
-        nodes_tokens: a dictionary with all tokens that can be a given node in pattern {node: [token id]}
-        possible_token_pairs: a dictionary with all nodes pairs as a key and a list of possible token
-        pairs as a value
+        Attributes:
+            sentence: sentence represented as TokenList
+            node_pattern: a dictionary with a node_label as a key and a dictionary of feature restrictions as a value.
+            sample_node_pattern = { node_label: {
+                                        field_or_category: regex_pattern,
+                                        'exclude': [exclude categories]} }
+            constraints: a dictionary with a node_pair as a key and a dictionary with different constraints on node_pair
+            sample_constraints = { ('N', 'M'): {
+                                    'deprels': regexp_pattern,
+                                    'fconstraint': {
+                                        'disjoint': [grammar_category],
+                                        'intersec': [grammar_category]},
+                                    'lindist': (start, end) } }
+            sent_deprels: a dictionary of all relations and pairs with these relations {relation: [(head, dependent)]}
+            nodes_tokens: a dictionary with all tokens that can be a node in the pattern {node: [token id]}
+            possible_token_pairs: a dictionary with all nodes pairs as a key and a list of possible token
+            pairs as a value
     """
 
     def __init__(self, sentence: models.TokenList):
@@ -43,12 +43,11 @@ class SentenceFilter:
 
         for feat in node_pattern:
             if feat in token.keys():
-                if not re.fullmatch(node_pattern[feat], token[feat], re.I):  # changed from re.match to re.fullmatch
+                if not re.fullmatch(node_pattern[feat], token[feat], re.I):
                     return False
             elif token['feats']:
                 if feat in token['feats']:
-                    if not re.fullmatch(node_pattern[feat], token['feats'][feat],
-                                        re.I):  # changed from re.match to re.fullmatch
+                    if not re.fullmatch(node_pattern[feat], token['feats'][feat], re.I):
                         return False
                 elif feat == "exclude":
                     for ef in node_pattern[feat]:
@@ -95,7 +94,7 @@ class SentenceFilter:
                 rels.append(rel)
         return rels
 
-    def pairs_with_rel(self, node_pair: tuple, rel_name: str) -> set:  # оставить private
+    def pairs_with_rel(self, node_pair: tuple, rel_name: str) -> set:
         """Returns those pairs of tokens that:
             1) are related by a rel_name
             2) are among possible_token_pairs for a node_pair"""
@@ -200,6 +199,7 @@ class SentenceFilter:
         return True
 
     def filter_sentence(self, node_pattern: dict, constraints: dict):
+        check_query(node_pattern, constraints)
         self.node_pattern = node_pattern
         self.constraints = constraints
         self.nodes_tokens = {node: [] for node in self.node_pattern}
