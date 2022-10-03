@@ -9,6 +9,8 @@ import torch
 import fire
 import uuid
 from typing import Optional
+import gc
+import os
 
 from probing.pipeline import ProbingPipeline
 
@@ -63,9 +65,10 @@ def get_max_memory_per_gpu_dict(dtype, model_name):
 
 def main(
     model_name: str = "bigscience/bloom",
+    UD_folder: os.PathLike = "/home/jovyan/datasets/UD/",
     encoding_batch_size: int = 16,
     classifier_batch_size: int = 64,
-    classifier_device: Optional[str] = "cuda:0"
+    classifier_device: Optional[str] = "cuda:0" # all calculations here
 ):
     experiment = ProbingPipeline(
         metric_names = ["f1", "accuracy"],
@@ -104,8 +107,10 @@ def main(
     ]
     for lang in tqdm(bloom_langs, desc="Processing by languages"):
         experiment.transformer_model.cache.clear() # clear cache for optimal work before a new language
-        tasks_files = glob.glob(f'/home/jovyan/datasets/UD/UD*/*{lang}*/*.csv', recursive=True)
+        torch.cuda.empty_cache()
+        gc.collect()
 
+        tasks_files = glob.glob(f'{UD_folder}UD*/*{lang}*/*.csv', recursive=True)
         for f in tqdm(tasks_files):
             try:
                 experiment.run(probe_task = Path(f).stem, path_to_task_file = f, verbose=True, train_epochs=20)
