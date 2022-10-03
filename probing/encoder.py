@@ -242,7 +242,7 @@ class TransformersLoader:
                     out_cache_encoded_batch_vectors = encoded_batch_text_tensor.permute(1,0,2)
                     
                     # add to cache
-                    self.add_to_cache(input_ids_out, out_cache_encoded_batch_vectors)
+                    self.add_to_cache(input_ids_out, out_cache_encoded_batch_vectors.cpu())
                 else:
                     out_cache_encoded_batch_vectors = []
                     
@@ -250,7 +250,7 @@ class TransformersLoader:
                 cached_tensors_list = self.get_from_cache(input_ids_in)
 
                 if len(cached_tensors_list):
-                    cached_tensors = torch.cat(cached_tensors_list)
+                    cached_tensors = torch.cat(cached_tensors_list).to(self.device, non_blocking=True)
                     final_tensor = torch.cat((out_cache_encoded_batch_vectors, cached_tensors)) if len(out_cache_encoded_batch_vectors) else cached_tensors
                 else:
                     final_tensor = out_cache_encoded_batch_vectors
