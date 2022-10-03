@@ -4,6 +4,7 @@ from typing import Optional, Callable, Union, List, Tuple
 import os
 from tqdm import trange
 import numpy as np
+import gc
 import torch
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
@@ -78,21 +79,24 @@ class ProbingPipeline:
     ) -> float:
         epoch_train_losses = []
         self.classifier.train()
-        for x, y in train_loader:
-            x = x.permute(1,0,2)
-            x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
-            x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
-            y = y.to(self.transformer_model.device)
+        for i, batch in enumerate(train_loader):
+            # x is already on device since it was passed through the model
+            y = batch[1].to(self.transformer_model.device, non_blocking=True)
 
-            self.classifier.zero_grad()
+            x = batch[0].permute(1,0,2)
+            x = torch.squeeze(x[layer], 0).float()
+            x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+
+            self.classifier.zero_grad(set_to_none=True)
             prediction = self.classifier(x)
             loss = self.criterion(prediction, y)
             epoch_train_losses.append(loss.item())
-            
             loss.backward()
-            self.optimizer.step()
-        if self.scheduler:
-            self.scheduler.step()
+
+            if (i+1) % 2 == 0 or (i+1) == len(train_loader):
+                self.optimizer.step()
+                if self.scheduler:
+                    self.scheduler.step()
 
         epoch_loss = np.mean(epoch_train_losses)
         return epoch_loss
@@ -110,10 +114,12 @@ class ProbingPipeline:
         self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
+                # x is already on device since it was passed through the model
+                y = y.to(self.transformer_model.device, non_blocking=True)
+
                 x = x.permute(1,0,2)
-                x = torch.squeeze(x[layer], 0).to(self.transformer_model.device).float()
+                x = torch.squeeze(x[layer], 0).float()
                 x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
-                y = y.to(self.transformer_model.device)
 
                 prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
@@ -122,7 +128,7 @@ class ProbingPipeline:
                 if save_checkpoints:
                     raise NotImplementedError()
 
-                epoch_predictions += prediction.data.max(1).indices.cpu()
+                epoch_predictions += prediction.cpu().data.max(1).indices
                 epoch_true_labels += y.cpu()
 
         epoch_metric_score = self.metrics(epoch_predictions, epoch_true_labels)
@@ -141,12 +147,11 @@ class ProbingPipeline:
         num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
         task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
-        path_to_file_for_probing = task_data.data_path
-        task_language, task_category = lang_category_extraction(path_to_file_for_probing)
+        task_language, task_category = lang_category_extraction(task_data.data_path)
 
         self.log_info = ProbingLog()
         self.log_info['params']['probing_task'] = probe_task
-        self.log_info['params']['file_path'] = path_to_file_for_probing
+        self.log_info['params']['file_path'] = task_data.data_path
         self.log_info['params']['task_language'] = task_language
         self.log_info['params']['task_category'] = task_category
         self.log_info['params']['probing_type'] = self.probing_type
@@ -159,10 +164,9 @@ class ProbingPipeline:
 
         if verbose:
             print('=' * 100)
-            print(f'Task in progress: {probe_task}\nPath to data: {path_to_file_for_probing}')
+            print(f'Task in progress: {probe_task}\nPath to data: {task_data.data_path}')
 
         start_time = time()
-
         probing_dataloaders, encoded_labels_dict = self.transformer_model.get_encoded_dataloaders(
             task_dataset,
             self.encoding_batch_size,
@@ -171,36 +175,33 @@ class ProbingPipeline:
             self.embedding_type,
             verbose
             )
-        self.log_info['params']['encoded_labels'] = encoded_labels_dict
-        tr_dataset = probing_dataloaders["tr"]
-        val_dataset = probing_dataloaders["va"]
-        te_dataset = probing_dataloaders["te"]
-
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
         self.log_info['results']['elapsed_time(sec)'] = 0
+        self.log_info['params']['encoded_labels'] = encoded_labels_dict
+
+        torch.cuda.empty_cache()
+        gc.collect()
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
                 self.classifier_name,
                 num_classes,
                 self.transformer_model.config.hidden_size
                 ).to(self.transformer_model.device)
-            # self.criterion = torch.nn.CrossEntropyLoss(
-            #     weight=torch.Tensor(list(self.log_info['params']['original_classes_ratio']['tr'].values()))
-            #     ).to(self.transformer_model.device)
+
             self.criterion = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
             self.optimizer = AdamW(self.classifier.parameters())
             
             self.scheduler = get_linear_schedule_with_warmup(
                 self.optimizer,
                 num_warmup_steps=2000,
-                num_training_steps=len(tr_dataset) // train_epochs
+                num_training_steps=len(probing_dataloaders["tr"]) // train_epochs
                 ) if is_scheduler else None
 
             for epoch in range(train_epochs):
-                epoch_train_loss = self.train(tr_dataset, layer)
+                epoch_train_loss = self.train(probing_dataloaders["tr"], layer)
 
-                epoch_val_loss, epoch_val_score = self.evaluate(val_dataset, layer, save_checkpoints)
+                epoch_val_loss, epoch_val_score = self.evaluate(probing_dataloaders["va"], layer, save_checkpoints)
 
                 self.log_info['results']['train_loss'].add(layer, epoch_train_loss)
                 self.log_info['results']['val_loss'].add(layer, epoch_val_loss)
@@ -208,7 +209,7 @@ class ProbingPipeline:
                 for m in self.metric_names:
                     self.log_info['results']['val_score'][m].add(layer, epoch_val_score[m])
 
-            _, epoch_test_score = self.evaluate(te_dataset, layer, save_checkpoints)
+            _, epoch_test_score = self.evaluate(probing_dataloaders["te"], layer, save_checkpoints)
 
             for m in self.metric_names:
                 self.log_info['results']['test_score'][m].add(layer, epoch_test_score[m])

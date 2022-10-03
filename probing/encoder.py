@@ -6,6 +6,7 @@ from enum import Enum
 import numpy as np
 from tqdm import tqdm
 import logging
+import gc
 from sklearn.preprocessing import LabelEncoder
 
 from probing.utils import exclude_rows
@@ -219,14 +220,16 @@ class TransformersLoader:
         label_vectors = []
         
         self.model.eval()
+        torch.cuda.empty_cache()
+        gc.collect()
         with torch.no_grad():
             iter_data = tqdm(data, total = len(data), desc=f"Data encoding {stage}") if verbose else data
             for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
                 in_cache_ids, out_cache_ids = self.check_cache_ids(batch_input_ids)
-                input_ids_out = batch_input_ids[out_cache_ids].to(self.device)
-                input_ids_in = batch_input_ids[in_cache_ids].to(self.device)
+                input_ids_out = batch_input_ids[out_cache_ids].to(self.device, non_blocking=True)
+                input_ids_in = batch_input_ids[in_cache_ids].to(self.device, non_blocking=True)
 
-                attention_mask_out = batch_attention_mask[out_cache_ids].to(self.device)
+                attention_mask_out = batch_attention_mask[out_cache_ids].to(self.device, non_blocking=True)
                 # attention_mask_in = batch_attention_mask[in_cache_ids].to(self.device)
 
                 labels_out = batch_labels[out_cache_ids]
