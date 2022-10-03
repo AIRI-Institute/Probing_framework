@@ -7,6 +7,8 @@ import traceback
 import torch
 import fire
 import uuid
+import os
+import gc
 from typing import Optional
 
 from probing.pipeline import ProbingPipeline
@@ -21,6 +23,7 @@ def init_seed(seed: int = 42):
 
 def main(
     model_name: str = "bert-base-multilingual-cased",
+    UD_folder: os.PathLike = Path("/home/jovyan/datasets/UD/"),
     encoding_batch_size: int = 64,
     classifier_batch_size: int = 64,
     device: Optional[str] = None
@@ -46,8 +49,10 @@ def main(
     ]
     for lang in tqdm(bloom_langs, desc="Processing by languages"):
         experiment.transformer_model.cache.clear() # clear cache for optimal work before a new language
-        tasks_files = glob.glob(f'/home/jovyan/datasets/UD/UD*/*{lang}*/*.csv', recursive=True)
+        torch.cuda.empty_cache()
+        gc.collect()
 
+        tasks_files = glob.glob(f'{UD_folder}UD*/*{lang}*/*.csv', recursive=True)
         for f in tqdm(tasks_files):
             try:
                 experiment.run(probe_task = Path(f).stem, path_to_task_file = f, verbose=True, train_epochs=20)
