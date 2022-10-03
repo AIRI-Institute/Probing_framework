@@ -23,7 +23,7 @@ def init_seed(seed: int = 42):
 
 def main(
     model_name: str = "bert-base-multilingual-cased",
-    UD_folder: os.PathLike = Path("/home/jovyan/datasets/UD/"),
+    UD_folder: os.PathLike = "/home/jovyan/datasets/UD/",
     encoding_batch_size: int = 64,
     classifier_batch_size: int = 64,
     device: Optional[str] = None
