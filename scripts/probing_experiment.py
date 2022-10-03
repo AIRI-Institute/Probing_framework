@@ -65,6 +65,5 @@ def main(
                 log_errors.write(e + "\n")
                 log_errors.close()
 
-
 if __name__ == "__main__":
     fire.Fire(main)
