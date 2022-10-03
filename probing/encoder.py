@@ -213,7 +213,7 @@ class TransformersLoader:
         stage: Enum,
         embedding_type: Enum,
         verbose: bool,
-        mode: str = None
+        do_control_task: bool = False
     ) -> EncodedVectorFormer:
         encoded_text_tensors = []
         label_vectors = []
@@ -257,7 +257,7 @@ class TransformersLoader:
 
         encoded_text_tensors = torch.cat(encoded_text_tensors, dim=0)
         label_vectors = torch.cat(label_vectors, dim=0)
-        if mode == "do_control_task":
+        if do_control_task:
             idx = torch.randperm(label_vectors.shape[0])
             label_vectors = label_vectors[:, idx]
         probe_dataset = EncodedVectorFormer(encoded_text_tensors, label_vectors)
@@ -271,16 +271,16 @@ class TransformersLoader:
         shuffle: bool = True,
         embedding_type: Enum = "cls",
         verbose: bool = True,
-        mode: str = None
+        do_control_task: bool = False
     ) -> Tuple[Dict[Enum, DataLoader], Dict[Enum, int]]:
         tokenized_datasets, encoded_labels = self.get_tokenized_datasets(task_dataset)
         tr_dataloader_tokenized = DataLoader(tokenized_datasets["tr"], batch_size=encoding_batch_size)
         va_dataloader_tokenized = DataLoader(tokenized_datasets["va"], batch_size=encoding_batch_size)
         te_dataloader_tokenized = DataLoader(tokenized_datasets["te"], batch_size=encoding_batch_size)
 
-        tr_tokenized = self.encode_data(tr_dataloader_tokenized, "train", embedding_type, verbose, mode=mode)
-        va_tokenized = self.encode_data(va_dataloader_tokenized, "val", embedding_type, verbose, mode=mode)
-        te_tokenized = self.encode_data(te_dataloader_tokenized, "test", embedding_type, verbose, mode=mode)
+        tr_tokenized = self.encode_data(tr_dataloader_tokenized, "train", embedding_type, verbose, do_control_task=do_control_task)
+        va_tokenized = self.encode_data(va_dataloader_tokenized, "val", embedding_type, verbose, do_control_task=do_control_task)
+        te_tokenized = self.encode_data(te_dataloader_tokenized, "test", embedding_type, verbose, do_control_task=do_control_task)
 
         tr_dataloader_encoded = DataLoader(tr_tokenized, batch_size=classifier_batch_size, shuffle=shuffle)
         va_dataloader_encoded = DataLoader(va_tokenized, batch_size=classifier_batch_size, shuffle=shuffle)
