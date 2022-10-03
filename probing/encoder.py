@@ -43,7 +43,6 @@ class TransformersLoader:
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
-        
         self.device = device
         self.init_device()
 
