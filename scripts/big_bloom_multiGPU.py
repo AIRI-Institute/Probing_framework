@@ -66,7 +66,7 @@ def get_max_memory_per_gpu_dict(dtype, model_name):
 def main(
     model_name: str = "bigscience/bloom",
     UD_folder: os.PathLike = "/home/jovyan/datasets/UD/",
-    encoding_batch_size: int = 16,
+    encoding_batch_size: int = 8,
     classifier_batch_size: int = 64,
     classifier_device: Optional[str] = "cuda:0" # all calculations here
 ):
