@@ -137,7 +137,7 @@ class ProbingPipeline:
         is_scheduler: bool = False,
         save_checkpoints: bool = False,
         verbose: bool = True,
-        mode: str = None
+        do_control_task: bool = False
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
@@ -171,7 +171,7 @@ class ProbingPipeline:
             self.shuffle,
             self.embedding_type,
             verbose,
-            mode=mode
+            do_control_task = do_control_task
             )
         self.log_info['params']['encoded_labels'] = encoded_labels_dict
         tr_dataset = probing_dataloaders["tr"]
