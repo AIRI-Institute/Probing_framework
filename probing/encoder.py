@@ -257,7 +257,7 @@ class TransformersLoader:
 
         encoded_text_tensors = torch.cat(encoded_text_tensors, dim=0)
         label_vectors = torch.cat(label_vectors, dim=0)
-        if mode == "control_tasks":
+        if mode == "do_control_task":
             idx = torch.randperm(label_vectors.shape[0])
             label_vectors = label_vectors[:, idx]
         probe_dataset = EncodedVectorFormer(encoded_text_tensors, label_vectors)
