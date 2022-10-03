@@ -142,7 +142,8 @@ class ProbingPipeline:
         train_epochs: int = 10,
         is_scheduler: bool = False,
         save_checkpoints: bool = False,
-        verbose: bool = True
+        verbose: bool = True,
+        do_control_task: bool = False
     ) -> None:
         num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
@@ -173,7 +174,8 @@ class ProbingPipeline:
             self.classifier_batch_size,
             self.shuffle,
             self.embedding_type,
-            verbose
+            verbose,
+            do_control_task = do_control_task
             )
 
         probing_iter_range = trange(num_layers, desc="Probing by layers") if verbose else range(num_layers)
