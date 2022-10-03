@@ -180,9 +180,9 @@ class ProbingPipeline:
         self.log_info['results']['elapsed_time(sec)'] = 0
         self.log_info['params']['encoded_labels'] = encoded_labels_dict
 
+        torch.cuda.empty_cache()
+        gc.collect()
         for layer in probing_iter_range:
-            torch.cuda.empty_cache()
-            gc.collect()
             self.classifier = self.get_classifier(
                 self.classifier_name,
                 num_classes,
