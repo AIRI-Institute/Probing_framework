@@ -166,6 +166,8 @@ class ProbingPipeline:
             print('=' * 100)
             print(f'Task in progress: {probe_task}\nPath to data: {task_data.data_path}')
 
+        torch.cuda.empty_cache()
+        gc.collect()
         start_time = time()
         probing_dataloaders, encoded_labels_dict = self.transformer_model.get_encoded_dataloaders(
             task_dataset,
@@ -180,8 +182,6 @@ class ProbingPipeline:
         self.log_info['results']['elapsed_time(sec)'] = 0
         self.log_info['params']['encoded_labels'] = encoded_labels_dict
 
-        torch.cuda.empty_cache()
-        gc.collect()
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
                 self.classifier_name,
