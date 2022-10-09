@@ -1,8 +1,7 @@
 import os
 from collections import defaultdict
 from enum import Enum
-from typing import (Callable, DefaultDict, Dict, List, Optional, Set, Tuple,
-                    Union)
+from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
 import torch
