@@ -48,11 +48,12 @@ def myconverter(obj: Any) -> Any:
 
 
 def save_log(log: Dict, probe_task: str) -> None:
+    log_file_name = "log.json"
     date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
     experiments_path = pathlib.Path(config.results_folder, f"{date}_{probe_task}")
     if not probe_task.startswith("test_"):
         os.makedirs(experiments_path, exist_ok=True)
-        log_path = pathlib.Path(experiments_path, "log.json")
+        log_path = pathlib.Path(experiments_path, log_file_name)
 
         with open(log_path, "w") as outfile:
             json.dump(log, outfile, indent=4, default=myconverter)
