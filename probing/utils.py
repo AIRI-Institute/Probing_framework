@@ -1,36 +1,34 @@
-from enum import Enum
-from typing import Optional, Dict, Any, List, Tuple
-from pathlib import Path
-from collections import Counter, defaultdict
-import os
 import glob
-import logging
-import pathlib
-import torch
-import numpy as np
 import json
+import logging
+import os
+import pathlib
+from collections import Counter, defaultdict
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import torch
 
 from probing import config
 
 
 def get_probe_task_path(
-    probe_task_name: Enum,
-    file_path: Optional[os.PathLike] = None
+    probe_task_name: str, file_path: Optional[os.PathLike] = None
 ) -> os.PathLike:
     if file_path is None:
         path_to_folder = pathlib.Path(config.data_folder, probe_task_name)
-        path_to_file = glob.glob(f'{path_to_folder}*')
+        path_to_file = glob.glob(f"{path_to_folder}*")
 
         if len(path_to_file) == 0:
             raise RuntimeError(
-                f"We didn\'t find any files for the task: {probe_task_name}."
+                f"We didn't find any files for the task: {probe_task_name}."
                 "You should provide a path to the file with data."
-                )
-        return path_to_file[0]
+            )
+        return pathlib.Path(path_to_file[0])
 
     elif not os.path.exists(file_path):
-        raise RuntimeError(f"Provided path: {file_path} doesn\'t exist")
+        raise RuntimeError(f"Provided path: {file_path} doesn't exist")
     return file_path
 
 
@@ -48,19 +46,20 @@ def myconverter(obj: Any) -> Any:
     return obj
 
 
-def save_log(log: Dict, probe_task: str) -> None:
+def save_log(log: Dict, probe_task: str) -> os.PathLike:
+    log_file_name = "log.json"
     date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
-    experiments_path = pathlib.Path(config.results_folder, f'{date}_{probe_task}')
+    experiments_path = pathlib.Path(config.results_folder, f"{date}_{probe_task}")
     if not probe_task.startswith("test_"):
         os.makedirs(experiments_path, exist_ok=True)
-        log_path = pathlib.Path(experiments_path, "log.json")
+        log_path = pathlib.Path(experiments_path, log_file_name)
 
         with open(log_path, "w") as outfile:
-            json.dump(log, outfile, indent = 4, default = myconverter)
-    return str(experiments_path)
+            json.dump(log, outfile, indent=4, default=myconverter)
+    return experiments_path
 
 
-def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum, int]]:
+def get_ratio_by_classes(samples: Dict[str, List[str]]) -> Dict[str, Dict[str, int]]:
     ratio_by_classes = {}
     for class_name in samples:
         class_labels_all = [i[1] for i in samples[class_name]]
@@ -69,23 +68,25 @@ def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum
     return ratio_by_classes
 
 
-def lang_category_extraction(file_path: os.PathLike) -> Tuple[Optional[str], Optional[str]]:
-    if '_' in str(file_path):   
-        path = str(Path(file_path).stem)           
-        task_language = path.split('_')[0]
-        task_category = path.split('_')[-1]
+def lang_category_extraction(
+    file_path: os.PathLike,
+) -> Tuple[Optional[str], Optional[str]]:
+    if "_" in str(file_path):
+        path = str(pathlib.Path(file_path).stem)
+        task_language = path.split("_")[0]
+        task_category = path.split("_")[-1]
     else:
         task_language, task_category = None, None
     return task_language, task_category
 
 
-def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tensor:
+def exclude_rows(tensor: torch.Tensor, rows_to_exclude: torch.Tensor) -> torch.Tensor:
     if len(tensor.size()) == 1:
-        tensor = tensor.view(-1,1)
+        tensor = tensor.view(-1, 1)
 
     tensor_shape = tensor.size()
     assert len(tensor_shape) == 2
-    tensor = tensor.view(*tensor_shape,1)
+    tensor = tensor.view(*tensor_shape, 1)
 
     mask = torch.ones(tensor_shape, dtype=torch.bool)
     mask[rows_to_exclude, :] = False

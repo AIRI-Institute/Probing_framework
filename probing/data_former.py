@@ -1,10 +1,11 @@
-from enum import Enum
-from typing import Tuple, Dict, Optional, List, Union, Callable, Set, DefaultDict
 import os
-from torch.utils.data import Dataset
-import torch
-import numpy as np
+import typing
 from collections import defaultdict
+from typing import DefaultDict, Dict, Optional, Set, Tuple
+
+import numpy as np
+import torch
+from torch.utils.data import Dataset
 
 from probing.utils import get_probe_task_path
 
@@ -12,9 +13,9 @@ from probing.utils import get_probe_task_path
 class TextFormer:
     def __init__(
         self,
-        probe_task: Union[Enum, str],
+        probe_task: str,
         data_path: Optional[os.PathLike] = None,
-        shuffle: bool = True
+        shuffle: bool = True,
     ):
         self.probe_task = probe_task
         self.shuffle = shuffle
@@ -28,7 +29,8 @@ class TextFormer:
     def __getitem__(self, idx):
         return self.samples[idx]
 
-    def form_data(self) -> Tuple[DefaultDict[Enum, np.ndarray], Set[str]]:
+    @typing.no_type_check
+    def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
         f = open(self.data_path)
@@ -38,7 +40,9 @@ class TextFormer:
             unique_labels.add(label)
 
         if self.shuffle:
-            samples_dict = {k: np.random.permutation(v) for k, v in samples_dict.items()}
+            samples_dict = {
+                k: np.random.permutation(v) for k, v in samples_dict.items()
+            }
         else:
             samples_dict = {k: np.array(v) for k, v in samples_dict.items()}
         return samples_dict, unique_labels
@@ -60,10 +64,10 @@ class EncodedVectorFormer(Dataset):
 
 
 class TokenizedVectorFormer(Dataset):
-    def __init__(self, data: Dict[Enum, torch.tensor]):
-        self.input_ids = data['input_ids']
-        self.attention_masks = data['attention_mask']
-        self.labels = data['labels']
+    def __init__(self, data: Dict[str, torch.Tensor]):
+        self.input_ids = data["input_ids"]
+        self.attention_masks = data["attention_mask"]
+        self.labels = data["labels"]
 
     def __len__(self):
         return len(self.input_ids)

@@ -2,11 +2,7 @@ import torch
 
 
 class LogReg(torch.nn.Module):
-    def __init__(
-        self,
-        input_dim: int,
-        num_classes: int
-    ):
+    def __init__(self, input_dim: int, num_classes: int):
         super(LogReg, self).__init__()
         self.input_dim = input_dim
         self.num_classes = num_classes
@@ -21,11 +17,7 @@ class LogReg(torch.nn.Module):
 
 class MLP(torch.nn.Module):
     def __init__(
-        self,
-        input_dim: int,
-        num_classes: int,
-        hidden_size: int,
-        dropout_rate: float
+        self, input_dim: int, num_classes: int, hidden_size: int, dropout_rate: float
     ):
         super(MLP, self).__init__()
         self.input_dim = input_dim
