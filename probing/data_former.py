@@ -1,10 +1,12 @@
-from enum import Enum
-from typing import Tuple, Dict, Optional, List, Union, Callable, Set, DefaultDict
 import os
-from torch.utils.data import Dataset
-import torch
-import numpy as np
 from collections import defaultdict
+from enum import Enum
+from typing import (Callable, DefaultDict, Dict, List, Optional, Set, Tuple,
+                    Union)
+
+import numpy as np
+import torch
+from torch.utils.data import Dataset
 
 from probing.utils import get_probe_task_path
 

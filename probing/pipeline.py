@@ -1,20 +1,22 @@
-from time import time
-from enum import Enum
-from typing import Optional, Callable, Union, List, Tuple
-import os
-from tqdm import trange
-import numpy as np
 import gc
+import os
+from enum import Enum
+from time import time
+from typing import Callable, List, Optional, Tuple, Union
+
+import numpy as np
 import torch
-from torch.utils.data import DataLoader
 from torch.optim import AdamW
+from torch.utils.data import DataLoader
+from tqdm import trange
 from transformers import get_linear_schedule_with_warmup
 
-from probing.classifier import LogReg, MLP
-from probing.encoder import TransformersLoader
+from probing.classifier import MLP, LogReg
 from probing.data_former import TextFormer
+from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import save_log, get_ratio_by_classes, lang_category_extraction, ProbingLog
+from probing.utils import (ProbingLog, get_ratio_by_classes,
+                           lang_category_extraction, save_log)
 
 
 class ProbingPipeline:

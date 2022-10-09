@@ -1,11 +1,12 @@
-from probing.ud_parser.ud_parser import ConlluUDParser
-
-import pytest
 import os
 import unittest
-from conllu import parse_tree
 from collections import defaultdict
 from pathlib import Path
+
+import pytest
+from conllu import parse_tree
+
+from probing.ud_parser.ud_parser import ConlluUDParser
 
 
 @pytest.mark.ud_parser

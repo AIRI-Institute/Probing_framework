@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import List, Callable, Union, Dict
+from typing import Callable, Dict, List, Union
+
 import torch
 from sklearn.metrics import f1_score as f1
 

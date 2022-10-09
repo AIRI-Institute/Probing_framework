@@ -1,6 +1,5 @@
-from typing import List, Dict
 from enum import Enum
-
+from typing import Dict, List
 
 too_much_files_err_str = "Too much files. You provided \"{}\" files"
 

@@ -1,19 +1,20 @@
-import re
-import os
 import csv
-import numpy as np
 import logging
-from collections import Counter
+import os
+import re
+from collections import Counter, defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Tuple, Optional, Dict, List, Any
-from collections import defaultdict
-from conllu import parse_tree, parse
-from conllu.models import TokenTree, Token
-from sklearn.model_selection import train_test_split
-from nltk.tokenize import wordpunct_tokenize
+from typing import Any, Dict, List, Optional, Tuple
 
-from probing.ud_parser.ud_config import partitions_by_files, too_much_files_err_str, splits_by_files
+import numpy as np
+from conllu import parse, parse_tree
+from conllu.models import Token, TokenTree
+from nltk.tokenize import wordpunct_tokenize
+from sklearn.model_selection import train_test_split
+
+from probing.ud_parser.ud_config import (partitions_by_files, splits_by_files,
+                                         too_much_files_err_str)
 
 
 class ConlluUDParser:

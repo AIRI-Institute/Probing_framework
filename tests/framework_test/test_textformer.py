@@ -1,10 +1,11 @@
-import pytest
 import unittest
 from pathlib import Path
-import numpy as np
 
-from probing.data_former import TextFormer
+import numpy as np
+import pytest
+
 from probing.config import data_folder
+from probing.data_former import TextFormer
 
 
 def sort_dict(dictionary):

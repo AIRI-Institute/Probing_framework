@@ -1,17 +1,17 @@
-from transformers import  AutoConfig, AutoModel, AutoTokenizer
-import torch
-from torch.utils.data import DataLoader
-from typing import Optional, List, Tuple, Union, Dict
-from enum import Enum
-import numpy as np
-from tqdm import tqdm
-import logging
 import gc
+import logging
+from enum import Enum
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import torch
 from sklearn.preprocessing import LabelEncoder
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import AutoConfig, AutoModel, AutoTokenizer
 
+from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
 from probing.utils import exclude_rows
-from probing.data_former import TokenizedVectorFormer, EncodedVectorFormer
-
 
 
 class TransformersLoader:

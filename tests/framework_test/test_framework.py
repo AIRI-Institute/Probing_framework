@@ -1,6 +1,7 @@
-import pytest
 import unittest
 from pathlib import Path
+
+import pytest
 
 from probing.pipeline import ProbingPipeline
 
