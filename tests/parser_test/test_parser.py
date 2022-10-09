@@ -129,7 +129,7 @@ class TestUDParser(unittest.TestCase):
         self.assertEqual(
             {},
             parser.subsamples_split(
-                probing_data, partition=[0.8, 0.1, 0.1], random_seed=0
+                probing_data, partition=[0.8, 0.1, 0.1], random_seed=0, split=["tr", "va", "te"],
             ),
         )
         self.assertEqual(
