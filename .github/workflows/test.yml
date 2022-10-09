@@ -32,7 +32,7 @@ jobs:
       - name: Code testing
         run: |
           isort --check --diff ./probing/ ./tests/
-          black --check --diff ./src/ ./tests/
+          black --check --diff ./probing/ ./tests/
           mypy -p src
       - name: Test with pytest
         run: |
