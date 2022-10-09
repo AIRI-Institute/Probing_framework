@@ -37,7 +37,7 @@ jobs:
           black --check --diff ./probing/ ./tests/
       - name: mypy
         run: |
-          mypy -p probing
+          mypy probing 
       - name: Test with pytest
         run: |
           python -m pytest .
