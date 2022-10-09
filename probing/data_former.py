@@ -1,6 +1,6 @@
 import os
 from collections import defaultdict
-from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
+from typing import DefaultDict, Dict, Optional, Set, Tuple
 
 import numpy as np
 import torch
@@ -14,7 +14,7 @@ class TextFormer:
         self,
         probe_task: str,
         data_path: Optional[os.PathLike] = None,
-        shuffle: bool = True
+        shuffle: bool = True,
     ):
         self.probe_task = probe_task
         self.shuffle = shuffle
@@ -38,7 +38,9 @@ class TextFormer:
             unique_labels.add(label)
 
         if self.shuffle:
-            samples_dict = {k: np.random.permutation(v) for k, v in samples_dict.items()}
+            samples_dict = {
+                k: np.random.permutation(v) for k, v in samples_dict.items()
+            }
         else:
             samples_dict = {k: np.array(v) for k, v in samples_dict.items()}
         return samples_dict, unique_labels
@@ -61,9 +63,9 @@ class EncodedVectorFormer(Dataset):
 
 class TokenizedVectorFormer(Dataset):
     def __init__(self, data: Dict[str, torch.tensor]):
-        self.input_ids = data['input_ids']
-        self.attention_masks = data['attention_mask']
-        self.labels = data['labels']
+        self.input_ids = data["input_ids"]
+        self.attention_masks = data["attention_mask"]
+        self.labels = data["labels"]
 
     def __len__(self):
         return len(self.input_ids)
