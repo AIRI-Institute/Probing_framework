@@ -1,6 +1,5 @@
 import os
 from collections import defaultdict
-from enum import Enum
 from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
@@ -13,7 +12,7 @@ from probing.utils import get_probe_task_path
 class TextFormer:
     def __init__(
         self,
-        probe_task: Union[Enum, str],
+        probe_task: str,
         data_path: Optional[os.PathLike] = None,
         shuffle: bool = True
     ):
@@ -29,7 +28,7 @@ class TextFormer:
     def __getitem__(self, idx):
         return self.samples[idx]
 
-    def form_data(self) -> Tuple[DefaultDict[Enum, np.ndarray], Set[str]]:
+    def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
         f = open(self.data_path)
@@ -61,7 +60,7 @@ class EncodedVectorFormer(Dataset):
 
 
 class TokenizedVectorFormer(Dataset):
-    def __init__(self, data: Dict[Enum, torch.tensor]):
+    def __init__(self, data: Dict[str, torch.tensor]):
         self.input_ids = data['input_ids']
         self.attention_masks = data['attention_mask']
         self.labels = data['labels']
