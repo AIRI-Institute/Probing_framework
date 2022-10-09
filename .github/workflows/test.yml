@@ -29,13 +29,13 @@ jobs:
           pip install black isort pytest
           pip install torch==1.12 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
           pip install -r requirements.txt
-      - name: ISORT
+      - name: isort
         run: |
           isort --check --diff ./probing/ ./tests/
-      - name: BLACK
+      - name: black
         run: |
           black --check --diff ./probing/ ./tests/
-      - name: MYPY
+      - name: mypy
         run: |
           mypy -p probing
       - name: Test with pytest
