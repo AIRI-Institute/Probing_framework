@@ -14,13 +14,13 @@ class Metric:
     ) -> Dict[str, float]:
         res_metrics = {}
         for m, f in self.metrics.items():
-            res_metrics[m] = f(predictions, true_labels).item()
+            res_metrics[m] = f(predictions, true_labels)
         return res_metrics
 
     def accuracy(self, predictions: List[int], true_labels: List[int]) -> float:
         return torch.mean(
             (torch.tensor(predictions) == torch.tensor(true_labels)).float()
-        )
+        ).item()
 
     def f1_score(self, predictions: List[int], true_labels: List[int]) -> float:
         return f1(true_labels, predictions, average="weighted")

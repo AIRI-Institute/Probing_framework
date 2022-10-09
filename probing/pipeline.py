@@ -1,7 +1,7 @@
 import gc
 import os
 from time import time
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -58,7 +58,7 @@ class ProbingPipeline:
 
     def get_classifier(
         self, classifier_name: str, num_classes: int, embed_dim: int
-    ) -> Callable:
+    ) -> Union[LogReg, MLP]:
         if classifier_name == "logreg":
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
         elif classifier_name == "mlp":
@@ -98,7 +98,7 @@ class ProbingPipeline:
 
     def evaluate(
         self, dataloader: DataLoader, layer: int, save_checkpoints: bool = False
-    ) -> Tuple[List[float], List[float]]:
+    ) -> Tuple[List[float], Dict[str, float]]:
         epoch_losses = []
         epoch_predictions = []
         epoch_true_labels = []
@@ -236,6 +236,6 @@ class ProbingPipeline:
                 )
 
         self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
-        output_path = save_log(self.log_info, probe_task)
+        output_path = str(save_log(self.log_info, probe_task))
         if verbose:
             print(f"Experiments were saved in the folder: {output_path}")

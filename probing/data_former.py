@@ -1,4 +1,5 @@
 import os
+import typing
 from collections import defaultdict
 from typing import DefaultDict, Dict, Optional, Set, Tuple
 
@@ -28,6 +29,7 @@ class TextFormer:
     def __getitem__(self, idx):
         return self.samples[idx]
 
+    @typing.no_type_check
     def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
@@ -62,7 +64,7 @@ class EncodedVectorFormer(Dataset):
 
 
 class TokenizedVectorFormer(Dataset):
-    def __init__(self, data: Dict[str, torch.tensor]):
+    def __init__(self, data: Dict[str, torch.Tensor]):
         self.input_ids = data["input_ids"]
         self.attention_masks = data["attention_mask"]
         self.labels = data["labels"]

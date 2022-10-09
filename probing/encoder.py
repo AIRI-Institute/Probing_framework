@@ -1,5 +1,6 @@
 import gc
 import logging
+import typing
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -46,7 +47,7 @@ class TransformersLoader:
             else None
         )
 
-        self.cache = {}
+        self.cache: Dict[str, torch.Tensor] = {}
         self.truncation = truncation
         self.padding = padding
         self.return_tensors = return_tensors
@@ -120,12 +121,12 @@ class TransformersLoader:
         )
         return tokenized_text
 
+    @typing.no_type_check
     def _fix_tokenized_tensors(
         self, tokenized_text: Dict[str, torch.Tensor]
     ) -> Tuple[torch.Tensor, torch.Tensor, List[int]]:
         input_ids = tokenized_text["input_ids"]
         attention_mask = tokenized_text["attention_mask"]
-        row_ids_to_exclude = []
         if (
             not self.truncation
             and input_ids.size()[1] > self.tokenizer.model_max_length
@@ -147,15 +148,17 @@ class TransformersLoader:
                 :, : self.tokenizer.model_max_length
             ]
             row_ids_to_exclude = row_ids_to_exclude.tolist()
+        else:
+            row_ids_to_exclude = []
         return input_ids, attention_mask, row_ids_to_exclude
 
     def _get_embeddings_by_layers(
         self, model_outputs: Tuple[torch.Tensor], embedding_type: str
     ) -> List[torch.Tensor]:
         layers_outputs = []
-        for output in model_outputs[1:]:
+        for output in model_outputs[1:]:  # type: ignore
             if embedding_type == "cls":
-                sent_vector = output[:, 0, :]
+                sent_vector = output[:, 0, :]  # type: ignore
             elif embedding_type == "sum":
                 sent_vector = torch.sum(output, dim=1)
             elif embedding_type == "avg":
@@ -169,7 +172,7 @@ class TransformersLoader:
 
     def get_tokenized_datasets(
         self, task_dataset: Dict[str, np.ndarray]
-    ) -> Tuple[Dict[str, TokenizedVectorFormer], Dict[str, int]]:
+    ) -> Tuple[Dict[str, TokenizedVectorFormer], Dict[str, Dict[str, int]]]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
@@ -271,8 +274,8 @@ class TransformersLoader:
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:
-        encoded_text_tensors = []
-        label_vectors = []
+        encoded_text_list = []
+        labels_list = []
 
         self.model.eval()
         torch.cuda.empty_cache()
@@ -315,7 +318,7 @@ class TransformersLoader:
                         input_ids_out, out_cache_encoded_batch_vectors.cpu()
                     )
                 else:
-                    out_cache_encoded_batch_vectors = []
+                    out_cache_encoded_batch_vectors = torch.Tensor()
 
                 # get from cache
                 cached_tensors_list = self.get_from_cache(input_ids_in)
@@ -332,15 +335,15 @@ class TransformersLoader:
                 else:
                     final_tensor = out_cache_encoded_batch_vectors
 
-                encoded_text_tensors.append(final_tensor)
-                label_vectors.append(labels)
+                encoded_text_list.append(final_tensor)
+                labels_list.append(labels)
 
-        encoded_text_tensors = torch.cat(encoded_text_tensors, dim=0)
-        label_vectors = torch.cat(label_vectors, dim=0)
+        encoded_text_tensor = torch.cat(encoded_text_list, dim=0)
+        labels_tensor = torch.cat(labels_list, dim=0)
         if do_control_task:
-            idx = torch.randperm(label_vectors.shape[0])
-            label_vectors = label_vectors[:, idx]
-        probe_dataset = EncodedVectorFormer(encoded_text_tensors, label_vectors)
+            idx = torch.randperm(labels_tensor.shape[0])
+            labels_tensor = labels_tensor[:, idx]
+        probe_dataset = EncodedVectorFormer(encoded_text_tensor, labels_tensor)
         return probe_dataset
 
     def get_encoded_dataloaders(
@@ -352,7 +355,7 @@ class TransformersLoader:
         embedding_type: str = "cls",
         verbose: bool = True,
         do_control_task: bool = False,
-    ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
+    ) -> Tuple[Dict[str, DataLoader], Dict[str, Dict[str, int]]]:
         tokenized_datasets, encoded_labels = self.get_tokenized_datasets(task_dataset)
         tr_dataloader_tokenized = DataLoader(
             tokenized_datasets["tr"], batch_size=encoding_batch_size

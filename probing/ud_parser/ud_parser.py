@@ -2,6 +2,7 @@ import csv
 import logging
 import os
 import re
+import typing
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -57,7 +58,7 @@ class ConlluUDParser:
 
     def find_category_token(
         self, category: str, head: Token, children: List[TokenTree]
-    ) -> Optional[str]:
+    ) -> Optional[Token]:
         """
         Finds a token that has a given category and is located on the top of a tree
         Args:
@@ -84,14 +85,15 @@ class ConlluUDParser:
         """
         probing_data = defaultdict(list)
         for token_tree in token_trees:
-            s_text = " ".join(wordpunct_tokenize(token_tree.metadata["text"]))
-            root = token_tree.token
-            category_token = self.find_category_token(
-                category, root, token_tree.children
-            )
-            if category_token:
-                value = category_token["feats"][category]
-                probing_data[value].append(s_text)
+            if token_tree.metadata:
+                s_text = " ".join(wordpunct_tokenize(token_tree.metadata["text"]))
+                root = token_tree.token
+                category_token = self.find_category_token(
+                    category, root, token_tree.children
+                )
+                if category_token:
+                    value = category_token["feats"][category]
+                    probing_data[value].append(s_text)
         return probing_data
 
     def filter_labels_after_split(self, labels: List[Any]) -> List[Any]:
@@ -123,10 +125,10 @@ class ConlluUDParser:
 
     def subsamples_split(
         self,
-        probing_data: Dict,
+        probing_data: List[Tuple[str, str]],
         partition: List[float],
         random_seed: int,
-        split: List[str] = None,
+        split: List[str],
     ) -> Dict:
         """
         Splits data into three sets: train, validation, and test
@@ -238,7 +240,7 @@ class ConlluUDParser:
         self, paths: List[os.PathLike]
     ) -> Tuple[List[str], List[str]]:
         set_of_values = set()
-        list_texts = [self.read(p) for p in paths]
+        list_texts = [self.read(str(p)) for p in paths]
         text_data = "\n".join(list_texts)
         token_lists = parse(text_data)
         for token_list in token_lists:
@@ -252,10 +254,9 @@ class ConlluUDParser:
         dir_path = Path(dir_path).resolve() if dir_path is not None else None
 
         def sorting_parts_func(p: os.PathLike) -> int:
-            p = str(p)
-            if "train" in p:
+            if "train" in str(p):
                 return 0
-            elif "dev" in p:
+            elif "dev" in str(p):
                 return 1
             return 2
 
@@ -297,7 +298,7 @@ class ConlluUDParser:
             splits: the way how the data should be splitted
             partitions: the percentage of different splits
         """
-        data = defaultdict(dict)
+        data: Dict[str, Dict] = defaultdict(dict)
         list_texts, categories = self.get_text_and_categories(paths)
 
         if self.verbose:
@@ -315,30 +316,31 @@ class ConlluUDParser:
             splits = splits_by_files[len(paths)]
 
         for category_name in categories:
-            category_parts = {}
+            category_parts: Dict = {}
             for text, split, part in zip(list_texts, splits, partitions):
-                part = self.generate_probing_file(
+                process_part = self.generate_probing_file(
                     conllu_text=text,
                     splits=split,
                     partitions=part,
                     category=category_name,
                 )
                 # means that some part within tr, va, te wasn't satisfied to the conditions
-                if part == {}:
+                if process_part == {}:
                     category_parts = {}
                     break
-                category_parts.update(part)
+                category_parts.update(process_part)
 
             if category_parts:
                 self.check_parts(category_parts, category_name)
             data[category_name] = category_parts
         return data
 
+    @typing.no_type_check
     def process_paths(
         self,
-        tr_path: os.PathLike = None,
-        va_path: os.PathLike = None,
-        te_path: os.PathLike = None,
+        tr_path: Optional[os.PathLike] = None,
+        va_path: Optional[os.PathLike] = None,
+        te_path: Optional[os.PathLike] = None,
         language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None,
     ) -> Tuple[Dict[str, Dict[str, List[str]]], str, os.PathLike]:
@@ -385,7 +387,7 @@ class ConlluUDParser:
             print("=" * 100)
             paths_str = "\n".join(
                 [
-                    p
+                    str(p)
                     for p in [tr_path, va_path, te_path, path_dir_conllu]
                     if p is not None
                 ]
@@ -407,7 +409,7 @@ class ConlluUDParser:
         for category, category_data in data.items():
             if category_data:
                 output_path = self.writer(
-                    category_data, category, language, save_path_dir
+                    category_data, category, language, save_path_dir  # type: ignore
                 )
                 if self.verbose:
                     print(f"Writing to file: {output_path}")

@@ -5,7 +5,6 @@ import os
 import pathlib
 from collections import Counter, defaultdict
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -26,7 +25,7 @@ def get_probe_task_path(
                 f"We didn't find any files for the task: {probe_task_name}."
                 "You should provide a path to the file with data."
             )
-        return path_to_file[0]
+        return pathlib.Path(path_to_file[0])
 
     elif not os.path.exists(file_path):
         raise RuntimeError(f"Provided path: {file_path} doesn't exist")
@@ -47,7 +46,7 @@ def myconverter(obj: Any) -> Any:
     return obj
 
 
-def save_log(log: Dict, probe_task: str) -> None:
+def save_log(log: Dict, probe_task: str) -> os.PathLike:
     log_file_name = "log.json"
     date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
     experiments_path = pathlib.Path(config.results_folder, f"{date}_{probe_task}")
@@ -57,7 +56,7 @@ def save_log(log: Dict, probe_task: str) -> None:
 
         with open(log_path, "w") as outfile:
             json.dump(log, outfile, indent=4, default=myconverter)
-    return str(experiments_path)
+    return experiments_path
 
 
 def get_ratio_by_classes(samples: Dict[str, List[str]]) -> Dict[str, Dict[str, int]]:
@@ -73,7 +72,7 @@ def lang_category_extraction(
     file_path: os.PathLike,
 ) -> Tuple[Optional[str], Optional[str]]:
     if "_" in str(file_path):
-        path = str(Path(file_path).stem)
+        path = str(pathlib.Path(file_path).stem)
         task_language = path.split("_")[0]
         task_category = path.split("_")[-1]
     else:
@@ -81,7 +80,7 @@ def lang_category_extraction(
     return task_language, task_category
 
 
-def exclude_rows(tensor: torch.Tensor, rows_to_exclude: List[int]) -> torch.Tensor:
+def exclude_rows(tensor: torch.Tensor, rows_to_exclude: torch.Tensor) -> torch.Tensor:
     if len(tensor.size()) == 1:
         tensor = tensor.view(-1, 1)
 
