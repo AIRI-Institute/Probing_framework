@@ -1,6 +1,5 @@
 import gc
 import os
-from enum import Enum
 from time import time
 from typing import Callable, List, Optional, Tuple, Union
 
@@ -26,12 +25,12 @@ from probing.utils import (
 class ProbingPipeline:
     def __init__(
         self,
-        hf_model_name: Optional[Enum] = None,
-        probing_type: Optional[Enum] = "layer",
-        device: Optional[Enum] = None,
-        classifier_name: Enum = "logreg",
-        metric_names: Union[Enum, List[Enum]] = "f1",
-        embedding_type: Enum = "cls",
+        hf_model_name: Optional[str] = None,
+        probing_type: Optional[str] = "layer",
+        device: Optional[str] = None,
+        classifier_name: str = "logreg",
+        metric_names: Union[str, List[str]] = "f1",
+        embedding_type: str = "cls",
         encoding_batch_size: int = 32,
         classifier_batch_size: int = 64,
         dropout_rate: float = 0.2,
@@ -58,7 +57,7 @@ class ProbingPipeline:
         )
 
     def get_classifier(
-        self, classifier_name: Enum, num_classes: int, embed_dim: int
+        self, classifier_name: str, num_classes: int, embed_dim: int
     ) -> Callable:
         if classifier_name == "logreg":
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
@@ -130,7 +129,7 @@ class ProbingPipeline:
 
     def run(
         self,
-        probe_task: Union[Enum, str],
+        probe_task: str,
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
         is_scheduler: bool = False,

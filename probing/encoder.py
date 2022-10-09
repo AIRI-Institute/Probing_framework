@@ -1,6 +1,5 @@
 import gc
 import logging
-from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -17,11 +16,11 @@ from probing.utils import exclude_rows
 class TransformersLoader:
     def __init__(
         self,
-        model_name: Optional[Enum] = None,
-        device: Optional[Enum] = None,
+        model_name: Optional[str] = None,
+        device: Optional[str] = None,
         truncation: bool = False,
-        padding: Enum = "longest",
-        return_tensors: Enum = "pt",
+        padding: str = "longest",
+        return_tensors: str = "pt",
         add_special_tokens: bool = True,
         return_dict: bool = True,
         output_hidden_states: bool = True,
@@ -151,7 +150,7 @@ class TransformersLoader:
         return input_ids, attention_mask, row_ids_to_exclude
 
     def _get_embeddings_by_layers(
-        self, model_outputs: Tuple[torch.Tensor], embedding_type: Enum
+        self, model_outputs: Tuple[torch.Tensor], embedding_type: str
     ) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:
@@ -169,8 +168,8 @@ class TransformersLoader:
         return layers_outputs
 
     def get_tokenized_datasets(
-        self, task_dataset: Dict[Enum, np.ndarray]
-    ) -> Tuple[Dict[Enum, TokenizedVectorFormer], Dict[Enum, int]]:
+        self, task_dataset: Dict[str, np.ndarray]
+    ) -> Tuple[Dict[str, TokenizedVectorFormer], Dict[str, int]]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
@@ -237,7 +236,7 @@ class TransformersLoader:
         self,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
-        embedding_type: Enum,
+        embedding_type: str,
     ) -> List[torch.Tensor]:
         if hasattr(self.model, "encoder") and hasattr(self.model, "decoder"):
             # In case of encoder-decoder model, for embeddings we use only encoder
@@ -267,8 +266,8 @@ class TransformersLoader:
     def encode_data(
         self,
         data: DataLoader,
-        stage: Enum,
-        embedding_type: Enum,
+        stage: str,
+        embedding_type: str,
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:
@@ -346,14 +345,14 @@ class TransformersLoader:
 
     def get_encoded_dataloaders(
         self,
-        task_dataset: Dict[Enum, np.ndarray],
+        task_dataset: Dict[str, np.ndarray],
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
-        embedding_type: Enum = "cls",
+        embedding_type: str = "cls",
         verbose: bool = True,
         do_control_task: bool = False,
-    ) -> Tuple[Dict[Enum, DataLoader], Dict[Enum, int]]:
+    ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
         tokenized_datasets, encoded_labels = self.get_tokenized_datasets(task_dataset)
         tr_dataloader_tokenized = DataLoader(
             tokenized_datasets["tr"], batch_size=encoding_batch_size

@@ -3,7 +3,6 @@ import logging
 import os
 import re
 from collections import Counter, defaultdict
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -38,7 +37,7 @@ class ConlluUDParser:
     def writer(
         self,
         partition_sets: Dict,
-        category: Enum,
+        category: str,
         language: str,
         save_path_dir: os.PathLike,
     ) -> Path:
@@ -57,7 +56,7 @@ class ConlluUDParser:
         return result_path
 
     def find_category_token(
-        self, category: Enum, head: Token, children: List[TokenTree]
+        self, category: str, head: Token, children: List[TokenTree]
     ) -> Optional[str]:
         """
         Finds a token that has a given category and is located on the top of a tree
@@ -76,7 +75,7 @@ class ConlluUDParser:
                 return result
         return None
 
-    def classify(self, token_trees: List[TokenTree], category: Enum) -> Dict:
+    def classify(self, token_trees: List[TokenTree], category: str) -> Dict:
         """
         Classifies sentences by a grammatical value they contain
         Args:
@@ -102,7 +101,7 @@ class ConlluUDParser:
             label for label, count in labels_repeat_dict.items() if count > n_repeat
         ]
 
-    def check_parts(self, parts: Dict, category: Enum) -> None:
+    def check_parts(self, parts: Dict, category: str) -> None:
         """
         Checks if the data are not empty and have a train set
         Args:
@@ -127,7 +126,7 @@ class ConlluUDParser:
         probing_data: Dict,
         partition: List[float],
         random_seed: int,
-        split: List[Enum] = None,
+        split: List[str] = None,
     ) -> Dict:
         """
         Splits data into three sets: train, validation, and test
@@ -181,8 +180,8 @@ class ConlluUDParser:
     def generate_probing_file(
         self,
         conllu_text: str,
-        category: Enum,
-        splits: List[Enum],
+        category: str,
+        splits: List[str],
         partitions: List[float],
         random_seed: int = 42,
     ) -> Dict:
@@ -237,7 +236,7 @@ class ConlluUDParser:
 
     def get_text_and_categories(
         self, paths: List[os.PathLike]
-    ) -> Tuple[List[str], List[Enum]]:
+    ) -> Tuple[List[str], List[str]]:
         set_of_values = set()
         list_texts = [self.read(p) for p in paths]
         text_data = "\n".join(list_texts)
@@ -289,8 +288,8 @@ class ConlluUDParser:
         self,
         paths: List[os.PathLike],
         partitions: Optional[List[List[float]]] = None,
-        splits: Optional[List[List[Enum]]] = None,
-    ) -> Dict[str, Dict[Enum, List[str]]]:
+        splits: Optional[List[List[str]]] = None,
+    ) -> Dict[str, Dict[str, List[str]]]:
         """
         Generates files for all categories
         Args:
@@ -342,7 +341,7 @@ class ConlluUDParser:
         te_path: os.PathLike = None,
         language: Optional[str] = None,
         save_path_dir: Optional[os.PathLike] = None,
-    ) -> Tuple[Dict[str, Dict[Enum, List[str]]], str, os.PathLike]:
+    ) -> Tuple[Dict[str, Dict[str, List[str]]], str, os.PathLike]:
         known_paths = [Path(p) for p in [tr_path, va_path, te_path] if p is not None]
         assert len(known_paths) > 0, "None paths were provided"
         assert tr_path is not None, "At least the path to train data should be provided"

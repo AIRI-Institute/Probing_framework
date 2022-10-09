@@ -5,7 +5,6 @@ import os
 import pathlib
 from collections import Counter, defaultdict
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -16,7 +15,7 @@ from probing import config
 
 
 def get_probe_task_path(
-    probe_task_name: Enum, file_path: Optional[os.PathLike] = None
+    probe_task_name: str, file_path: Optional[os.PathLike] = None
 ) -> os.PathLike:
     if file_path is None:
         path_to_folder = pathlib.Path(config.data_folder, probe_task_name)
@@ -60,7 +59,7 @@ def save_log(log: Dict, probe_task: str) -> None:
     return str(experiments_path)
 
 
-def get_ratio_by_classes(samples: Dict[Enum, List[str]]) -> Dict[Enum, Dict[Enum, int]]:
+def get_ratio_by_classes(samples: Dict[str, List[str]]) -> Dict[str, Dict[str, int]]:
     ratio_by_classes = {}
     for class_name in samples:
         class_labels_all = [i[1] for i in samples[class_name]]
