@@ -15,12 +15,8 @@ from probing.classifier import MLP, LogReg
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import (
-    ProbingLog,
-    get_ratio_by_classes,
-    lang_category_extraction,
-    save_log,
-)
+from probing.utils import (ProbingLog, get_ratio_by_classes,
+                           lang_category_extraction, save_log)
 
 
 class ProbingPipeline:
