@@ -13,8 +13,11 @@ from conllu.models import Token, TokenTree
 from nltk.tokenize import wordpunct_tokenize
 from sklearn.model_selection import train_test_split
 
-from probing.ud_parser.ud_config import (partitions_by_files, splits_by_files,
-                                         too_much_files_err_str)
+from probing.ud_parser.ud_config import (
+    partitions_by_files,
+    splits_by_files,
+    too_much_files_err_str,
+)
 
 
 class ConlluUDParser:
