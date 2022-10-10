@@ -32,6 +32,6 @@ class TestTextFormer(unittest.TestCase):
             path_to_task_file=self.path_testfile,
             verbose=True,
             train_epochs=2,
-            do_control_task = True
+            do_control_task=True,
         )
         return True
