@@ -99,9 +99,7 @@ class ProbingConlluFilter:
             logging.warning(f"Your parts in {partition} doesn't add up to 1, so it was automatically changed to {[[0.8, 0.1, 0.1]]}")
             partition = [0.8, 0.1, 0.1]
 
-        self.classes = {label: query for label, query in queries.items()}
-
-        self.probing_dict = {label: self._filter_conllu(label) for label in self.classes}
+        self.classes = queries
         for label in self.classes:
             matching, not_matching = self._filter_conllu(label)
             self.probing_dict[label] = matching
