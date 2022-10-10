@@ -342,7 +342,7 @@ class TransformersLoader:
         labels_tensor = torch.cat(labels_list, dim=0)
         if do_control_task:
             idx = torch.randperm(labels_tensor.shape[0])
-            labels_tensor = labels_tensor[:, idx]
+            labels_tensor = labels_tensor[idx]
         probe_dataset = EncodedVectorFormer(encoded_text_tensor, labels_tensor)
         return probe_dataset
 
