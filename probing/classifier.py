@@ -1,5 +1,7 @@
 import torch
+
 from probing.utils import *
+
 
 class LogReg(torch.nn.Module):
     def __init__(self, input_dim: int, num_classes: int):
