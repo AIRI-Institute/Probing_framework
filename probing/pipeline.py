@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from tqdm import trange
 from transformers import get_linear_schedule_with_warmup
 
-from probing.classifier import MLP, LogReg
+from probing.classifier import MLP, LogReg, MDLLinearModel
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
@@ -19,6 +19,7 @@ from probing.utils import (
     get_ratio_by_classes,
     lang_category_extraction,
     save_log,
+    KL_Loss
 )
 
 
@@ -68,6 +69,13 @@ class ProbingPipeline:
                 hidden_size=self.hidden_size,
                 dropout_rate=self.dropout_rate,
             )
+        elif classifier_name == "mdl":
+            return MDLLinearModel(
+                input_dim = embed_dim,
+                num_classes = num_classes,
+                hidden_size =  self.hidden_size,
+                device = self.transformer_model.device
+                )
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")
 
@@ -195,10 +203,12 @@ class ProbingPipeline:
                 num_classes,
                 self.transformer_model.config.hidden_size,
             ).to(self.transformer_model.device)
-
-            self.criterion = torch.nn.CrossEntropyLoss().to(
-                self.transformer_model.device
-            )
+            
+            if self.classifier == "mdl":
+                self.criterion = KL_Loss().to(self.transformer_model.device)
+            else:
+                self.criterion = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
+  
             self.optimizer = AdamW(self.classifier.parameters())
 
             self.scheduler = (
