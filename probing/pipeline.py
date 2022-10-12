@@ -19,7 +19,7 @@ from probing.utils import (
     ProbingLog,
     get_ratio_by_classes,
     lang_category_extraction,
-    save_log
+    save_log,
 )
 
 
