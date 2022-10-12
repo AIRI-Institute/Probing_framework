@@ -15,11 +15,11 @@ from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
 from probing.utils import (
+    KL_Loss,
     ProbingLog,
     get_ratio_by_classes,
     lang_category_extraction,
-    save_log,
-    KL_Loss
+    save_log
 )
 
 
