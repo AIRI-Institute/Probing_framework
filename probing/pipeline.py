@@ -14,12 +14,7 @@ from probing.classifier import MLP, LogReg
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import (
-    ProbingLog,
-    get_ratio_by_classes,
-    lang_category_extraction,
-    save_log,
-)
+from probing.utils import ProbingLog, lang_category_extraction, save_log
 
 
 class ProbingPipeline:
@@ -137,7 +132,6 @@ class ProbingPipeline:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> None:
-        num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
         task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
         task_language, task_category = lang_category_extraction(task_data.data_path)
@@ -155,9 +149,7 @@ class ProbingPipeline:
         ] = self.transformer_model.config._name_or_path
         self.log_info["params"]["classifier_name"] = self.classifier_name
         self.log_info["params"]["metric_names"] = self.metric_names
-        self.log_info["params"]["original_classes_ratio"] = get_ratio_by_classes(
-            task_dataset
-        )
+        self.log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
 
         if verbose:
             print("=" * 100)
@@ -182,9 +174,12 @@ class ProbingPipeline:
         )
 
         probing_iter_range = (
-            trange(num_layers, desc="Probing by layers")
+            trange(
+                self.transformer_model.config.num_hidden_layers,
+                desc="Probing by layers",
+            )
             if verbose
-            else range(num_layers)
+            else range(self.transformer_model.config.num_hidden_layers)
         )
         self.log_info["results"]["elapsed_time(sec)"] = 0
         self.log_info["params"]["encoded_labels"] = encoded_labels_dict
