@@ -302,7 +302,7 @@ class ConlluUDParser:
         list_texts, categories = self.get_text_and_categories(paths)
 
         if self.verbose:
-            logging.info(f"{len(categories)} categories were found")
+            print(f"{len(categories)} categories were found")
 
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
@@ -391,7 +391,7 @@ class ConlluUDParser:
                     if p is not None
                 ]
             )
-            logging.info(f"In progress:\n{paths_str}")
+            print(f"In progress:\n{paths_str}")
 
         if path_dir_conllu:
             paths = [Path(p) for p in self.get_filepaths_from_dir(path_dir_conllu)]
@@ -411,4 +411,4 @@ class ConlluUDParser:
                     category_data, category, language, save_path_dir  # type: ignore
                 )
                 if self.verbose:
-                    logging.info(f"Writing to file: {output_path}")
+                    print(f"Writing to file: {output_path}")
