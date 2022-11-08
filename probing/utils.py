@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
-from transformers.utils import logging
+import logging
 
 from probing import config
 
