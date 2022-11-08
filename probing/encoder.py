@@ -172,7 +172,7 @@ class TransformersLoader:
 
     def get_tokenized_datasets(
         self, task_dataset: Dict[str, np.ndarray]
-    ) -> Tuple[Dict[str, TokenizedVectorFormer], Dict[str, Dict[str, int]]]:
+    ) -> Dict[str, TokenizedVectorFormer]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
@@ -184,28 +184,26 @@ class TransformersLoader:
             self.init_device()
 
         encoded_stage_data_dict = {}
-        encoded_stage_labels_dict = {}
+        label_encoder = LabelEncoder()
 
-        tr_text_label_data = task_dataset["tr"]
-        va_text_label_data = task_dataset["va"]
-        te_text_label_data = task_dataset["te"]
-
-        for stage, text_label_data in zip(
-            ["tr", "va", "te"],
-            [tr_text_label_data, va_text_label_data, te_text_label_data],
-        ):
-            tokenized_text = self.tokenize_text(text_label_data[:, 0].tolist())
+        for stage in task_dataset.keys():
+            stage_data = task_dataset[stage]
+            tokenized_text = self.tokenize_text(stage_data[:, 0].tolist())
+            numeric_labels = stage_data[:, 1]
 
             if stage == "tr":
-                label_encoder = LabelEncoder()
-                label_encoder.fit(text_label_data[:, 1])
+                labels = label_encoder.fit_transform(numeric_labels)
+                encoder_labels_mapping = dict(
+                    zip(
+                        label_encoder.classes_,
+                        label_encoder.transform(label_encoder.classes_),
+                    )
+                )
+            else:
+                labels = label_encoder.transform(numeric_labels)
 
             input_ids, attention_mask, row_ids_to_exclude = self._fix_tokenized_tensors(
                 tokenized_text
-            )
-            labels = label_encoder.transform(text_label_data[:, 1])
-            fixed_labels = (
-                exclude_rows(torch.tensor(labels), row_ids_to_exclude).view(-1).tolist()
             )
 
             if row_ids_to_exclude:
@@ -213,27 +211,20 @@ class TransformersLoader:
                     f"Since you decided not to truncate long sentences, {len(row_ids_to_exclude)} sample(s) were excluded"
                 )
 
-            encoded_stage_labels_dict[stage] = dict(
-                zip(
-                    label_encoder.classes_,
-                    label_encoder.transform(label_encoder.classes_),
-                )
+            stage_data_dict = TokenizedVectorFormer(
+                {
+                    "input_ids": input_ids,
+                    "attention_mask": attention_mask,
+                    "labels": exclude_rows(
+                        torch.tensor(labels), row_ids_to_exclude
+                    ).view(-1),
+                }
             )
-            encoded_stage_data_dict[stage] = {
-                "input_ids": input_ids,
-                "attention_mask": attention_mask,
-                "labels": fixed_labels,
-            }
+            if stage == "tr":
+                stage_data_dict.mapped_labels = encoder_labels_mapping  # type: ignore
+            encoded_stage_data_dict[stage] = stage_data_dict
 
-        tokenized_tr_data = TokenizedVectorFormer(encoded_stage_data_dict["tr"])
-        tokenized_va_data = TokenizedVectorFormer(encoded_stage_data_dict["va"])
-        tokenized_te_data = TokenizedVectorFormer(encoded_stage_data_dict["te"])
-        tokenized_datasets = {
-            "tr": tokenized_tr_data,
-            "va": tokenized_va_data,
-            "te": tokenized_te_data,
-        }
-        return tokenized_datasets, encoded_stage_labels_dict
+        return encoded_stage_data_dict
 
     def model_layers_forward(
         self,
@@ -355,51 +346,23 @@ class TransformersLoader:
         embedding_type: str = "cls",
         verbose: bool = True,
         do_control_task: bool = False,
-    ) -> Tuple[Dict[str, DataLoader], Dict[str, Dict[str, int]]]:
-        tokenized_datasets, encoded_labels = self.get_tokenized_datasets(task_dataset)
-        tr_dataloader_tokenized = DataLoader(
-            tokenized_datasets["tr"], batch_size=encoding_batch_size
-        )
-        va_dataloader_tokenized = DataLoader(
-            tokenized_datasets["va"], batch_size=encoding_batch_size
-        )
-        te_dataloader_tokenized = DataLoader(
-            tokenized_datasets["te"], batch_size=encoding_batch_size
-        )
+    ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
+        tokenized_datasets = self.get_tokenized_datasets(task_dataset)
+        encoded_dataloaders = {}
+        for stage in tokenized_datasets.keys():
+            stage_dataloader_tokenized = DataLoader(
+                tokenized_datasets[stage], batch_size=encoding_batch_size
+            )
 
-        tr_tokenized = self.encode_data(
-            tr_dataloader_tokenized,
-            "train",
-            embedding_type,
-            verbose,
-            do_control_task=do_control_task,
-        )
-        va_tokenized = self.encode_data(
-            va_dataloader_tokenized,
-            "val",
-            embedding_type,
-            verbose,
-            do_control_task=do_control_task,
-        )
-        te_tokenized = self.encode_data(
-            te_dataloader_tokenized,
-            "test",
-            embedding_type,
-            verbose,
-            do_control_task=do_control_task,
-        )
+            stage_encoded_data = self.encode_data(
+                stage_dataloader_tokenized,
+                stage,
+                embedding_type,
+                verbose,
+                do_control_task=do_control_task,
+            )
 
-        tr_dataloader_encoded = DataLoader(
-            tr_tokenized, batch_size=classifier_batch_size, shuffle=shuffle
-        )
-        va_dataloader_encoded = DataLoader(
-            va_tokenized, batch_size=classifier_batch_size, shuffle=shuffle
-        )
-        te_dataloader_encoded = DataLoader(
-            te_tokenized, batch_size=classifier_batch_size, shuffle=shuffle
-        )
-        return {
-            "tr": tr_dataloader_encoded,
-            "va": va_dataloader_encoded,
-            "te": te_dataloader_encoded,
-        }, encoded_labels
+            encoded_dataloaders[stage] = DataLoader(
+                stage_encoded_data, batch_size=classifier_batch_size, shuffle=shuffle
+            )
+        return encoded_dataloaders, tokenized_datasets["tr"].mapped_labels  # type: ignore

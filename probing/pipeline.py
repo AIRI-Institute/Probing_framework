@@ -162,7 +162,7 @@ class ProbingPipeline:
         start_time = time()
         (
             probing_dataloaders,
-            encoded_labels_dict,
+            mapped_labels,
         ) = self.transformer_model.get_encoded_dataloaders(
             task_dataset,
             self.encoding_batch_size,
@@ -181,8 +181,8 @@ class ProbingPipeline:
             if verbose
             else range(self.transformer_model.config.num_hidden_layers)
         )
+        self.log_info["params"]["tr_mapped_labels"] = mapped_labels
         self.log_info["results"]["elapsed_time(sec)"] = 0
-        self.log_info["params"]["encoded_labels"] = encoded_labels_dict
 
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
