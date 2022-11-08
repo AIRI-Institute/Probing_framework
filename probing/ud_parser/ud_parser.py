@@ -22,6 +22,7 @@ from probing.ud_parser.ud_config import (
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing_parser")
 
+
 class ConlluUDParser:
     def __init__(self, shuffle: bool = True, verbose: bool = True):
         self.shuffle = shuffle
