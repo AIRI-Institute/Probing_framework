@@ -1,7 +1,7 @@
 import os
 import typing
-from collections import defaultdict
-from typing import DefaultDict, Dict, Optional, Set, Tuple
+from collections import Counter, defaultdict
+from typing import DefaultDict, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import torch
@@ -28,6 +28,15 @@ class TextFormer:
 
     def __getitem__(self, idx):
         return self.samples[idx]
+
+    @property
+    def ratio_by_classes(self) -> Dict[str, Dict[str, int]]:
+        ratio_by_classes = {}
+        for class_name in self.samples:
+            class_labels_all = [i[1] for i in self.samples[class_name]]
+            dict_ratio_sorted = dict(sorted(dict(Counter(class_labels_all)).items()))
+            ratio_by_classes[class_name] = dict_ratio_sorted
+        return ratio_by_classes
 
     @typing.no_type_check
     def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
