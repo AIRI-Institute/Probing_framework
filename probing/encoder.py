@@ -205,9 +205,6 @@ class TransformersLoader:
             input_ids, attention_mask, row_ids_to_exclude = self._fix_tokenized_tensors(
                 tokenized_text
             )
-            fixed_labels = (
-                exclude_rows(torch.tensor(labels), row_ids_to_exclude).view(-1).tolist()
-            )
 
             if row_ids_to_exclude:
                 logging.warning(
@@ -218,11 +215,13 @@ class TransformersLoader:
                 {
                     "input_ids": input_ids,
                     "attention_mask": attention_mask,
-                    "labels": fixed_labels,
+                    "labels": exclude_rows(
+                        torch.tensor(labels), row_ids_to_exclude
+                    ).view(-1),
                 }
             )
             if stage == "tr":
-                stage_data_dict.mapped_labels = encoder_labels_mapping
+                stage_data_dict.mapped_labels = encoder_labels_mapping  # type: ignore
             encoded_stage_data_dict[stage] = stage_data_dict
 
         return encoded_stage_data_dict
@@ -366,4 +365,4 @@ class TransformersLoader:
             encoded_dataloaders[stage] = DataLoader(
                 stage_encoded_data, batch_size=classifier_batch_size, shuffle=shuffle
             )
-        return encoded_dataloaders, tokenized_datasets["tr"].mapped_labels
+        return encoded_dataloaders, tokenized_datasets["tr"].mapped_labels  # type: ignore
