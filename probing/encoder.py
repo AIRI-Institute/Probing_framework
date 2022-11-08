@@ -1,5 +1,4 @@
 import gc
-import logging
 import typing
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -9,9 +8,13 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoConfig, AutoModel, AutoTokenizer
+from transformers.utils import logging
 
 from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
 from probing.utils import exclude_rows
+
+logging.set_verbosity_warning()
+logger = logging.get_logger("probing")
 
 
 class TransformersLoader:
@@ -207,7 +210,7 @@ class TransformersLoader:
             )
 
             if row_ids_to_exclude:
-                logging.warning(
+                logger.warning(
                     f"Since you decided not to truncate long sentences, {len(row_ids_to_exclude)} sample(s) were excluded"
                 )
 
