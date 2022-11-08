@@ -100,6 +100,7 @@ class ProbingConlluFilter:
             partition = [0.8, 0.1, 0.1]
 
         self.classes = queries
+        self.probing_dict = {}
         for label in self.classes:
             matching, not_matching = self._filter_conllu(label)
             self.probing_dict[label] = matching
