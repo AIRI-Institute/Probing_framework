@@ -1,7 +1,7 @@
 import gc
 import os
 from time import time
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -9,12 +9,16 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import trange
 from transformers import get_linear_schedule_with_warmup
+from transformers.utils import logging
 
 from probing.classifier import MLP, LogReg
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
 from probing.utils import ProbingLog, lang_category_extraction, save_log
+
+logging.set_verbosity_warning()
+logger = logging.get_logger("probing")
 
 
 class ProbingPipeline:
@@ -152,7 +156,6 @@ class ProbingPipeline:
         self.log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
 
         if verbose:
-            print("=" * 100)
             print(
                 f"Task in progress: {probe_task}\nPath to data: {task_data.data_path}"
             )

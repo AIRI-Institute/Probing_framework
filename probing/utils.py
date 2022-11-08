@@ -1,6 +1,5 @@
 import glob
 import json
-import logging
 import os
 import pathlib
 from collections import defaultdict
@@ -9,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
+from transformers.utils import logging
 
 from probing import config
 
