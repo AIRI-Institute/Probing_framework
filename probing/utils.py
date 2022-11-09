@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import pathlib
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -59,15 +59,6 @@ def save_log(log: Dict, probe_task: str) -> os.PathLike:
     return experiments_path
 
 
-def get_ratio_by_classes(samples: Dict[str, List[str]]) -> Dict[str, Dict[str, int]]:
-    ratio_by_classes = {}
-    for class_name in samples:
-        class_labels_all = [i[1] for i in samples[class_name]]
-        dict_ratio_sorted = dict(sorted(dict(Counter(class_labels_all)).items()))
-        ratio_by_classes[class_name] = dict_ratio_sorted
-    return ratio_by_classes
-
-
 def lang_category_extraction(
     file_path: os.PathLike,
 ) -> Tuple[Optional[str], Optional[str]]:
@@ -75,9 +66,8 @@ def lang_category_extraction(
         path = str(pathlib.Path(file_path).stem)
         task_language = path.split("_")[0]
         task_category = path.split("_")[-1]
-    else:
-        task_language, task_category = None, None
-    return task_language, task_category
+        return task_language, task_category
+    return None, None
 
 
 def exclude_rows(tensor: torch.Tensor, rows_to_exclude: torch.Tensor) -> torch.Tensor:

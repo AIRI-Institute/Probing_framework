@@ -1,5 +1,4 @@
 import csv
-import logging
 import os
 import re
 import typing
@@ -12,12 +11,16 @@ from conllu import parse, parse_tree
 from conllu.models import Token, TokenTree
 from nltk.tokenize import wordpunct_tokenize
 from sklearn.model_selection import train_test_split
+from transformers.utils import logging
 
 from probing.ud_parser.ud_config import (
     partitions_by_files,
     splits_by_files,
     too_much_files_err_str,
 )
+
+logging.set_verbosity_warning()
+logger = logging.get_logger("probing_parser")
 
 
 class ConlluUDParser:
@@ -115,11 +118,11 @@ class ConlluUDParser:
             val_categories_set = set(parts["va"][1])
             te_categories_set = set(parts["te"][1])
             if tr_categories_set != val_categories_set:
-                logging.warning(
+                logger.warning(
                     f'The classes in train and validation parts are different for category "{category}"'
                 )
             elif val_categories_set != te_categories_set:
-                logging.warning(
+                logger.warning(
                     f'The classes in train and test parts are different for category "{category}"'
                 )
 
@@ -202,10 +205,10 @@ class ConlluUDParser:
         num_classes = len(classified_sentences.keys())
 
         if num_classes == 1:
-            logging.warning(f'Category "{category}" has only one class')
+            logger.warning(f'Category "{category}" has only one class')
             return {}
         elif num_classes == 0:
-            logging.warning(
+            logger.warning(
                 f'This file does not contain examples of category "{category}"'
             )
             return {}
@@ -231,7 +234,7 @@ class ConlluUDParser:
             parts = {}
 
         if not parts:
-            logging.warning(
+            logger.warning(
                 f'Not enough data of category "{category}" for stratified split'
             )
         return parts
@@ -306,7 +309,7 @@ class ConlluUDParser:
 
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
-            logging.warning(
+            logger.warning(
                 f"Something went wrong during processing files. None categories were found for paths:\n{paths_str}"
             )
 
@@ -384,7 +387,6 @@ class ConlluUDParser:
             dir_path: a path to a directory with all files
         """
         if self.verbose:
-            print("=" * 100)
             paths_str = "\n".join(
                 [
                     str(p)

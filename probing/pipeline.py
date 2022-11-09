@@ -1,7 +1,7 @@
 import gc
 import os
 from time import time
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -9,6 +9,7 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import trange
 from transformers import get_linear_schedule_with_warmup
+from transformers.utils import logging
 
 from probing.classifier import MLP, LogReg, MDLLinearModel
 from probing.data_former import TextFormer
@@ -21,6 +22,10 @@ from probing.utils import (
     lang_category_extraction,
     save_log,
 )
+
+logging.set_verbosity_warning()
+logger = logging.get_logger("probing")
+
 
 
 class ProbingPipeline:
@@ -145,7 +150,6 @@ class ProbingPipeline:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> None:
-        num_layers = self.transformer_model.config.num_hidden_layers
         task_data = TextFormer(probe_task, path_to_task_file)
         task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
         task_language, task_category = lang_category_extraction(task_data.data_path)
@@ -163,12 +167,9 @@ class ProbingPipeline:
         ] = self.transformer_model.config._name_or_path
         self.log_info["params"]["classifier_name"] = self.classifier_name
         self.log_info["params"]["metric_names"] = self.metric_names
-        self.log_info["params"]["original_classes_ratio"] = get_ratio_by_classes(
-            task_dataset
-        )
+        self.log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
 
         if verbose:
-            print("=" * 100)
             print(
                 f"Task in progress: {probe_task}\nPath to data: {task_data.data_path}"
             )
@@ -178,7 +179,7 @@ class ProbingPipeline:
         start_time = time()
         (
             probing_dataloaders,
-            encoded_labels_dict,
+            mapped_labels,
         ) = self.transformer_model.get_encoded_dataloaders(
             task_dataset,
             self.encoding_batch_size,
@@ -190,12 +191,15 @@ class ProbingPipeline:
         )
 
         probing_iter_range = (
-            trange(num_layers, desc="Probing by layers")
+            trange(
+                self.transformer_model.config.num_hidden_layers,
+                desc="Probing by layers",
+            )
             if verbose
-            else range(num_layers)
+            else range(self.transformer_model.config.num_hidden_layers)
         )
+        self.log_info["params"]["tr_mapped_labels"] = mapped_labels
         self.log_info["results"]["elapsed_time(sec)"] = 0
-        self.log_info["params"]["encoded_labels"] = encoded_labels_dict
 
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
