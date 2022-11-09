@@ -38,15 +38,16 @@ class MLP(torch.nn.Module):
         x = self.activation(x)
         x = self.fc2(x)
         return x
-    
+
+
 class LinearVariational(torch.nn.Module):
     def __init__(
         self, 
         in_features: int, 
         out_features: int, 
         parent, 
-        bias: bool=True, 
-        device: torch.device = torch.device('cpu'),
+        bias: bool = True,
+        device: torch.device = torch.device("cpu"),
     ) -> None:
         super().__init__()
         self.in_features = in_features
@@ -55,20 +56,20 @@ class LinearVariational(torch.nn.Module):
         self.include_bias = bias        
         self.parent = parent
         
-        if getattr(parent, 'accumulated_kl_div', None) is None:
-            if getattr(parent.parent, 'accumulated_kl_div', None) is None: 
+        if getattr(parent, "accumulated_kl_div", None) is None:
+            if getattr(parent.parent, "accumulated_kl_div", None) is None:
                 parent.accumulated_kl_div = 0
             else: 
                 parent.accumulated_kl_div = parent.parent.accumulated_kl_div
             
         self.w_mu = torch.nn.Parameter(
             torch.FloatTensor(in_features, out_features)
-            .normal_(mean = 0, std = 0.001)
+            .normal_(mean=0, std=0.001)
             .to(self.device)
         )
         self.w_p = torch.nn.Parameter(
             torch.FloatTensor(in_features, out_features)
-            .normal_(mean = 0, std = 0.001)
+            .normal_(mean=0, std=0.001)
             .to(self.device)
         )
 
@@ -76,6 +77,7 @@ class LinearVariational(torch.nn.Module):
             self.b_mu = torch.nn.Parameter(torch.zeros(out_features))
             self.b_p = torch.nn.Parameter(torch.zeros(out_features))
 
+    @staticmethod
     def _reparameterize(self, mu, p):
         sigma = torch.log(1 + torch.exp(p))
         eps = torch.randn_like(sigma)
@@ -97,8 +99,12 @@ class LinearVariational(torch.nn.Module):
                 b, self.b_mu, self.b_p).item()
         return z
 
+
 class MDLLinearModel(torch.nn.Module):
-    def __init__(self, input_dim: int, hidden_size: int, num_classes: int, device: torch.device = torch.device('cpu')) -> None:
+    def __init__(self,
+                 input_dim: int,
+                 num_classes: int,
+                 device: torch.device = torch.device("cpu")) -> None:
         super().__init__()
         self.kl_loss = KL
         self.layers = torch.nn.Sequential(

@@ -27,7 +27,6 @@ logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
 
 
-
 class ProbingPipeline:
     def __init__(
         self,
@@ -79,8 +78,8 @@ class ProbingPipeline:
                 input_dim=embed_dim,
                 num_classes=num_classes,
                 hidden_size=self.hidden_size,
-                device=self.transformer_model.device
-                )
+                device=self.transformer_model.device,
+            )
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")
 
@@ -209,11 +208,11 @@ class ProbingPipeline:
             ).to(self.transformer_model.device)
             
             if self.classifier == "mdl":
-                self.criterion = KL_Loss().to(
+                self.criterion = KL_Loss().to(self.transformer_model.device)
+            else:
+                self.criterion = torch.nn.CrossEntropyLoss().to(
                     self.transformer_model.device
                 )
-            else:
-                self.criterion = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
   
             self.optimizer = AdamW(self.classifier.parameters())
 
