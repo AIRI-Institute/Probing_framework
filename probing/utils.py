@@ -114,11 +114,7 @@ class KL:
 
 
 class KL_Loss:
-    def __init__(
-        self,
-        blank_token: int = 0,
-        loss =None
-    ):
+    def __init__(self, blank_token: int = 0, loss=None):
         self.blank = blank_token
         self.loss = loss
 
