@@ -42,10 +42,10 @@ class MLP(torch.nn.Module):
 
 class LinearVariational(torch.nn.Module):
     def __init__(
-        self, 
-        in_features: int, 
-        out_features: int, 
-        parent, 
+        self,
+        in_features: int,
+        out_features: int,
+        parent,
         bias: bool = True,
         device: torch.device = torch.device("cpu"),
     ) -> None:
@@ -53,15 +53,15 @@ class LinearVariational(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
         self.device = device
-        self.include_bias = bias        
+        self.include_bias = bias
         self.parent = parent
-        
+
         if getattr(parent, "accumulated_kl_div", None) is None:
             if getattr(parent.parent, "accumulated_kl_div", None) is None:
                 parent.accumulated_kl_div = 0
             else: 
                 parent.accumulated_kl_div = parent.parent.accumulated_kl_div
-            
+
         self.w_mu = torch.nn.Parameter(
             torch.FloatTensor(in_features, out_features)
             .normal_(mean=0, std=0.001)
@@ -88,11 +88,11 @@ class LinearVariational(torch.nn.Module):
         
         if self.include_bias: 
             b = self._reparameterize(self.b_mu, self.b_p)
-        else: 
+        else:
             b = 0
-            
+
         z = torch.matmul(x, w) + b
-        
+
         self.parent.accumulated_kl_div += kl_divergence(w, self.w_mu, self.w_p).item()
         if self.include_bias: 
             self.parent.accumulated_kl_div += kl_divergence(
@@ -101,10 +101,12 @@ class LinearVariational(torch.nn.Module):
 
 
 class MDLLinearModel(torch.nn.Module):
-    def __init__(self,
-                 input_dim: int,
-                 num_classes: int,
-                 device: torch.device = torch.device("cpu")) -> None:
+    def __init__(
+            self,
+            input_dim: int,
+            num_classes: int,
+            device: torch.device = torch.device("cpu"),
+    ) -> None:
         super().__init__()
         self.kl_loss = KL
         self.layers = torch.nn.Sequential(
@@ -115,11 +117,11 @@ class MDLLinearModel(torch.nn.Module):
     def accumulated_kl_div(self):
         # assert self.variational
         return self.kl_loss.accumulated_kl_div
-    
+
     def reset_kl_div(self):
         # assert self.variational
         self.kl_loss.accumulated_kl_div = 0
-            
+
     def forward(self, x):
         # for l in self.layers.modules(): print(list(l.parameters()))
         return self.layers(x)
