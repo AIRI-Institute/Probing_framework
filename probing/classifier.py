@@ -94,8 +94,7 @@ class LinearVariational(torch.nn.Module):
         self.parent.accumulated_kl_div += kl_divergence(w, self.w_mu, self.w_p).item()
         if self.include_bias: 
             self.parent.accumulated_kl_div += kl_divergence(
-                b, self.b_mu, self.b_p)
-            .item()
+                b, self.b_mu, self.b_p).item()
         return z
 
 class MDLLinearModel(torch.nn.Module):

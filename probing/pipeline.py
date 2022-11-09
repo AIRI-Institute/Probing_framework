@@ -76,10 +76,10 @@ class ProbingPipeline:
             )
         elif classifier_name == "mdl":
             return MDLLinearModel(
-                input_dim = embed_dim,
-                num_classes = num_classes,
-                hidden_size =  self.hidden_size,
-                device = self.transformer_model.device
+                input_dim=embed_dim,
+                num_classes=num_classes,
+                hidden_size=self.hidden_size,
+                device=self.transformer_model.device
                 )
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")
@@ -209,7 +209,9 @@ class ProbingPipeline:
             ).to(self.transformer_model.device)
             
             if self.classifier == "mdl":
-                self.criterion = KL_Loss().to(self.transformer_model.device)
+                self.criterion = KL_Loss().to(
+                    self.transformer_model.device
+                )
             else:
                 self.criterion = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
   
