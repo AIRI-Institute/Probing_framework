@@ -61,12 +61,10 @@ class LinearVariational(torch.nn.Module):
                 parent.accumulated_kl_div = parent.parent.accumulated_kl_div
 
         self.w_mu = torch.nn.Parameter(
-            torch.FloatTensor(in_features, out_features)
-            .normal_(mean=0, std=0.001)
+            torch.FloatTensor(in_features, out_features).normal_(mean=0, std=0.001)
         )
         self.w_p = torch.nn.Parameter(
-            torch.FloatTensor(in_features, out_features)
-            .normal_(mean=0, std=0.001)
+            torch.FloatTensor(in_features, out_features).normal_(mean=0, std=0.001)
         )
 
         if self.include_bias:
