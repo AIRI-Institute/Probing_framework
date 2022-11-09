@@ -199,11 +199,13 @@ class ProbingPipeline:
                 self.transformer_model.config.hidden_size,
             ).to(self.transformer_model.device)
 
-            loss = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
             if self.classifier == "mdl":
-                self.criterion = KL_Loss(loss=loss)
+                loss = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
+                loss = KL_Loss(loss=loss)
             else:
-                self.criterion = loss
+                loss = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
+
+            self.criterion = loss
 
             self.optimizer = AdamW(self.classifier.parameters())
 
