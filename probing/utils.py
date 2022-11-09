@@ -117,15 +117,12 @@ class KL_Loss:
     def __init__(
         self,
         blank_token: int = 0,
-        device: Optional[str] = torch.device("cpu"),
+        loss =None
     ):
         self.blank = blank_token
-        self.device = device
+        self.loss = loss
 
     def __call__(self, y_true, y_pred, model=None, **kwargs):
-        reconstruction_error = torch.nn.CrossEntropyLoss()(y_pred, y_true).to(
-            self.device
-        )
         kl = model.accumulated_kl_div
         model.reset_kl_div()
-        return reconstruction_error + kl
+        return self.loss + kl
