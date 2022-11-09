@@ -59,7 +59,7 @@ class LinearVariational(torch.nn.Module):
         if getattr(parent, "accumulated_kl_div", None) is None:
             if getattr(parent.parent, "accumulated_kl_div", None) is None:
                 parent.accumulated_kl_div = 0
-            else: 
+            else:
                 parent.accumulated_kl_div = parent.parent.accumulated_kl_div
 
         self.w_mu = torch.nn.Parameter(
@@ -85,8 +85,8 @@ class LinearVariational(torch.nn.Module):
 
     def forward(self, x):
         w = self._reparameterize(self.w_mu, self.w_p)
-        
-        if self.include_bias: 
+
+        if self.include_bias:
             b = self._reparameterize(self.b_mu, self.b_p)
         else:
             b = 0
@@ -94,18 +94,19 @@ class LinearVariational(torch.nn.Module):
         z = torch.matmul(x, w) + b
 
         self.parent.accumulated_kl_div += kl_divergence(w, self.w_mu, self.w_p).item()
-        if self.include_bias: 
+        if self.include_bias:
             self.parent.accumulated_kl_div += kl_divergence(
-                b, self.b_mu, self.b_p).item()
+                b, self.b_mu, self.b_p
+            ).item()
         return z
 
 
 class MDLLinearModel(torch.nn.Module):
     def __init__(
-            self,
-            input_dim: int,
-            num_classes: int,
-            device: torch.device = torch.device("cpu"),
+        self,
+        input_dim: int,
+        num_classes: int,
+        device: torch.device = torch.device("cpu"),
     ) -> None:
         super().__init__()
         self.kl_loss = KL
