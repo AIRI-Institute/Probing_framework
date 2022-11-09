@@ -15,12 +15,7 @@ from probing.classifier import MLP, LogReg, MDLLinearModel
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import (
-    KL_Loss,
-    ProbingLog,
-    lang_category_extraction,
-    save_log,
-)
+from probing.utils import KL_Loss, ProbingLog, lang_category_extraction, save_log
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
