@@ -200,7 +200,7 @@ class ProbingPipeline:
             ).to(self.transformer_model.device)
 
             if self.classifier == "mdl":
-                self.criterion = KL_Loss().to(self.transformer_model.device)
+                self.criterion = KL_Loss(device=self.transformer_model.device)
             else:
                 self.criterion = torch.nn.CrossEntropyLoss().to(
                     self.transformer_model.device

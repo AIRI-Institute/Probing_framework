@@ -105,7 +105,7 @@ class MDLLinearModel(torch.nn.Module):
         super().__init__()
         self.kl_loss = KL
         self.layers = torch.nn.Sequential(
-            LinearVariational(input_dim, num_classes, self.kl_loss, device)
+            LinearVariational(input_dim, num_classes, self.kl_loss)
         )
 
     @property
