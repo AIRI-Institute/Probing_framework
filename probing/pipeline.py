@@ -18,7 +18,6 @@ from probing.metric import Metric
 from probing.utils import (
     KL_Loss,
     ProbingLog,
-    get_ratio_by_classes,
     lang_category_extraction,
     save_log,
 )
@@ -63,7 +62,7 @@ class ProbingPipeline:
 
     def get_classifier(
         self, classifier_name: str, num_classes: int, embed_dim: int
-    ) -> Union[LogReg, MLP]:
+    ) -> Union[LogReg, MLP, MDLLinearModel]:
         if classifier_name == "logreg":
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
         elif classifier_name == "mlp":
@@ -77,8 +76,6 @@ class ProbingPipeline:
             return MDLLinearModel(
                 input_dim=embed_dim,
                 num_classes=num_classes,
-                hidden_size=self.hidden_size,
-                device=self.transformer_model.device,
             )
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")

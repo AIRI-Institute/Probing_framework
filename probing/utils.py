@@ -113,7 +113,7 @@ class KL:
     accumulated_kl_div = 0
 
 
-class KL_Loss:
+class KL_Loss(torch.nn.modules.Loss):
     def __init__(self, blank_token: int = 0):
         self.blank = blank_token
 

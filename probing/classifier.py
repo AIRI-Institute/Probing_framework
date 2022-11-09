@@ -47,12 +47,10 @@ class LinearVariational(torch.nn.Module):
         out_features: int,
         parent,
         bias: bool = True,
-        device: torch.device = torch.device("cpu"),
     ) -> None:
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.device = device
         self.include_bias = bias
         self.parent = parent
 
@@ -65,12 +63,10 @@ class LinearVariational(torch.nn.Module):
         self.w_mu = torch.nn.Parameter(
             torch.FloatTensor(in_features, out_features)
             .normal_(mean=0, std=0.001)
-            .to(self.device)
         )
         self.w_p = torch.nn.Parameter(
             torch.FloatTensor(in_features, out_features)
             .normal_(mean=0, std=0.001)
-            .to(self.device)
         )
 
         if self.include_bias:
