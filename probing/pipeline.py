@@ -1,7 +1,7 @@
 import gc
 import os
 from time import time
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -54,6 +54,7 @@ class ProbingPipeline:
         self.transformer_model = TransformersLoader(
             model_name=hf_model_name, device=device, truncation=truncation
         )
+        self.criterion: Any = None
 
     def get_classifier(
         self, classifier_name: str, num_classes: int, embed_dim: int
@@ -199,13 +200,11 @@ class ProbingPipeline:
                 self.transformer_model.config.hidden_size,
             ).to(self.transformer_model.device)
 
+            loss_func = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
             if self.classifier == "mdl":
-                loss = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
-                loss = KL_Loss(loss=loss)
+                self.criterion = KL_Loss(loss=loss_func)
             else:
-                loss = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
-
-            self.criterion = loss
+                self.criterion = loss_func
 
             self.optimizer = AdamW(self.classifier.parameters())
 

@@ -1,6 +1,6 @@
 import torch
 
-from probing.utils import *
+from probing.utils import KL, kl_divergence
 
 
 class LogReg(torch.nn.Module):
@@ -71,7 +71,6 @@ class LinearVariational(torch.nn.Module):
             self.b_mu = torch.nn.Parameter(torch.zeros(out_features))
             self.b_p = torch.nn.Parameter(torch.zeros(out_features))
 
-    @staticmethod
     def _reparameterize(self, mu, p):
         sigma = torch.log(1 + torch.exp(p))
         eps = torch.randn_like(sigma)
@@ -96,12 +95,7 @@ class LinearVariational(torch.nn.Module):
 
 
 class MDLLinearModel(torch.nn.Module):
-    def __init__(
-        self,
-        input_dim: int,
-        num_classes: int,
-        device: torch.device = torch.device("cpu"),
-    ) -> None:
+    def __init__(self, input_dim: int, num_classes: int) -> None:
         super().__init__()
         self.kl_loss = KL
         self.layers = torch.nn.Sequential(
