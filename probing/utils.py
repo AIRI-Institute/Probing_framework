@@ -5,7 +5,7 @@ import os
 import pathlib
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch
@@ -99,3 +99,26 @@ class ProbingLog(defaultdict):
         if key not in self:
             self[key] = []
         self[key].append(value)
+
+
+def kl_divergence(z, mu_theta, p_theta):
+    log_prior = torch.distributions.Normal(0, 1).log_prob(z)
+    log_p_q = torch.distributions.Normal(
+        mu_theta, torch.log(1 + torch.exp(p_theta))
+    ).log_prob(z)
+    return (log_p_q - log_prior).mean()
+
+
+class KL:
+    accumulated_kl_div = 0
+
+
+class KL_Loss:
+    def __init__(self, blank_token: int = 0, loss=None):
+        self.blank = blank_token
+        self.loss = loss
+
+    def __call__(self, y_true, y_pred, model=None, **kwargs):
+        kl = model.accumulated_kl_div
+        model.reset_kl_div()
+        return self.loss + kl

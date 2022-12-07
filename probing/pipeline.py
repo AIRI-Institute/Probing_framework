@@ -1,7 +1,7 @@
 import gc
 import os
 from time import time
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -11,11 +11,11 @@ from tqdm import trange
 from transformers import get_linear_schedule_with_warmup
 from transformers.utils import logging
 
-from probing.classifier import MLP, LogReg
+from probing.classifier import MLP, LogReg, MDLLinearModel
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
-from probing.utils import ProbingLog, lang_category_extraction, save_log
+from probing.utils import KL_Loss, ProbingLog, lang_category_extraction, save_log
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
@@ -54,10 +54,11 @@ class ProbingPipeline:
         self.transformer_model = TransformersLoader(
             model_name=hf_model_name, device=device, truncation=truncation
         )
+        self.criterion: Any = None
 
     def get_classifier(
         self, classifier_name: str, num_classes: int, embed_dim: int
-    ) -> Union[LogReg, MLP]:
+    ) -> Union[LogReg, MLP, MDLLinearModel]:
         if classifier_name == "logreg":
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
         elif classifier_name == "mlp":
@@ -66,6 +67,11 @@ class ProbingPipeline:
                 num_classes=num_classes,
                 hidden_size=self.hidden_size,
                 dropout_rate=self.dropout_rate,
+            )
+        elif classifier_name == "mdl":
+            return MDLLinearModel(
+                input_dim=embed_dim,
+                num_classes=num_classes,
             )
         else:
             raise NotImplementedError(f"Unknown classifier: {classifier_name}")
@@ -194,9 +200,12 @@ class ProbingPipeline:
                 self.transformer_model.config.hidden_size,
             ).to(self.transformer_model.device)
 
-            self.criterion = torch.nn.CrossEntropyLoss().to(
-                self.transformer_model.device
-            )
+            loss_func = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
+            if self.classifier == "mdl":
+                self.criterion = KL_Loss(loss=loss_func)
+            else:
+                self.criterion = loss_func
+
             self.optimizer = AdamW(self.classifier.parameters())
 
             self.scheduler = (
