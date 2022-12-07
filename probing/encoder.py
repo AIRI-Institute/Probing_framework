@@ -29,6 +29,7 @@ class TransformersLoader:
         return_dict: bool = True,
         output_hidden_states: bool = True,
         output_attentions: bool = True,
+        model_max_length: int = 512,
     ):
         self.config = (
             AutoConfig.from_pretrained(
@@ -49,6 +50,11 @@ class TransformersLoader:
             if model_name
             else None
         )
+        if self.tokenizer.model_max_length > 10**4:
+            logger.warning(
+                f"In tokenizer model-max-length = {self.tokenizer.model_max_length}, which is quite big. Changed to {model_max_length} to prevent Out-Of-Memory."
+            )
+            self.tokenizer.model_max_length = 512
 
         self.cache: Dict[str, torch.Tensor] = {}
         self.truncation = truncation
@@ -87,7 +93,7 @@ class TransformersLoader:
         in_cache_ids = []
         out_cache_ids = []
         for i, element in enumerate(input_ids):
-            text = self.tokenizer.decode(element)
+            text = self.tokenizer.decode(element, skip_special_tokens=True)
             if text in self.cache:
                 in_cache_ids.append(i)
             else:
@@ -136,7 +142,9 @@ class TransformersLoader:
         ):
             pad_token_id = self.tokenizer.pad_token_id
             if self.tokenizer.padding_side == "left":
-                row_ids_to_exclude = torch.where(input_ids[:, 0] != pad_token_id)
+                row_ids_to_exclude = torch.where(
+                    input_ids[:, -self.tokenizer.model_max_length - 1] != pad_token_id
+                )
             else:
                 row_ids_to_exclude = torch.where(
                     input_ids[:, self.tokenizer.model_max_length - 1] != pad_token_id
