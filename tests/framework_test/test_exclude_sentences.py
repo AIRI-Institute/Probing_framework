@@ -7,7 +7,7 @@ from probing.data_former import TextFormer
 from probing.pipeline import ProbingPipeline
 
 
-@pytest.mark.pipeline
+@pytest.mark.truncation
 class TestTruncation(unittest.TestCase):
     path_testfile = Path(Path(__file__).parent.resolve(), "test_cs_cac_AdpType.csv")
     task_data = TextFormer(Path(path_testfile).stem, path_testfile)
