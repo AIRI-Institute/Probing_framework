@@ -94,7 +94,7 @@ class TransformersLoader:
         in_cache_ids = []
         out_cache_ids = []
         for i, element in enumerate(input_ids):
-            text = self.tokenizer.decode(element, skip_special_tokens=True)
+            text = self.tokenizer.decode(element)
             if text in self.cache:
                 in_cache_ids.append(i)
             else:
@@ -106,7 +106,7 @@ class TransformersLoader:
     ) -> None:
         for input_ids, out_cache_tensor in zip(input_ids_new, model_output_tensors_new):
             input_ids_unpad = (
-                input_ids  # input_ids[input_ids != self.tokenizer.pad_token_id]
+                input_ids
             )
             decoded_text = self.tokenizer.decode(input_ids_unpad)
             self.cache[decoded_text] = torch.unsqueeze(out_cache_tensor, 0)
@@ -115,7 +115,7 @@ class TransformersLoader:
         cached_tensors_list = []
         for input_ids in input_ids_cached:
             input_ids_unpad = (
-                input_ids  # input_ids[input_ids != self.tokenizer.pad_token_id]
+                input_ids
             )
             decoded_text = self.tokenizer.decode(input_ids_unpad)
             cached_tensors_list.append(self.cache[decoded_text])
