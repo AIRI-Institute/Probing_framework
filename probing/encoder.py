@@ -51,12 +51,6 @@ class TransformersLoader:
             else None
         )
 
-        if self.tokenizer.model_max_length > 10**4:
-            logger.warning(
-                f"In tokenizer model-max-length = {self.tokenizer.model_max_length}, which is quite big. Changed to {model_max_length} to prevent Out-Of-Memory."
-            )
-            self.tokenizer.model_max_length = 512
-
         self.cache: Dict[str, torch.Tensor] = {}
         self.truncation = truncation
         self.padding = padding
@@ -64,6 +58,8 @@ class TransformersLoader:
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
         self.device = device
+        self.model_max_length = model_max_length
+
         self.init_device()
 
     def init_device(self):
@@ -355,6 +351,13 @@ class TransformersLoader:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
+
+        if self.tokenizer.model_max_length > 10**4:
+            logger.warning(
+                f"In tokenizer model-max-length = {self.tokenizer.model_max_length}, which is quite big. Changed to {self.model_max_length} to prevent Out-Of-Memory."
+            )
+            self.tokenizer.model_max_length = 512
+
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
         for stage in tokenized_datasets.keys():
