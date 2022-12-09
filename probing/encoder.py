@@ -351,14 +351,14 @@ class TransformersLoader:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
+        tokenized_datasets = self.get_tokenized_datasets(task_dataset)
 
         if self.tokenizer.model_max_length > 10**4:
             logger.warning(
                 f"In tokenizer model-max-length = {self.tokenizer.model_max_length}, which is quite big. Changed to {self.model_max_length} to prevent Out-Of-Memory."
             )
-            self.tokenizer.model_max_length = 512
+            self.tokenizer.model_max_length = self.model_max_length
 
-        tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
         for stage in tokenized_datasets.keys():
             stage_dataloader_tokenized = DataLoader(
