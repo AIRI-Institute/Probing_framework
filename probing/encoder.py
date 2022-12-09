@@ -350,7 +350,7 @@ class TransformersLoader:
     ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
         if self.tokenizer.model_max_length > self.model_max_length:
             logger.warning(
-                f"In tokenizer model-max-length = {self.tokenizer.model_max_length}, which is quite big. Changed to {self.model_max_length} to prevent Out-Of-Memory."
+                f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
             )
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
