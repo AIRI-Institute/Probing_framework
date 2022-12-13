@@ -35,7 +35,7 @@ class TestTextFormer(unittest.TestCase):
             do_control_task=True,
         )
         return True
-    
+
     def test_launch3(self):
         mdl_experiment = ProbingPipeline(
             hf_model_name="bert-base-multilingual-uncased",
