@@ -3,7 +3,7 @@ from conllu import models
 from itertools import product
 from collections import defaultdict
 import networkx as nx
-from utils import check_query
+from probing.ud_filter.utils import check_query
 
 
 class SentenceFilter:
