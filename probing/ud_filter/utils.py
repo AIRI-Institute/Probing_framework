@@ -75,6 +75,7 @@ def subsamples_split(
 
 
 def read(path):
+    """Reads CoNLL-U file"""
     with open(path, encoding='utf-8') as f:
         conllu_file = f.read()
     return conllu_file
@@ -82,7 +83,7 @@ def read(path):
 
 def writer(partition_sets: Dict, task_name: str, language: str, save_path_dir: os.PathLike) -> Path:
     """
-    Writes to a file
+    Writes to a csv file
     Args:
 
         partition_sets: {part: [[sentences], [labels]]}
@@ -125,6 +126,8 @@ def determine_ud_savepath(
 
 
 def delete_duplicates(probing_dict):
+    """Deletes sentences with more than one different classes of node_pattern found"""
+
     all_sent = [s for cl_sent in probing_dict.values() for s in cl_sent]
     duplicates = [item for item, count in Counter(all_sent).items() if count > 1]
     new_probing_dict = {}
@@ -134,6 +137,8 @@ def delete_duplicates(probing_dict):
 
 
 def check_query(node_pattern, constraints):
+    """Checks that a query fits the syntax"""
+
     check_node_pattern(node_pattern)
     check_constraints(constraints)
     constr_nodes = set([n for p in constraints for n in p])
@@ -144,6 +149,8 @@ def check_query(node_pattern, constraints):
 
 
 def check_node_pattern(node_pattern):
+    """Checks that node_pattern uses only UD categories and given in a right format"""
+
     NODES_FIELDS = {'form', 'lemma', 'upos', 'xpos', 'exclude'}
     AVAILABLE_CATEGORIES = {'PronType', 'Gender', 'VerbForm', 'NumType', 'Animacy', 'Mood', 'Poss', 'NounClass',
                             'Tense', 'Reflex', 'Number', 'Aspect', 'Foreign', 'Case', 'Voice', 'Abbr', 'Definite',
@@ -167,6 +174,8 @@ def check_node_pattern(node_pattern):
 
 
 def check_constraints(constraints):
+    """Checks that constrains use only UD categories"""
+
     AVAILABLE_CATEGORIES = {'PronType', 'Gender', 'VerbForm', 'NumType', 'Animacy', 'Mood', 'Poss', 'NounClass',
                             'Tense', 'Reflex', 'Number', 'Aspect', 'Foreign', 'Case', 'Voice', 'Abbr', 'Definite',
                             'Evident', 'Typo', 'Degree', 'Polarity', 'Person', 'Polite', 'Clusivity'}

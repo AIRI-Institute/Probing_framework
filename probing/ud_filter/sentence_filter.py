@@ -17,16 +17,17 @@ class SentenceFilter:
                                         field_or_category: regex_pattern,
                                         'exclude': [exclude categories]} }
             constraints: a dictionary with a node_pair as a key and a dictionary with different constraints on node_pair
-            sample_constraints = { ('N', 'M'): {
-                                    'deprels': regexp_pattern,
+            sample_constraints = { ('W1', 'W2'): {
+                                    'deprels': regexp_pattern (W1 as head, W2 as dependent),
                                     'fconstraint': {
                                         'disjoint': [grammar_category],
                                         'intersec': [grammar_category]},
-                                    'lindist': (start, end) } }
+                                    'lindist': (start, end) (relatively W1)} }
             sent_deprels: a dictionary of all relations and pairs with these relations {relation: [(head, dependent)]}
-            nodes_tokens: a dictionary with all tokens that can be a node in the pattern {node: [token id]}
-            possible_token_pairs: a dictionary with all nodes pairs as a key and a list of possible token
-            pairs as a value
+            nodes_tokens: a dictionary with all tokens that can be a node in the pattern {node: [token id]},
+                        if filter_sentence == True, saves only one instance in nodes_tokens
+            possible_token_pairs: a dictionary with all nodes pairs as a key and a list of possible token,
+            pairs as a value, if filter_sentence == True, saves only one instance in possible_token_pairs
     """
 
     def __init__(self, sentence: models.TokenList):
@@ -114,7 +115,8 @@ class SentenceFilter:
 
     def linear_distance(self, node_pair: tuple) -> set:
         """Returns a set of token pairs with a given linear distance between tokens
-        :param lindist: tuple(min_distance, max_distance)"""
+        :param lindist: tuple(min_distance, max_distance), defined relatively to the W1,
+                        so in case of left-branching distance can be negative"""
 
         suitable_pairs = set()
         lindist = self.constraints[node_pair]['lindist']
@@ -158,7 +160,8 @@ class SentenceFilter:
         return suitable_pairs
 
     def find_isomorphism(self):
-        """Checks if there is a graph with possible_token_pairs that is isomorphic to a constraint pairs graph"""
+        """Checks if there is at least one graph with possible_token_pairs
+        that is isomorphic to a constraint pairs graph"""
 
         nodes_graph = nx.Graph()
         nodes_graph.add_edges_from(list(self.possible_token_pairs.keys()))
@@ -176,7 +179,7 @@ class SentenceFilter:
         return False
 
     def match_constraints(self):
-        """Checks if there is a token pair that matches all constraints"""
+        """Checks if there is at least one token pair that matches all constraints."""
 
         for np in self.constraints:
             self.possible_token_pairs[np] = list(product(self.nodes_tokens[np[0]], self.nodes_tokens[np[1]]))
@@ -199,6 +202,8 @@ class SentenceFilter:
         return True
 
     def filter_sentence(self, node_pattern: dict, constraints: dict):
+        """Check if a sentence contains at least one instance of a node_pattern that matches
+        all the given and isomophism constraints"""
         check_query(node_pattern, constraints)
         self.node_pattern = node_pattern
         self.constraints = constraints
