@@ -1,9 +1,10 @@
-import pytest
 import unittest
 from pathlib import Path
 
-from probing.data_former import TextFormer
+import pytest
+
 from probing.config import data_folder
+from probing.data_former import TextFormer
 
 
 @pytest.mark.data_former

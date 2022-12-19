@@ -1,10 +1,11 @@
 import csv
 import os
-import numpy as np
 from collections import Counter
 from enum import Enum
 from pathlib import Path
-from typing import List, Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+
+import numpy as np
 from sklearn.model_selection import train_test_split
 
 

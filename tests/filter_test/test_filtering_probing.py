@@ -1,10 +1,11 @@
-from probing.ud_filter.filtering_probing import ProbingConlluFilter
-from queries import by_passive, SOmatchingNumber, ADPdistance
+import unittest
+from pathlib import Path
 
 import pytest
-import unittest
 from conllu import parse
-from pathlib import Path
+from queries import ADPdistance, SOmatchingNumber, by_passive
+
+from probing.ud_filter.filtering_probing import ProbingConlluFilter
 
 
 @pytest.mark.filtering_probing

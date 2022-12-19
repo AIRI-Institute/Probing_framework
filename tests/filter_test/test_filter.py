@@ -1,11 +1,12 @@
-from probing.ud_filter.sentence_filter import SentenceFilter
-from queries import by_passive, SOmatchingNumber, ADPdistance
-
-import pytest
 import unittest
 from itertools import product
 from pathlib import Path
+
+import pytest
 from conllu import parse
+from queries import ADPdistance, SOmatchingNumber, by_passive
+
+from probing.ud_filter.sentence_filter import SentenceFilter
 
 
 @pytest.mark.sentence_filter

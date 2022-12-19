@@ -1,8 +1,9 @@
 import re
-from conllu import models
-from itertools import product
 from collections import defaultdict
+from itertools import product
+
 import networkx as nx
+from conllu import models
 from probing.ud_filter.utils import check_query
 
 

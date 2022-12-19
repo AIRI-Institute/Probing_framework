@@ -1,13 +1,15 @@
-from probing.ud_filter.sentence_filter import SentenceFilter
-from probing.ud_filter.utils import subsamples_split, read, writer, extract_lang_from_udfile_path, determine_ud_savepath, delete_duplicates
-
 import logging
 import os
 import re
-from conllu import parse
 from pathlib import Path
-from typing import Tuple, Optional, List, Dict
+from typing import Dict, List, Optional, Tuple
+
+from conllu import parse
 from nltk.tokenize import wordpunct_tokenize
+from probing.ud_filter.sentence_filter import SentenceFilter
+from probing.ud_filter.utils import (delete_duplicates, determine_ud_savepath,
+                                     extract_lang_from_udfile_path, read,
+                                     subsamples_split, writer)
 
 
 class ProbingConlluFilter:
