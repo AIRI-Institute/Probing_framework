@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort pytest mypy
+          pip install torch==1.12 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
+          pip install -r requirements.txt
+      - name: isort
+        run: |
+          isort --check --diff ./probing/ ./tests/
+      - name: black
+        run: |
+          black --check --diff ./probing/ ./tests/
+      - name: mypy
+        run: |
+          mypy probing 
+      - name: Test with pytest
+        run: |
+          python -m pytest .
