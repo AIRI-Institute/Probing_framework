@@ -24,9 +24,19 @@ logger = logging.get_logger("probing_parser")
 
 
 class ConlluUDParser:
-    def __init__(self, shuffle: bool = True, verbose: bool = True):
+    def __init__(
+        self,
+        shuffle: bool = True,
+        verbose: bool = True,
+        deprel: Optional[str] = None,
+        upos: Optional[str] = None,
+        sorting: Optional[str] = None,
+    ):
         self.shuffle = shuffle
         self.verbose = verbose
+        self.deprel = deprel
+        self.upos = upos
+        self.sorting = sorting
 
     def read(self, path: str) -> str:
         """
@@ -70,7 +80,19 @@ class ConlluUDParser:
             children: children of a token in token tree
         """
         if head["feats"] and category in head["feats"]:
-            return head
+            if (
+                self.upos
+                and head["upos"] == self.upos
+                and self.deprel
+                and head["deprel"] == self.deprel
+            ):
+                return head
+            elif self.deprel and head["deprel"] == self.deprel:
+                return head
+            elif self.upos and head["upos"] == self.upos:
+                return head
+            elif not self.upos and not self.deprel:
+                return head
 
         for token in children:
             token_info = token.token
@@ -79,7 +101,12 @@ class ConlluUDParser:
                 return result
         return None
 
-    def classify(self, token_trees: List[TokenTree], category: str) -> Dict:
+    def classify(
+        self,
+        token_trees: List[TokenTree],
+        category: str,
+        subcategory: Optional[str] = None,
+    ) -> Dict:
         """
         Classifies sentences by a grammatical value they contain
         Args:
@@ -95,8 +122,30 @@ class ConlluUDParser:
                     category, root, token_tree.children
                 )
                 if category_token:
-                    value = category_token["feats"][category]
-                    probing_data[value].append(s_text)
+                    if not subcategory:
+                        value = category_token["feats"][category]
+                        probing_data[value].append(s_text)
+                    elif (
+                        self.sorting == "by_pos"
+                        and category_token["upos"] == subcategory
+                    ):
+                        print(subcategory)
+                        value = category_token["feats"][category]
+                        probing_data[value].append(s_text)
+                    elif (
+                        self.sorting == "by_deprel"
+                        and category_token["deprel"] == subcategory
+                    ):
+                        value = category_token["feats"][category]
+                        probing_data[value].append(s_text)
+                    elif self.sorting == "by_pos_and_deprel":
+                        pos, deprel = subcategory.split("_")
+                        if (
+                            category_token["upos"] == pos
+                            and category_token["deprel"] == deprel
+                        ):
+                            value = category_token["feats"][category]
+                            probing_data[value].append(s_text)
         return probing_data
 
     def filter_labels_after_split(self, labels: List[Any]) -> List[Any]:
@@ -189,6 +238,7 @@ class ConlluUDParser:
         splits: List[str],
         partitions: List[float],
         random_seed: int = 42,
+        subcategory: Optional[str] = None,
     ) -> Dict:
         """
         Generates a split following given arguments
@@ -201,7 +251,7 @@ class ConlluUDParser:
             random_seed: a random seed for spliting
         """
         sentences = parse_tree(conllu_text)
-        classified_sentences = self.classify(sentences, category)
+        classified_sentences = self.classify(sentences, category, subcategory)
         num_classes = len(classified_sentences.keys())
 
         if num_classes == 1:
@@ -243,15 +293,32 @@ class ConlluUDParser:
         self, paths: List[os.PathLike]
     ) -> Tuple[List[str], List[str]]:
         set_of_values = set()
+        subcats: Dict[str, set] = defaultdict(set)
         list_texts = [self.read(str(p)) for p in paths]
         text_data = "\n".join(list_texts)
         token_lists = parse(text_data)
         for token_list in token_lists:
             for token in token_list:
                 feats = token["feats"]
-                if feats:
-                    set_of_values.update(feats.keys())
-        return list_texts, sorted(set_of_values)
+                pos = token["upos"]
+                deprel = token["deprel"].split(":")[0]
+
+                if self.sorting == "by_pos":
+                    if feats and pos:
+                        subcats[pos].update(feats.keys())
+                elif self.sorting == "by_deprel":
+                    if feats and deprel:
+                        subcats[deprel].update(feats.keys())
+                elif self.sorting == "by_pos_and_deprel":
+                    if feats and pos and deprel:
+                        subcats[f"{pos}_{deprel}"].update(feats.keys())
+                else:
+                    if feats:
+                        set_of_values.update(feats.keys())
+
+        if not self.sorting:
+            subcats["no_sorting"] = set_of_values
+        return list_texts, subcats
 
     def get_filepaths_from_dir(self, dir_path: os.PathLike) -> List[os.PathLike]:
         dir_path = Path(dir_path).resolve() if dir_path is not None else None
@@ -288,6 +355,40 @@ class ConlluUDParser:
         os.makedirs(final_path, exist_ok=True)
         return Path(final_path)
 
+    def prepare_data_for_probing(
+        self,
+        categories: List[str],
+        list_texts,
+        splits,
+        partitions,
+        subcategory: Optional[str] = None,
+    ):
+        data: Dict[str, Dict] = defaultdict(dict)
+        for category_name in categories:
+            category_parts: Dict = {}
+            for text, split, part in zip(list_texts, splits, partitions):
+                process_part = self.generate_probing_file(
+                    conllu_text=text,
+                    splits=split,
+                    partitions=part,
+                    category=category_name,
+                    subcategory=subcategory,
+                )
+                # means that some part within tr, va, te wasn't satisfied to the conditions
+                if process_part == {}:
+                    category_parts = {}
+                    break
+                category_parts.update(process_part)
+
+                if category_parts:
+                    self.check_parts(category_parts, category_name)
+
+                if subcategory:
+                    data[f"{subcategory}_{category_name}"] = category_parts
+                else:
+                    data[category_name] = category_parts
+        return data
+
     def generate_data_by_categories(
         self,
         paths: List[os.PathLike],
@@ -318,24 +419,14 @@ class ConlluUDParser:
         if splits is None:
             splits = splits_by_files[len(paths)]
 
-        for category_name in categories:
-            category_parts: Dict = {}
-            for text, split, part in zip(list_texts, splits, partitions):
-                process_part = self.generate_probing_file(
-                    conllu_text=text,
-                    splits=split,
-                    partitions=part,
-                    category=category_name,
+        for category, values in categories.items():
+            print(f"Collecting data for {category}")
+            data.update(
+                self.prepare_data_for_probing(
+                    values, list_texts, splits, partitions, category
                 )
-                # means that some part within tr, va, te wasn't satisfied to the conditions
-                if process_part == {}:
-                    category_parts = {}
-                    break
-                category_parts.update(process_part)
+            )
 
-            if category_parts:
-                self.check_parts(category_parts, category_name)
-            data[category_name] = category_parts
         return data
 
     @typing.no_type_check
@@ -386,6 +477,7 @@ class ConlluUDParser:
             va_path: a path to a file with test data
             dir_path: a path to a directory with all files
         """
+
         if self.verbose:
             paths_str = "\n".join(
                 [
