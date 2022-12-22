@@ -35,3 +35,18 @@ class TestTextFormer(unittest.TestCase):
             do_control_task=True,
         )
         return True
+
+    def test_launch3(self):
+        mdl_experiment = ProbingPipeline(
+            hf_model_name="bert-base-multilingual-uncased",
+            device="cpu",
+            classifier_name="mdl",
+        )
+        task_name = "test_gapping"
+        mdl_experiment.run(
+            probe_task=task_name,
+            path_to_task_file=self.path_testfile,
+            verbose=True,
+            train_epochs=2,
+        )
+        return True
