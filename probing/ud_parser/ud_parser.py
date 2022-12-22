@@ -4,7 +4,7 @@ import re
 import typing
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 from conllu import parse, parse_tree
@@ -291,7 +291,7 @@ class ConlluUDParser:
 
     def get_text_and_categories(
         self, paths: List[os.PathLike]
-    ) -> Tuple[List[str], List[str]]:
+    ) -> Tuple[List[str], Dict[str, Set[str]]]:
         set_of_values = set()
         subcats: Dict[str, set] = defaultdict(set)
         list_texts = [self.read(str(p)) for p in paths]
@@ -357,11 +357,11 @@ class ConlluUDParser:
 
     def prepare_data_for_probing(
         self,
-        categories: List[str],
+        categories: Set[str],
         list_texts,
         splits,
         partitions,
-        subcategory: Optional[str] = None,
+        subcategory,
     ):
         data: Dict[str, Dict] = defaultdict(dict)
         for category_name in categories:
@@ -383,10 +383,8 @@ class ConlluUDParser:
                 if category_parts:
                     self.check_parts(category_parts, category_name)
 
-                if subcategory:
-                    data[f"{subcategory}_{category_name}"] = category_parts
-                else:
-                    data[category_name] = category_parts
+                data[f"{subcategory}_{category_name}"] = category_parts
+
         return data
 
     def generate_data_by_categories(
