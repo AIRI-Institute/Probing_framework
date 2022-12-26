@@ -19,8 +19,9 @@ class TestUDParser(unittest.TestCase):
 
     def test_categories(self):
         parser = ConlluUDParser()
-        categories = sorted(
-            [
+        categories = defaultdict(set)
+        categories["no_sorting"] = sorted(
+            {
                 "Animacy",
                 "Case",
                 "Gender",
@@ -35,11 +36,12 @@ class TestUDParser(unittest.TestCase):
                 "Mood",
                 "Variant",
                 "Poss",
-            ]
+            }
         )
+
         texts, found_categories = parser.get_text_and_categories([self.path_testfile1])
         self.assertEqual(categories, found_categories)
-        self.assertEqual(list, type(found_categories))
+        self.assertEqual(dict, type(found_categories))
 
     def test_classify(self):
         parser = ConlluUDParser()
@@ -253,9 +255,7 @@ class TestUDParser(unittest.TestCase):
             "Tense",
         ]
         for c in empty_cats:
-            print(c)
-            self.assertEqual(data[c], {})
+            self.assertEqual(data[f"no_sorting_{c}"], {})
 
         for c in notempty_cats:
-            print(c)
-            self.assertTrue(data[c] != {})
+            self.assertTrue(data[f"no_sorting_{c}"] != {})

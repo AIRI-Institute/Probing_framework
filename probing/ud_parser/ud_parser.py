@@ -105,7 +105,7 @@ class ConlluUDParser:
         self,
         token_trees: List[TokenTree],
         category: str,
-        subcategory: Optional[str] = None,
+        subcategory: str,
     ) -> Dict:
         """
         Classifies sentences by a grammatical value they contain
@@ -122,14 +122,13 @@ class ConlluUDParser:
                     category, root, token_tree.children
                 )
                 if category_token:
-                    if not subcategory:
+                    if not self.sorting:
                         value = category_token["feats"][category]
                         probing_data[value].append(s_text)
                     elif (
                         self.sorting == "by_pos"
                         and category_token["upos"] == subcategory
                     ):
-                        print(subcategory)
                         value = category_token["feats"][category]
                         probing_data[value].append(s_text)
                     elif (
@@ -237,8 +236,8 @@ class ConlluUDParser:
         category: str,
         splits: List[str],
         partitions: List[float],
+        subcategory: str,
         random_seed: int = 42,
-        subcategory: Optional[str] = None,
     ) -> Dict:
         """
         Generates a split following given arguments
@@ -291,7 +290,7 @@ class ConlluUDParser:
 
     def get_text_and_categories(
         self, paths: List[os.PathLike]
-    ) -> Tuple[List[str], Dict[str, Set[str]]]:
+    ) -> Tuple[List[str], Dict[str, List[Any]]]:
         set_of_values = set()
         subcats: Dict[str, set] = defaultdict(set)
         list_texts = [self.read(str(p)) for p in paths]
@@ -318,7 +317,8 @@ class ConlluUDParser:
 
         if not self.sorting:
             subcats["no_sorting"] = set_of_values
-        return list_texts, subcats
+        sorted_categories = {key: sorted(value) for key, value in subcats.items()}
+        return list_texts, sorted_categories
 
     def get_filepaths_from_dir(self, dir_path: os.PathLike) -> List[os.PathLike]:
         dir_path = Path(dir_path).resolve() if dir_path is not None else None
@@ -357,7 +357,7 @@ class ConlluUDParser:
 
     def prepare_data_for_probing(
         self,
-        categories: Set[str],
+        categories: List[Any],
         list_texts,
         splits,
         partitions,
@@ -374,16 +374,17 @@ class ConlluUDParser:
                     category=category_name,
                     subcategory=subcategory,
                 )
+
                 # means that some part within tr, va, te wasn't satisfied to the conditions
                 if process_part == {}:
                     category_parts = {}
                     break
                 category_parts.update(process_part)
 
-                if category_parts:
-                    self.check_parts(category_parts, category_name)
+            if category_parts:
+                self.check_parts(category_parts, category_name)
 
-                data[f"{subcategory}_{category_name}"] = category_parts
+            data[f"{subcategory}_{category_name}"] = category_parts
 
         return data
 
@@ -404,7 +405,8 @@ class ConlluUDParser:
         list_texts, categories = self.get_text_and_categories(paths)
 
         if self.verbose:
-            print(f"{len(categories)} categories were found")
+            num_categories = sum([len(value) for value in categories.values()])
+            print(f"{num_categories} categories were found")
 
         if len(categories) == 0:
             paths_str = "\n".join([str(p) for p in paths])
