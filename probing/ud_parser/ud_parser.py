@@ -122,18 +122,16 @@ class ConlluUDParser:
                     category, root, token_tree.children
                 )
                 if category_token:
-                    if not self.sorting:
-                        value = category_token["feats"][category]
-                        probing_data[value].append(s_text)
-                    elif (
-                        self.sorting == "by_pos"
-                        and category_token["upos"] == subcategory
-                    ):
-                        value = category_token["feats"][category]
-                        probing_data[value].append(s_text)
-                    elif (
-                        self.sorting == "by_deprel"
-                        and category_token["deprel"] == subcategory
+                    if (
+                        (self.sorting == None)
+                        or (
+                            self.sorting == "by_pos"
+                            and category_token["upos"] == subcategory
+                        )
+                        or (
+                            self.sorting == "by_deprel"
+                            and category_token["deprel"] == subcategory
+                        )
                     ):
                         value = category_token["feats"][category]
                         probing_data[value].append(s_text)
