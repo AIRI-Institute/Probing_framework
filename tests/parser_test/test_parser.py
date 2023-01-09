@@ -19,8 +19,9 @@ class TestUDParser(unittest.TestCase):
 
     def test_categories(self):
         parser = ConlluUDParser()
-        categories = sorted(
-            [
+        categories = defaultdict(set)
+        categories["no_sorting"] = sorted(
+            {
                 "Animacy",
                 "Case",
                 "Gender",
@@ -35,11 +36,12 @@ class TestUDParser(unittest.TestCase):
                 "Mood",
                 "Variant",
                 "Poss",
-            ]
+            }
         )
+
         texts, found_categories = parser.get_text_and_categories([self.path_testfile1])
         self.assertEqual(categories, found_categories)
-        self.assertEqual(list, type(found_categories))
+        self.assertEqual(dict, type(found_categories))
 
     def test_classify(self):
         parser = ConlluUDParser()
@@ -53,7 +55,9 @@ class TestUDParser(unittest.TestCase):
             ],
         )
         sentences = parse_tree(self.text_testfile1)
-        self.assertEqual(person_dict, parser.classify(sentences, "Person"))
+        self.assertEqual(
+            person_dict, parser.classify(sentences, "Person", subcategory="no_sorting")
+        )
 
     def test_check(self):
         parser = ConlluUDParser()
@@ -165,10 +169,15 @@ class TestUDParser(unittest.TestCase):
                 "Degree",
                 splits=["tr", "va", "te"],
                 partitions=[0.8, 0.1, 0.1],
+                subcategory="no_sorting",
             )
 
         parts_2 = parser.generate_probing_file(
-            self.text_testfile1, "Number", splits=["tr"], partitions=[1.0]
+            self.text_testfile1,
+            "Number",
+            splits=["tr"],
+            partitions=[1.0],
+            subcategory="no_sorting",
         )
 
         log_2 = 'Not enough data of category "Voice" for stratified split'
@@ -178,6 +187,7 @@ class TestUDParser(unittest.TestCase):
                 "Voice",
                 splits=["tr", "va", "te"],
                 partitions=[0.8, 0.1, 0.1],
+                subcategory="no_sorting",
             )
 
         log_3 = 'This file does not contain examples of category "Number"'
@@ -187,15 +197,24 @@ class TestUDParser(unittest.TestCase):
                 "Number",
                 splits=["tr", "va", "te"],
                 partitions=[0.8, 0.1, 0.1],
+                subcategory="no_sorting",
             )
 
         cases = ["Nom"]
         parts_5 = parser.generate_probing_file(
-            self.text_testfile1, "Case", splits=["va", "te"], partitions=[0.5, 0.5]
+            self.text_testfile1,
+            "Case",
+            splits=["va", "te"],
+            partitions=[0.5, 0.5],
+            subcategory="no_sorting",
         )
 
         parts_6 = parser.generate_probing_file(
-            self.text_testfile2, "Number", splits=["va", "te"], partitions=[0.5, 0.5]
+            self.text_testfile2,
+            "Number",
+            splits=["va", "te"],
+            partitions=[0.5, 0.5],
+            subcategory="no_sorting",
         )
 
         self.assertIn(log_1, experiment_1.output[0])
@@ -253,9 +272,7 @@ class TestUDParser(unittest.TestCase):
             "Tense",
         ]
         for c in empty_cats:
-            print(c)
-            self.assertEqual(data[c], {})
+            self.assertEqual(data[f"no_sorting_{c}"], {})
 
         for c in notempty_cats:
-            print(c)
-            self.assertTrue(data[c] != {})
+            self.assertTrue(data[f"no_sorting_{c}"] != {})

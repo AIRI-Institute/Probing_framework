@@ -12,10 +12,12 @@ def main(
     language: Optional[str] = None,
     save_path_dir: Optional[os.PathLike] = None,
     shuffle: bool = True,
-    verbose: bool = True
+    verbose: bool = True,
 ) -> None:
     converter = ConlluUDParser(shuffle, verbose)
-    converter.convert(tr_path, va_path, te_path, dir_conllu_path, language, save_path_dir)
+    converter.convert(
+        tr_path, va_path, te_path, dir_conllu_path, language, save_path_dir
+    )
 
 
 if __name__ == "__main__":
