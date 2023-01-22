@@ -1,15 +1,14 @@
 import csv
 import os
 from collections import Counter
-from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 
 
-def filter_labels_after_split(labels: List[Any]) -> List[Any]:
+def filter_labels_after_split(labels: List[str]) -> List[str]:
     """Skipping those classes which have only 1 sentence???"""
 
     labels_repeat_dict = Counter(labels)
@@ -21,9 +20,9 @@ def subsamples_split(
     probing_dict: Dict[str, List[str]],
     partition: List[float],
     random_seed: int,
-    shuffle=True,
-    split: List[Enum] = None,
-) -> Dict:
+    shuffle: bool = True,
+    split: List[str] = ["tr", "va", "te"],
+) -> Dict[str, List[List[str]]]:
     """
     Splits data into three sets: train, validation, and test
     in the given relation
@@ -84,7 +83,7 @@ def subsamples_split(
     return parts
 
 
-def read(path):
+def read(path: os.PathLike) -> str:
     """Reads CoNLL-U file"""
     with open(path, encoding="utf-8") as f:
         conllu_file = f.read()
@@ -92,7 +91,10 @@ def read(path):
 
 
 def writer(
-    partition_sets: Dict, task_name: str, language: str, save_path_dir: os.PathLike
+    partition_sets: Dict[str, List[List[str]]],
+    task_name: str,
+    language: str,
+    save_path_dir: os.PathLike,
 ) -> Path:
     """
     Writes to a csv file
@@ -100,6 +102,8 @@ def writer(
 
         partition_sets: {part: [[sentences], [labels]]}
         task_name: name for the probing task (will be used in result file name)
+        language: language title
+        save_path_dir: path to the directory where to save
 
     """
     result_path = Path(Path(save_path_dir).resolve(), f"{language}_{task_name}.csv")
@@ -135,7 +139,7 @@ def determine_ud_savepath(
     return Path(final_path)
 
 
-def delete_duplicates(probing_dict):
+def delete_duplicates(probing_dict: Dict[str, List[str]]) -> Dict[str, List[str]]:
     """Deletes sentences with more than one different classes of node_pattern found"""
 
     all_sent = [s for cl_sent in probing_dict.values() for s in cl_sent]
@@ -146,7 +150,10 @@ def delete_duplicates(probing_dict):
     return new_probing_dict
 
 
-def check_query(node_pattern, constraints):
+def check_query(
+    node_pattern: Dict[str, Dict[str, str]],
+    constraints: Dict[Tuple[str, str], Dict[Any, Any]],
+) -> bool:
     """Checks that a query fits the syntax"""
 
     check_node_pattern(node_pattern)
@@ -160,7 +167,7 @@ def check_query(node_pattern, constraints):
     return True
 
 
-def check_node_pattern(node_pattern):
+def check_node_pattern(node_pattern: Dict[str, Dict[str, str]]) -> bool:
     """Checks that node_pattern uses only UD categories and given in a right format"""
 
     NODES_FIELDS = {"form", "lemma", "upos", "xpos", "exclude"}
@@ -211,7 +218,7 @@ def check_node_pattern(node_pattern):
     return True
 
 
-def check_constraints(constraints):
+def check_constraints(constraints: Dict[Tuple[str, str], Dict[Any, Any]]) -> bool:
     """Checks that constrains use only UD categories"""
 
     AVAILABLE_CATEGORIES = {

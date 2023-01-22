@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from itertools import product
+from typing import Any, DefaultDict, Dict, List, Set, Tuple
 
 import networkx as nx
 from conllu import models
@@ -35,13 +36,13 @@ class SentenceFilter:
     def __init__(self, sentence: models.TokenList):
 
         self.sentence = sentence
-        self.node_pattern = None
-        self.constraints = None
-        self.sent_deprels = {}
-        self.nodes_tokens = {}
-        self.possible_token_pairs = None
+        self.node_pattern: Dict[str, Dict[str, str]] = {}
+        self.constraints: Dict[Tuple[str, str], Dict[Any, Any]] = {}
+        self.sent_deprels: DefaultDict[str, List[Tuple[int, int]]] = defaultdict(list)
+        self.nodes_tokens: Dict[str, List[int]] = {}
+        self.possible_token_pairs: Dict[Tuple[str, str], Set[Tuple[int, int]]] = {}
 
-    def token_match_node(self, token: models.Token, node_pattern: dict) -> bool:
+    def token_match_node(self, token: models.Token, node_pattern: Dict[str, str]) -> bool:
         """Checks if a token matches the node_pattern"""
 
         for feat in node_pattern:
@@ -62,16 +63,16 @@ class SentenceFilter:
                 return False
         return True
 
-    def all_deprels(self, token_list: models.TokenList) -> defaultdict:
+    def all_deprels(self) -> DefaultDict[str, List[Tuple[int, int]]]:
         """Returns a dictionary {relation: [(head, dependent)]} of all relations in the sentence"""
 
-        deprels = defaultdict(list)
-        for t in token_list:
-            if isinstance(t["head"], int) and isinstance(t["id"], int):
-                deprels[t["deprel"]].append((t["head"] - 1, t["id"] - 1))
+        deprels: DefaultDict[str, list] = defaultdict(list)
+        for token in self.sentence:
+            if isinstance(token["head"], int) and isinstance(token["id"], int):
+                deprels[token["deprel"]].append((token["head"] - 1, token["id"] - 1))
         return deprels
 
-    def search_suitable_tokens(self, node: str):
+    def search_suitable_tokens(self, node: str) -> None:
         """Selects from a token_list those tokens that match given node_pattern
         and saves it in self.nodes_tokens[node]"""
 
@@ -81,7 +82,7 @@ class SentenceFilter:
             ):
                 self.nodes_tokens[node].append(token["id"] - 1)
 
-    def find_all_nodes(self):
+    def find_all_nodes(self) -> bool:
         """Checks if every node in the pattern has at least one matching token"""
 
         for node in self.node_pattern:
@@ -90,7 +91,7 @@ class SentenceFilter:
                 return False
         return True
 
-    def pattern_relations(self, rel_pattern: str):
+    def pattern_relations(self, rel_pattern: str) -> List[str]:
         """Returns all relation names in the sentence that match the given pattern"""
 
         rels = []
@@ -99,9 +100,12 @@ class SentenceFilter:
                 rel_pattern, rel, re.I
             ):  # changed from re.serach to re.fullmatch
                 rels.append(rel)
+        print(rels)
         return rels
 
-    def pairs_with_rel(self, node_pair: tuple, rel_name: str) -> set:
+    def pairs_with_rel(
+        self, node_pair: Tuple[str, str], rel_name: str
+    ) -> Set[Tuple[int, int]]:
         """Returns those pairs of tokens that:
         1) are related by a rel_name
         2) are among possible_token_pairs for a node_pair"""
@@ -113,20 +117,20 @@ class SentenceFilter:
                 self.possible_token_pairs[node_pair]
             )
 
-    def pairs_matching_relpattern(self, node_pair: tuple) -> set:
+    def pairs_matching_relpattern(
+        self, node_pair: Tuple[str, str]
+    ) -> Set[Tuple[int, int]]:
         """Returns a set of token pairs, whose relations match the pattern"""
 
-        all_suitable_rels = set()
+        all_suitable_rels: Set[Tuple[int, int]] = set()
         for rel in self.pattern_relations(self.constraints[node_pair]["deprels"]):
             all_suitable_rels = all_suitable_rels | self.pairs_with_rel(node_pair, rel)
         return all_suitable_rels
 
-    def linear_distance(self, node_pair: tuple) -> set:
-        """Returns a set of token pairs with a given linear distance between tokens
-        :param lindist: tuple(min_distance, max_distance), defined relatively to the W1,
-                        so in case of left-branching distance can be negative"""
+    def linear_distance(self, node_pair: Tuple[str, str]) -> Set[Tuple[int, int]]:
+        """Returns a set of token pairs with a given linear distance between tokens"""
 
-        suitable_pairs = set()
+        suitable_pairs: Set[Tuple[int, int]] = set()
         lindist = self.constraints[node_pair]["lindist"]
         for pair in self.possible_token_pairs[node_pair]:
             dist = pair[1] - pair[0]
@@ -134,9 +138,8 @@ class SentenceFilter:
                 suitable_pairs.add(pair)
         return suitable_pairs
 
-    def pair_match_fconstraint(self, token_pair: tuple, fconstraint: dict) -> bool:
+    def pair_match_fconstraint(self, token_pair: Tuple[int, int], fconstraint: Dict[Any, Any]) -> bool:
         """Checks if a token pair matches all the feature constraints"""
-
         t1_feats = self.sentence[token_pair[0]]["feats"]
         t2_feats = self.sentence[token_pair[1]]["feats"]
         if t1_feats and t2_feats:
@@ -157,17 +160,17 @@ class SentenceFilter:
         else:
             return False
 
-    def feature_constraint(self, node_pair: tuple) -> set:
+    def feature_constraint(self, node_pair: Tuple[str, str]) -> Set[Tuple[int, int]]:
         """Returns all pairs that match constraints on features"""
 
-        suitable_pairs = set()
+        suitable_pairs: Set[Tuple[int, int]] = set()
         fconstraint = self.constraints[node_pair]["fconstraint"]
         for pair in self.possible_token_pairs[node_pair]:
             if self.pair_match_fconstraint(pair, fconstraint):
                 suitable_pairs.add(pair)
         return suitable_pairs
 
-    def find_isomorphism(self):
+    def find_isomorphism(self) -> bool:
         """Checks if there is at least one graph with possible_token_pairs
         that is isomorphic to a constraint pairs graph"""
 
@@ -181,21 +184,21 @@ class SentenceFilter:
                 continue
             if nx.is_isomorphic(tokens_graph, nodes_graph):
                 self.possible_token_pairs = {
-                    k: edges[i] for i, k in enumerate(self.possible_token_pairs)
+                    k: {edges[i]} for i, k in enumerate(self.possible_token_pairs)
                 }
                 self.nodes_tokens = {
-                    np[i]: {self.possible_token_pairs[np][i]}
+                    np[i]: [list(self.possible_token_pairs[np])[0][i]]
                     for np in self.possible_token_pairs
                     for i in range(2)
                 }
                 return True
         return False
 
-    def match_constraints(self):
+    def match_constraints(self) -> bool:
         """Checks if there is at least one token pair that matches all constraints."""
 
         for np in self.constraints:
-            self.possible_token_pairs[np] = list(
+            self.possible_token_pairs[np] = set(
                 product(self.nodes_tokens[np[0]], self.nodes_tokens[np[1]])
             )
             for constraint in self.constraints[np]:
@@ -210,17 +213,21 @@ class SentenceFilter:
                 if not self.possible_token_pairs[np]:
                     return False
                 else:
-                    self.nodes_tokens[np[0]] = set(
-                        [p[0] for p in self.possible_token_pairs[np]]
+                    self.nodes_tokens[np[0]] = list(
+                        set([p[0] for p in self.possible_token_pairs[np]])
                     )
-                    self.nodes_tokens[np[1]] = set(
-                        [p[1] for p in self.possible_token_pairs[np]]
+                    self.nodes_tokens[np[1]] = list(
+                        set([p[1] for p in self.possible_token_pairs[np]])
                     )
         if not self.find_isomorphism():
             return False
         return True
 
-    def filter_sentence(self, node_pattern: dict, constraints: dict):
+    def filter_sentence(
+        self,
+        node_pattern: Dict[str, Dict[str, str]],
+        constraints: Dict[Tuple[str, str], dict],
+    ) -> bool:
         """Check if a sentence contains at least one instance of a node_pattern that matches
         all the given and isomophism constraints"""
         check_query(node_pattern, constraints)
@@ -231,7 +238,7 @@ class SentenceFilter:
         if not self.find_all_nodes():
             return False
         else:
-            self.sent_deprels = self.all_deprels(self.sentence)
+            self.sent_deprels = self.all_deprels()
             if self.match_constraints():
                 return True
             else:

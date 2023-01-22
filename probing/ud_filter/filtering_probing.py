@@ -2,9 +2,10 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from conllu import parse
+from conllu.models import SentenceList
 from nltk.tokenize import wordpunct_tokenize
 
 from probing.ud_filter.sentence_filter import SentenceFilter
@@ -35,19 +36,21 @@ class ProbingConlluFilter:
     def __init__(self, shuffle: bool = True):
 
         self.shuffle = shuffle
-        self.paths = None
-        self.language = None
-        self.sentences = []
-        self.classes = None
-        self.probing_dict = None
-        self.parts_data = None
+        self.paths: List[Path] = []
+        self.language: str = ""
+        self.sentences: SentenceList = SentenceList()
+        self.classes: Dict[
+            str, Tuple[Dict[str, Dict[str, Any]], Dict[Tuple[str, str], Dict[str, Any]]]
+        ] = {}
+        self.probing_dict: Dict[str, List[str]] = {}
+        self.parts_data: Dict[str, List[List[str]]] = {}
 
     def upload_files(
         self,
-        conllu_paths: List[Optional[os.PathLike]] = None,
-        dir_conllu_path: Optional[os.PathLike] = None,
-        language: str = None,
-    ):
+        conllu_paths: List[str] = [],
+        dir_conllu_path: Optional[str] = "",
+        language: str = "",
+    ) -> None:
         """Reads and combines conllu files (if there are several), parses them and saves as a list of TokenTree"""
 
         if dir_conllu_path:
@@ -72,7 +75,7 @@ class ProbingConlluFilter:
         self.language = extract_lang_from_udfile_path(self.paths[0], language=language)
         self.sentences = parse(conllu_data)
 
-    def _filter_conllu(self, class_label: str):
+    def _filter_conllu(self, class_label: str) -> Tuple[List[str], List[str]]:
         """Filters sentences by class's query and saves the result to the relevant fields"""
 
         matching = []
@@ -101,7 +104,7 @@ class ProbingConlluFilter:
         save_dir_path: Optional[os.PathLike] = None,
         task_name: str = "CustomTask",
         partition: List[float] = [0.8, 0.1, 0.1],
-    ):
+    ) -> os.PathLike:
         """
         Uses user's queries to create a probing task from uploaded conllu files
         Args:
