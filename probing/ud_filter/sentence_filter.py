@@ -42,7 +42,9 @@ class SentenceFilter:
         self.nodes_tokens: Dict[str, List[int]] = {}
         self.possible_token_pairs: Dict[Tuple[str, str], Set[Tuple[int, int]]] = {}
 
-    def token_match_node(self, token: models.Token, node_pattern: Dict[str, str]) -> bool:
+    def token_match_node(
+        self, token: models.Token, node_pattern: Dict[str, str]
+    ) -> bool:
         """Checks if a token matches the node_pattern"""
 
         for feat in node_pattern:
@@ -138,7 +140,9 @@ class SentenceFilter:
                 suitable_pairs.add(pair)
         return suitable_pairs
 
-    def pair_match_fconstraint(self, token_pair: Tuple[int, int], fconstraint: Dict[Any, Any]) -> bool:
+    def pair_match_fconstraint(
+        self, token_pair: Tuple[int, int], fconstraint: Dict[Any, Any]
+    ) -> bool:
         """Checks if a token pair matches all the feature constraints"""
         t1_feats = self.sentence[token_pair[0]]["feats"]
         t2_feats = self.sentence[token_pair[1]]["feats"]
