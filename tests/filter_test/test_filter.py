@@ -84,7 +84,7 @@ class TestSentenceFilter(unittest.TestCase):
     def test_pattern_relations(self):
         sent = self.trees_testfile[0]
         sf = SentenceFilter(sent)
-        sf.sent_deprels = sf.all_deprels(sf.sentence)
+        sf.sent_deprels = sf.all_deprels()
         patterns = [
             "nsubj(:.*)?",  # nsubj, nsubj:pass
             ".mod(:.*)?",  # amod, nmid:poss
@@ -107,7 +107,7 @@ class TestSentenceFilter(unittest.TestCase):
         sf.possible_token_pairs = {
             ("N", "M"): list(product(sf.nodes_tokens["N"], sf.nodes_tokens["M"]))
         }
-        sf.sent_deprels = sf.all_deprels(sf.sentence)
+        sf.sent_deprels = sf.all_deprels()
         sf.constraints = relpattern
 
         self.assertEqual(answer, sf.pairs_matching_relpattern(("N", "M")))
