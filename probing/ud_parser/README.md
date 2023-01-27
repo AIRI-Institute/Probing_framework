@@ -73,16 +73,16 @@ Category "Polarity" has only one class
 Category "Polite" has only one class
 Not enough data of category "PronType" for stratified split
 Category "VerbForm" has only one class
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Animacy.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Aspect.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Case.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Definite.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Gender.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Gender[psor].csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Number.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Number[psor].csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Person.csv
-Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Tense.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Animacy.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Aspect.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Case.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Definite.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Gender.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Gender[psor].csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Number.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Number[psor].csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Person.csv
+Writing to file: /home/jovyan/Probing_probing/tests/parser_test/hi_pud_no_sorting_Tense.csv
 ```
 
 
