@@ -50,4 +50,39 @@ There are several ways to generate files with different sorting mechanisms:
     ```python
     splitter = ConlluUDParser(sorting="by_pos_and_deprel")
     ```
+    
+    
+## Example
+```python
+from probing.ud_parser.ud_parser import ConlluUDParser
+
+splitter = ConlluUDParser()
+splitter.convert(tr_path="tests/parser_test/hi_pud-ud-test.conllu")
+```
+
+Output:
+```python
+In progress:
+tests/parser_test/hi_pud-ud-test.conllu
+17 categories were found
+Collecting data for no_sorting
+Category "Foreign" has only one class
+Not enough data of category "Mood" for stratified split
+Category "NumType" has only one class
+Category "Polarity" has only one class
+Category "Polite" has only one class
+Not enough data of category "PronType" for stratified split
+Category "VerbForm" has only one class
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Animacy.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Aspect.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Case.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Definite.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Gender.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Gender[psor].csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Number.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Number[psor].csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Person.csv
+Writing to file: /home/jovyan/katya/mdl_probing/tests/parser_test/hi_pud_no_sorting_Tense.csv
+```
+
 
