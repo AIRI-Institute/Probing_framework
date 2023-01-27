@@ -61,7 +61,7 @@ splitter.convert(tr_path="tests/parser_test/hi_pud-ud-test.conllu")
 ```
 
 Output:
-```python
+```
 In progress:
 tests/parser_test/hi_pud-ud-test.conllu
 17 categories were found
