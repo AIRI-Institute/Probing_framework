@@ -36,14 +36,16 @@ def subsamples_split(
         parts: {part: [[sentences], [labels]]}
     """
     num_classes = len(probing_dict.keys())
-    probing_data = [
-        (s, class_name)
-        for class_name, sentences in probing_dict.items()
-        if len(sentences) > num_classes
-        for s in sentences
-    ]
+    probing_data = []
+    for class_name, sentences in probing_dict.items():
+        if len(sentences) > num_classes:
+            for s in sentences:
+                probing_data.append((s, class_name))
+        else:
+            print(f'Class {class_name} has less sentences ({len(sentences)}) '
+                  f'than the number of classes ({num_classes}), so it is excluded.')
     if not probing_data:
-        raise Exception("Some class has less sentences than the number of classes")
+        raise Exception("All classes have less sentences than the number of classes")
     parts = {}
     data, labels = map(np.array, zip(*probing_data))
     X_train, X_test, y_train, y_test = train_test_split(

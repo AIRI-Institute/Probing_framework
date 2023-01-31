@@ -102,7 +102,6 @@ class SentenceFilter:
                 rel_pattern, rel, re.I
             ):  # changed from re.serach to re.fullmatch
                 rels.append(rel)
-        print(rels)
         return rels
 
     def pairs_with_rel(
