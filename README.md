@@ -14,7 +14,7 @@ bash cuda_install_requirements.sh
     splitter = ConlluUDParser()
 
     # You can provide a direct path to the folder with conllu files
-    splitter.convert(path_dir_conllu=<folder path>
+    splitter.convert(path_dir_conllu=<folder path>)
 
     # Or you can pass paths to each of three possible conllu files
     splitter.convert(tr_path=..., va_path=..., te_path=...)
@@ -48,7 +48,18 @@ bash cuda_install_requirements.sh
 
 ### Usage examples:
 Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_framework/tree/main/scripts) for the samples how to launch
+* __Jupyter__:
+    ```python3
+    from probing.pipeline import ProbingPipeline
 
+    experiment = ProbingPipeline(
+        hf_model_name="bert-base-uncased",
+        device="cuda:1",
+        classifier_name="logreg",
+        )
+
+    experiment.run(probe_task="sent_len")
+    ```
 
 * __Output__:
     ```
