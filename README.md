@@ -71,3 +71,6 @@ Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_fram
     Probing by layers: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 12/12 [04:04<00:00, 20.40s/it]
     Experiments were saved in folder:  /home/test/test/TEST/Probing_framework/results/sent_len_2022_02_18-05:51:47_PM
     ```
+
+# Article:
+- https://arxiv.org/abs/2210.13236

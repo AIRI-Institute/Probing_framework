@@ -1,19 +1,20 @@
 import os
 import typing
 from collections import Counter, defaultdict
-from typing import DefaultDict, Dict, List, Optional, Set, Tuple
+from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from probing.types import UDProbingTaskName
 from probing.utils import get_probe_task_path
 
 
 class TextFormer:
     def __init__(
         self,
-        probe_task: str,
+        probe_task: Union[UDProbingTaskName, str],
         data_path: Optional[os.PathLike] = None,
         shuffle: bool = True,
     ):

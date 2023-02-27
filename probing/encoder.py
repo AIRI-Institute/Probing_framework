@@ -1,6 +1,6 @@
-import gc
+import logging as info_logging
 import typing
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -10,8 +10,10 @@ from tqdm import tqdm
 from transformers import AutoConfig, AutoModel, AutoTokenizer
 from transformers.utils import logging
 
+from probing.cacher import Cacher
 from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
-from probing.utils import exclude_rows
+from probing.types import AggregationName, AggregationType
+from probing.utils import clear_memory
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
@@ -51,7 +53,7 @@ class TransformersLoader:
             else None
         )
 
-        self.cache: Dict[str, torch.Tensor] = {}
+        self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
         self.truncation = truncation
         self.padding = padding
         self.return_tensors = return_tensors
@@ -86,33 +88,6 @@ class TransformersLoader:
         else:
             self.device = None
 
-    def check_cache_ids(self, input_ids: torch.Tensor) -> Tuple[List[int], List[int]]:
-        in_cache_ids = []
-        out_cache_ids = []
-        for i, element in enumerate(input_ids):
-            text = self.tokenizer.decode(element)
-            if text in self.cache:
-                in_cache_ids.append(i)
-            else:
-                out_cache_ids.append(i)
-        return in_cache_ids, out_cache_ids
-
-    def add_to_cache(
-        self, input_ids_new: torch.Tensor, model_output_tensors_new: torch.Tensor
-    ) -> None:
-        for input_ids, out_cache_tensor in zip(input_ids_new, model_output_tensors_new):
-            input_ids_unpad = input_ids
-            decoded_text = self.tokenizer.decode(input_ids_unpad)
-            self.cache[decoded_text] = torch.unsqueeze(out_cache_tensor, 0)
-
-    def get_from_cache(self, input_ids_cached: torch.Tensor) -> List[torch.Tensor]:
-        cached_tensors_list = []
-        for input_ids in input_ids_cached:
-            input_ids_unpad = input_ids
-            decoded_text = self.tokenizer.decode(input_ids_unpad)
-            cached_tensors_list.append(self.cache[decoded_text])
-        return cached_tensors_list
-
     def tokenize_text(self, text: Union[str, List[str]]) -> torch.Tensor:
         tokenized_text = self.tokenizer(
             text,
@@ -122,6 +97,27 @@ class TransformersLoader:
             truncation=self.truncation,
         )
         return tokenized_text
+
+    def exclude_rows(
+        self, tensor: torch.Tensor, rows_to_exclude: torch.Tensor
+    ) -> torch.Tensor:
+        if len(tensor.size()) == 1:
+            tensor = tensor.view(-1, 1)
+
+        tensor_shape = tensor.size()
+        assert len(tensor_shape) == 2
+        tensor = tensor.view(*tensor_shape, 1)
+
+        mask = torch.ones(tensor_shape, dtype=torch.bool)
+        mask[rows_to_exclude, :] = False
+        new_num_rows = tensor_shape[0] - len(rows_to_exclude)
+        if new_num_rows == 0:
+            info_logging.warning(
+                "All samples were excluded due to long sentences truncation"
+            )
+            return tensor[mask]
+        output = tensor[mask].view(new_num_rows, -1)
+        return output
 
     @typing.no_type_check
     def _fix_tokenized_tensors(
@@ -142,10 +138,10 @@ class TransformersLoader:
             if isinstance(row_ids_to_exclude, tuple):
                 row_ids_to_exclude = row_ids_to_exclude[0]
 
-            input_ids = exclude_rows(input_ids, row_ids_to_exclude)[
+            input_ids = self.exclude_rows(input_ids, row_ids_to_exclude)[
                 :, : self.model_max_length
             ]
-            attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[
+            attention_mask = self.exclude_rows(attention_mask, row_ids_to_exclude)[
                 :, : self.model_max_length
             ]
             row_ids_to_exclude = row_ids_to_exclude.tolist()
@@ -154,26 +150,28 @@ class TransformersLoader:
         return input_ids, attention_mask, row_ids_to_exclude
 
     def _get_embeddings_by_layers(
-        self, model_outputs: Tuple[torch.Tensor], embedding_type: str
+        self,
+        model_outputs: Tuple[torch.Tensor],
+        aggregation_embeddings: AggregationName,
     ) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:  # type: ignore
-            if embedding_type == "cls":
+            if aggregation_embeddings == AggregationType.cls:
                 sent_vector = output[:, 0, :]  # type: ignore
-            elif embedding_type == "sum":
+            elif aggregation_embeddings == AggregationType.sum:
                 sent_vector = torch.sum(output, dim=1)
-            elif embedding_type == "avg":
+            elif aggregation_embeddings == AggregationType.avg:
                 sent_vector = torch.mean(output, dim=1)
             else:
                 raise NotImplementedError(
-                    f"Unknown type of embedding's aggregation: {embedding_type}"
+                    f"Unknown type of embedding's aggregation: {aggregation_embeddings}"
                 )
             layers_outputs.append(sent_vector)
         return layers_outputs
 
     def get_tokenized_datasets(
-        self, task_dataset: Dict[str, np.ndarray]
-    ) -> Dict[str, TokenizedVectorFormer]:
+        self, task_dataset: Dict[Literal["tr", "va", "te"], np.ndarray]
+    ) -> Dict[Literal["tr", "va", "te"], TokenizedVectorFormer]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
@@ -216,7 +214,7 @@ class TransformersLoader:
                 {
                     "input_ids": input_ids,
                     "attention_mask": attention_mask,
-                    "labels": exclude_rows(
+                    "labels": self.exclude_rows(
                         torch.tensor(labels), row_ids_to_exclude
                     ).view(-1),
                 }
@@ -231,7 +229,7 @@ class TransformersLoader:
         self,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
-        embedding_type: str,
+        aggregation_embeddings: AggregationName,
     ) -> List[torch.Tensor]:
         if hasattr(self.model, "encoder") and hasattr(self.model, "decoder"):
             # In case of encoder-decoder model, for embeddings we use only encoder
@@ -254,15 +252,15 @@ class TransformersLoader:
             else model_outputs["encoder_hidden_states"]
         )
         layers_outputs = self._get_embeddings_by_layers(
-            model_outputs, embedding_type=embedding_type
+            model_outputs, aggregation_embeddings=aggregation_embeddings
         )
         return layers_outputs
 
     def encode_data(
         self,
         data: DataLoader,
-        stage: str,
-        embedding_type: str,
+        stage: Literal["tr", "va", "te"],
+        aggregation_embeddings: AggregationName,
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:
@@ -270,8 +268,7 @@ class TransformersLoader:
         labels_list = []
 
         self.model.eval()
-        torch.cuda.empty_cache()
-        gc.collect()
+        clear_memory()
         with torch.no_grad():
             iter_data = (
                 tqdm(data, total=len(data), desc=f"Data encoding {stage}")
@@ -279,7 +276,9 @@ class TransformersLoader:
                 else data
             )
             for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
-                in_cache_ids, out_cache_ids = self.check_cache_ids(batch_input_ids)
+                in_cache_ids, out_cache_ids = self.Caching.check_cache_ids(
+                    batch_input_ids
+                )
                 input_ids_out = batch_input_ids[out_cache_ids].to(
                     self.device, non_blocking=True
                 )
@@ -298,7 +297,7 @@ class TransformersLoader:
 
                 if len(input_ids_out):
                     layers_outputs = self.model_layers_forward(
-                        input_ids_out, attention_mask_out, embedding_type
+                        input_ids_out, attention_mask_out, aggregation_embeddings
                     )
                     encoded_batch_text_tensor = torch.stack(layers_outputs)
                     out_cache_encoded_batch_vectors = encoded_batch_text_tensor.permute(
@@ -306,14 +305,14 @@ class TransformersLoader:
                     )
 
                     # add to cache
-                    self.add_to_cache(
+                    self.Caching.add_to_cache(
                         input_ids_out, out_cache_encoded_batch_vectors.cpu()
                     )
                 else:
                     out_cache_encoded_batch_vectors = torch.Tensor()
 
                 # get from cache
-                cached_tensors_list = self.get_from_cache(input_ids_in)
+                cached_tensors_list = self.Caching.get_from_cache(input_ids_in)
 
                 if len(cached_tensors_list):
                     cached_tensors = torch.cat(cached_tensors_list).to(
@@ -340,14 +339,14 @@ class TransformersLoader:
 
     def get_encoded_dataloaders(
         self,
-        task_dataset: Dict[str, np.ndarray],
+        task_dataset: Dict[Literal["tr", "va", "te"], np.ndarray],
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
-        embedding_type: str = "cls",
+        aggregation_embeddings: AggregationName = AggregationType.cls,
         verbose: bool = True,
         do_control_task: bool = False,
-    ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
+    ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
         if self.tokenizer.model_max_length > self.model_max_length:
             logger.warning(
                 f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
@@ -355,7 +354,7 @@ class TransformersLoader:
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
-        for stage in tokenized_datasets.keys():
+        for stage, _ in tokenized_datasets.items():
             stage_dataloader_tokenized = DataLoader(
                 tokenized_datasets[stage], batch_size=encoding_batch_size
             )
@@ -363,7 +362,7 @@ class TransformersLoader:
             stage_encoded_data = self.encode_data(
                 stage_dataloader_tokenized,
                 stage,
-                embedding_type,
+                aggregation_embeddings,
                 verbose,
                 do_control_task=do_control_task,
             )
