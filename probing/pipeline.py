@@ -23,6 +23,7 @@ from probing.types import (
     MetricType,
     ProbingName,
     ProbingType,
+    UDProbingTaskName,
 )
 from probing.utils import KL_Loss, ProbingLog, clear_memory, lang_category_extraction
 
@@ -142,7 +143,7 @@ class ProbingPipeline:
 
     def run(
         self,
-        probe_task: str,
+        probe_task: Union[UDProbingTaskName, str],
         path_to_task_file: Optional[os.PathLike] = None,
         train_epochs: int = 10,
         is_scheduler: bool = False,
@@ -208,7 +209,7 @@ class ProbingPipeline:
             ).to(self.transformer_model.device)
 
             loss_func = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
-            if self.classifier == "mdl":
+            if self.classifier == ClassifierType.mdl:
                 self.criterion = KL_Loss(loss=loss_func)
             else:
                 self.criterion = loss_func
