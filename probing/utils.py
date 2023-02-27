@@ -5,7 +5,7 @@ import os
 import pathlib
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import numpy as np
 import torch
@@ -13,7 +13,7 @@ import torch
 from probing import config
 
 
-def clear_memory():
+def clear_memory() -> None:
     torch.cuda.empty_cache()
     gc.collect()
 

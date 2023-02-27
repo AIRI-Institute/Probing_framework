@@ -1,7 +1,7 @@
 import os
 import typing
 from collections import Counter, defaultdict
-from typing import DefaultDict, Dict, List, Optional, Set, Tuple
+from typing import DefaultDict, Dict, Optional, Set, Tuple
 
 import numpy as np
 import torch
