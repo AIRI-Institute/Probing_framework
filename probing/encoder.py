@@ -265,7 +265,7 @@ class TransformersLoader:
         self,
         data: DataLoader,
         stage: str,
-        aggregation_embeddings: str,
+        aggregation_embeddings: AggregationName,
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:

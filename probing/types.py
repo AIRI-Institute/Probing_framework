@@ -25,7 +25,7 @@ class AggregationType(str, Enum):
 
 MetricName = Literal[MetricType.accuracy, MetricType.f1]
 ClassifierName = Literal[
-    ClassifierType.logreg, ClassifierType.mlp, ClassifierType.mdlClassifierType
+    ClassifierType.logreg, ClassifierType.mlp, ClassifierType.mdl
 ]
 ProbingName = Literal[ProbingType.layerwise]
 AggregationName = Literal[AggregationType.cls, AggregationType.sum, AggregationType.avg]
