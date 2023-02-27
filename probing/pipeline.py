@@ -15,6 +15,16 @@ from probing.classifier import MLP, LogReg, MDLLinearModel
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
+from probing.types import (
+    AggregationName,
+    AggregationType,
+    ClassifierName,
+    ClassifierType,
+    MetricName,
+    MetricType,
+    ProbingName,
+    ProbingType,
+)
 from probing.utils import KL_Loss, ProbingLog, lang_category_extraction, save_log
 
 logging.set_verbosity_warning()
@@ -25,11 +35,11 @@ class ProbingPipeline:
     def __init__(
         self,
         hf_model_name: Optional[str] = None,
-        probing_type: Optional[str] = "layer",
+        probing_type: Optional[ProbingName] = ProbingType.layerwise,
         device: Optional[str] = None,
-        classifier_name: str = "logreg",
-        metric_names: Union[str, List[str]] = "f1",
-        embedding_type: str = "cls",
+        classifier_name: ClassifierName = ClassifierType.logreg,
+        metric_names: Union[MetricName, List[MetricName]] = MetricType.f1,
+        aggregation_embeddings: AggregationName = AggregationType.cls,
         encoding_batch_size: int = 32,
         classifier_batch_size: int = 64,
         dropout_rate: float = 0.2,
@@ -45,7 +55,7 @@ class ProbingPipeline:
         self.dropout_rate = dropout_rate
         self.hidden_size = hidden_size
         self.classifier_name = classifier_name
-        self.embedding_type = embedding_type
+        self.aggregation_embeddings = aggregation_embeddings
 
         self.metric_names = (
             metric_names if isinstance(metric_names, list) else [metric_names]
@@ -128,7 +138,7 @@ class ProbingPipeline:
                 epoch_predictions += prediction.cpu().data.max(1).indices
                 epoch_true_labels += y.cpu()
 
-        epoch_metric_score = self.metrics(epoch_predictions, epoch_true_labels)
+        epoch_metric_score = self.metrics.compute(epoch_predictions, epoch_true_labels)
         epoch_loss = np.mean(epoch_losses)
         return epoch_loss, epoch_metric_score
 
@@ -177,7 +187,7 @@ class ProbingPipeline:
             self.encoding_batch_size,
             self.classifier_batch_size,
             self.shuffle,
-            self.embedding_type,
+            self.aggregation_embeddings,
             verbose,
             do_control_task=do_control_task,
         )

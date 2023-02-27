@@ -11,6 +11,7 @@ from transformers import AutoConfig, AutoModel, AutoTokenizer
 from transformers.utils import logging
 
 from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
+from probing.types import AggregationName, AggregationType
 from probing.utils import exclude_rows
 
 logging.set_verbosity_warning()
@@ -154,19 +155,21 @@ class TransformersLoader:
         return input_ids, attention_mask, row_ids_to_exclude
 
     def _get_embeddings_by_layers(
-        self, model_outputs: Tuple[torch.Tensor], embedding_type: str
+        self,
+        model_outputs: Tuple[torch.Tensor],
+        aggregation_embeddings: AggregationName,
     ) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:  # type: ignore
-            if embedding_type == "cls":
+            if aggregation_embeddings == AggregationType.cls:
                 sent_vector = output[:, 0, :]  # type: ignore
-            elif embedding_type == "sum":
+            elif aggregation_embeddings == AggregationType.sum:
                 sent_vector = torch.sum(output, dim=1)
-            elif embedding_type == "avg":
+            elif aggregation_embeddings == AggregationType.avg:
                 sent_vector = torch.mean(output, dim=1)
             else:
                 raise NotImplementedError(
-                    f"Unknown type of embedding's aggregation: {embedding_type}"
+                    f"Unknown type of embedding's aggregation: {aggregation_embeddings}"
                 )
             layers_outputs.append(sent_vector)
         return layers_outputs
@@ -231,7 +234,7 @@ class TransformersLoader:
         self,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
-        embedding_type: str,
+        aggregation_embeddings: str,
     ) -> List[torch.Tensor]:
         if hasattr(self.model, "encoder") and hasattr(self.model, "decoder"):
             # In case of encoder-decoder model, for embeddings we use only encoder
@@ -254,7 +257,7 @@ class TransformersLoader:
             else model_outputs["encoder_hidden_states"]
         )
         layers_outputs = self._get_embeddings_by_layers(
-            model_outputs, embedding_type=embedding_type
+            model_outputs, aggregation_embeddings=aggregation_embeddings
         )
         return layers_outputs
 
@@ -262,7 +265,7 @@ class TransformersLoader:
         self,
         data: DataLoader,
         stage: str,
-        embedding_type: str,
+        aggregation_embeddings: str,
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:
@@ -298,7 +301,7 @@ class TransformersLoader:
 
                 if len(input_ids_out):
                     layers_outputs = self.model_layers_forward(
-                        input_ids_out, attention_mask_out, embedding_type
+                        input_ids_out, attention_mask_out, aggregation_embeddings
                     )
                     encoded_batch_text_tensor = torch.stack(layers_outputs)
                     out_cache_encoded_batch_vectors = encoded_batch_text_tensor.permute(
@@ -344,7 +347,7 @@ class TransformersLoader:
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
-        embedding_type: str = "cls",
+        aggregation_embeddings: str = "cls",
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
@@ -363,7 +366,7 @@ class TransformersLoader:
             stage_encoded_data = self.encode_data(
                 stage_dataloader_tokenized,
                 stage,
-                embedding_type,
+                aggregation_embeddings,
                 verbose,
                 do_control_task=do_control_task,
             )
