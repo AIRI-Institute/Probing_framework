@@ -7,8 +7,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from probing.utils import get_probe_task_path
 from probing.types import UDProbingTaskName
+from probing.utils import get_probe_task_path
 
 
 class TextFormer:
