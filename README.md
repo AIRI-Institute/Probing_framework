@@ -72,5 +72,5 @@ Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_fram
     Experiments were saved in folder:  /home/test/test/TEST/Probing_framework/results/sent_len_2022_02_18-05:51:47_PM
     ```
 
-# Article:
-- https://arxiv.org/abs/2210.13236
+# Our article:
+You can cite our framework, this is our article: https://arxiv.org/abs/2210.13236
