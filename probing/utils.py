@@ -51,6 +51,10 @@ def lang_category_extraction(
 class ProbingLog(defaultdict):
     def __init__(self, *args, **kwargs):
         super(ProbingLog, self).__init__(ProbingLog, *args, **kwargs)
+        self.start_time = ProbingLog.get_time()
+        self.results_folder = pathlib.Path(
+            config.HOME_PATH, f"probing_results/experiment_{self.start_time}"
+        )
 
     def __repr__(self):
         return repr(dict(self))
@@ -59,6 +63,10 @@ class ProbingLog(defaultdict):
         if key not in self:
             self[key] = []
         self[key].append(value)
+
+    @staticmethod
+    def get_time() -> str:
+        return datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
 
     @staticmethod
     def myconverter(obj: Any) -> Any:
@@ -75,9 +83,9 @@ class ProbingLog(defaultdict):
         return obj
 
     def save_log(self, probe_task: str) -> os.PathLike:
-        saving_date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
+        saving_date = ProbingLog.get_time()
         experiments_path = pathlib.Path(
-            config.results_folder, f"{saving_date}_{probe_task}"
+            self.results_folder, f"{saving_date}_{probe_task}"
         )
         if not probe_task.startswith("test_"):
             os.makedirs(experiments_path, exist_ok=True)
