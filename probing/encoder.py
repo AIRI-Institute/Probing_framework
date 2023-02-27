@@ -1,6 +1,6 @@
 import logging as info_logging
 import typing
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -52,7 +52,7 @@ class TransformersLoader:
             else None
         )
 
-        self.cache: Dict[str, torch.Tensor] = {}
+        self.Caching = Caching(tokenizer=self.tokenizer, cache={})
         self.truncation = truncation
         self.padding = padding
         self.return_tensors = return_tensors
@@ -86,33 +86,6 @@ class TransformersLoader:
                 self.model.to(torch.device(self.device))
         else:
             self.device = None
-
-    def check_cache_ids(self, input_ids: torch.Tensor) -> Tuple[List[int], List[int]]:
-        in_cache_ids = []
-        out_cache_ids = []
-        for i, element in enumerate(input_ids):
-            text = self.tokenizer.decode(element)
-            if text in self.cache:
-                in_cache_ids.append(i)
-            else:
-                out_cache_ids.append(i)
-        return in_cache_ids, out_cache_ids
-
-    def add_to_cache(
-        self, input_ids_new: torch.Tensor, model_output_tensors_new: torch.Tensor
-    ) -> None:
-        for input_ids, out_cache_tensor in zip(input_ids_new, model_output_tensors_new):
-            input_ids_unpad = input_ids
-            decoded_text = self.tokenizer.decode(input_ids_unpad)
-            self.cache[decoded_text] = torch.unsqueeze(out_cache_tensor, 0)
-
-    def get_from_cache(self, input_ids_cached: torch.Tensor) -> List[torch.Tensor]:
-        cached_tensors_list = []
-        for input_ids in input_ids_cached:
-            input_ids_unpad = input_ids
-            decoded_text = self.tokenizer.decode(input_ids_unpad)
-            cached_tensors_list.append(self.cache[decoded_text])
-        return cached_tensors_list
 
     def tokenize_text(self, text: Union[str, List[str]]) -> torch.Tensor:
         tokenized_text = self.tokenizer(
@@ -302,7 +275,9 @@ class TransformersLoader:
                 else data
             )
             for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
-                in_cache_ids, out_cache_ids = self.check_cache_ids(batch_input_ids)
+                in_cache_ids, out_cache_ids = self.Caching.check_cache_ids(
+                    batch_input_ids
+                )
                 input_ids_out = batch_input_ids[out_cache_ids].to(
                     self.device, non_blocking=True
                 )
@@ -329,14 +304,14 @@ class TransformersLoader:
                     )
 
                     # add to cache
-                    self.add_to_cache(
+                    self.Caching.add_to_cache(
                         input_ids_out, out_cache_encoded_batch_vectors.cpu()
                     )
                 else:
                     out_cache_encoded_batch_vectors = torch.Tensor()
 
                 # get from cache
-                cached_tensors_list = self.get_from_cache(input_ids_in)
+                cached_tensors_list = self.Caching.get_from_cache(input_ids_in)
 
                 if len(cached_tensors_list):
                     cached_tensors = torch.cat(cached_tensors_list).to(
@@ -395,3 +370,36 @@ class TransformersLoader:
                 stage_encoded_data, batch_size=classifier_batch_size, shuffle=shuffle
             )
         return encoded_dataloaders, tokenized_datasets["tr"].mapped_labels  # type: ignore
+
+
+class Caching:
+    def __init__(self, tokenizer: Any, cache: Dict[str, torch.Tensor]):
+        self.tokenizer = tokenizer
+        self.cache = cache
+
+    def check_cache_ids(self, input_ids: torch.Tensor) -> Tuple[List[int], List[int]]:
+        in_cache_ids = []
+        out_cache_ids = []
+        for i, element in enumerate(input_ids):
+            text = self.tokenizer.decode(element)
+            if text in self.cache:
+                in_cache_ids.append(i)
+            else:
+                out_cache_ids.append(i)
+        return in_cache_ids, out_cache_ids
+
+    def add_to_cache(
+        self, input_ids_new: torch.Tensor, model_output_tensors_new: torch.Tensor
+    ) -> None:
+        for input_ids, out_cache_tensor in zip(input_ids_new, model_output_tensors_new):
+            input_ids_unpad = input_ids
+            decoded_text = self.tokenizer.decode(input_ids_unpad)
+            self.cache[decoded_text] = torch.unsqueeze(out_cache_tensor, 0)
+
+    def get_from_cache(self, input_ids_cached: torch.Tensor) -> List[torch.Tensor]:
+        cached_tensors_list = []
+        for input_ids in input_ids_cached:
+            input_ids_unpad = input_ids
+            decoded_text = self.tokenizer.decode(input_ids_unpad)
+            cached_tensors_list.append(self.cache[decoded_text])
+        return cached_tensors_list
