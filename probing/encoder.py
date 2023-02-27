@@ -1,4 +1,3 @@
-import gc
 import logging as info_logging
 import typing
 from typing import Dict, List, Literal, Optional, Tuple, Union

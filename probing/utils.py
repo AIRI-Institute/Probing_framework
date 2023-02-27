@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+import gc
 import pathlib
 from collections import defaultdict
 from datetime import datetime

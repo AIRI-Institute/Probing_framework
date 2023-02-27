@@ -1,4 +1,3 @@
-import gc
 import os
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
