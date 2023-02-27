@@ -343,7 +343,7 @@ class TransformersLoader:
 
     def get_encoded_dataloaders(
         self,
-        task_dataset: Dict[str, np.ndarray],
+        task_dataset: Dict[Literal["tr", "va", "te"], np.ndarray],
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,

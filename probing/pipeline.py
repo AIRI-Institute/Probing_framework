@@ -113,7 +113,7 @@ class ProbingPipeline:
 
     def evaluate(
         self, dataloader: DataLoader, layer: int, save_checkpoints: bool = False
-    ) -> Tuple[List[float], Dict[str, float]]:
+    ) -> Tuple[List[float], Dict[MetricName, float]]:
         epoch_losses = []
         epoch_predictions = []
         epoch_true_labels = []
