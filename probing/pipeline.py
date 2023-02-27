@@ -25,7 +25,7 @@ from probing.types import (
     ProbingName,
     ProbingType,
 )
-from probing.utils import KL_Loss, ProbingLog, lang_category_extraction
+from probing.utils import KL_Loss, ProbingLog, clear_memory, lang_category_extraction
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
@@ -175,8 +175,7 @@ class ProbingPipeline:
                 f"Task in progress: {probe_task}\nPath to data: {task_data.data_path}"
             )
 
-        torch.cuda.empty_cache()
-        gc.collect()
+        clear_memory()
         start_time = time()
         (
             probing_dataloaders,

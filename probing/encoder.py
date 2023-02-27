@@ -13,6 +13,7 @@ from transformers.utils import logging
 
 from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
 from probing.types import AggregationName, AggregationType
+from probing.utils import clear_memory
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
@@ -294,8 +295,7 @@ class TransformersLoader:
         labels_list = []
 
         self.model.eval()
-        torch.cuda.empty_cache()
-        gc.collect()
+        clear_memory()
         with torch.no_grad():
             iter_data = (
                 tqdm(data, total=len(data), desc=f"Data encoding {stage}")

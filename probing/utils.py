@@ -12,6 +12,11 @@ import torch
 from probing import config
 
 
+def clear_memory():
+    torch.cuda.empty_cache()
+    gc.collect()
+
+
 def get_probe_task_path(
     probe_task_name: str, file_path: Optional[os.PathLike] = None
 ) -> os.PathLike:
