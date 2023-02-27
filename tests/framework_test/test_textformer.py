@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from probing.config import data_folder
+from probing.config import DATA_FOLDER_PATH
 from probing.data_former import TextFormer
 
 
@@ -41,8 +41,8 @@ class TestTextFormer(unittest.TestCase):
         task_name = "sent_len"
         data = TextFormer(probe_task=task_name)
         task_path = Path(data.data_path)
-        self.assertEqual(task_path.parent, data_folder)
-        self.assertEqual(task_path, Path(data_folder, f"{task_name}.txt"))
+        self.assertEqual(task_path.parent, DATA_FOLDER_PATH)
+        self.assertEqual(task_path, Path(DATA_FOLDER_PATH, f"{task_name}.txt"))
 
     def test_unique_labels(self):
         task_name = "test_sent_len"
