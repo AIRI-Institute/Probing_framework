@@ -67,7 +67,7 @@ class ProbingPipeline:
         self.criterion: Any = None
 
     def get_classifier(
-        self, classifier_name: str, num_classes: int, embed_dim: int
+        self, classifier_name: MetricName, num_classes: int, embed_dim: int
     ) -> Union[LogReg, MLP, MDLLinearModel]:
         if classifier_name == "logreg":
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
