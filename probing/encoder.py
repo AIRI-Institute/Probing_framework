@@ -358,7 +358,7 @@ class TransformersLoader:
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
-        for stage in tokenized_datasets.keys():
+        for stage, _ in tokenized_datasets.items():
             stage_dataloader_tokenized = DataLoader(
                 tokenized_datasets[stage], batch_size=encoding_batch_size
             )

@@ -27,7 +27,7 @@ def get_probe_task_path(
             )
         return pathlib.Path(path_to_file[0])
 
-    elif not os.path.exists(file_path):
+    if not os.path.exists(file_path):
         raise RuntimeError(f"Provided path: {file_path} doesn't exist")
     return file_path
 
@@ -35,13 +35,13 @@ def get_probe_task_path(
 def myconverter(obj: Any) -> Any:
     if isinstance(obj, np.integer):
         return int(obj)
-    elif isinstance(obj, np.floating):
+    if isinstance(obj, np.floating):
         return float(obj)
-    elif isinstance(obj, np.ndarray):
+    if isinstance(obj, np.ndarray):
         return obj.tolist()
-    elif isinstance(obj, datetime):
+    if isinstance(obj, datetime):
         return obj.__str__()
-    elif isinstance(obj, pathlib.PosixPath):
+    if isinstance(obj, pathlib.PosixPath):
         return obj.__str__()
     return obj
 
@@ -82,7 +82,7 @@ def exclude_rows(tensor: torch.Tensor, rows_to_exclude: torch.Tensor) -> torch.T
     mask[rows_to_exclude, :] = False
     new_num_rows = tensor_shape[0] - len(rows_to_exclude)
     if new_num_rows == 0:
-        logging.warning(f"All samples were excluded due to long sentences truncation")
+        logging.warning("All samples were excluded due to long sentences truncation")
         return tensor[mask]
     output = tensor[mask].view(new_num_rows, -1)
     return output
