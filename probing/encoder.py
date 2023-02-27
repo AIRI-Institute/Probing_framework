@@ -175,8 +175,8 @@ class TransformersLoader:
         return layers_outputs
 
     def get_tokenized_datasets(
-        self, task_dataset: Dict[str, np.ndarray]
-    ) -> Dict[str, TokenizedVectorFormer]:
+        self, task_dataset: Dict[Literal["tr", "va", "te"], np.ndarray]
+    ) -> Dict[Literal["tr", "va", "te"], TokenizedVectorFormer]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
@@ -350,7 +350,7 @@ class TransformersLoader:
         aggregation_embeddings: AggregationName = AggregationType.cls,
         verbose: bool = True,
         do_control_task: bool = False,
-    ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
+    ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
         if self.tokenizer.model_max_length > self.model_max_length:
             logger.warning(
                 f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
