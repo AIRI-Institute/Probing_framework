@@ -1,28 +1,31 @@
 from enum import Enum
 from typing import Literal
 
-MetricName = Literal["accuracy", "f1"]
-ClassifierName = Literal["logreg", "mlp", "mdl"]
-ProbingName = Literal["layerwise"]
-AggregationName = Literal["cls", "sum", "avg"]
-
 
 class MetricType(str, Enum):
-    accuracy: MetricName = "accuracy"
-    f1: MetricName = "f1"
+    accuracy = "accuracy"
+    f1 = "f1"
 
 
 class ClassifierType(str, Enum):
-    logreg: ClassifierName = "logreg"
-    mlp: ClassifierName = "mlp"
-    mdl: ClassifierName = "mdl"
+    logreg = "logreg"
+    mlp = "mlp"
+    mdl = "mdl"
 
 
 class ProbingType(str, Enum):
-    layerwise: ProbingName = "layerwise"
+    layerwise = "layerwise"
 
 
 class AggregationType(str, Enum):
-    cls: AggregationName = "cls"
-    sum: AggregationName = "sum"
-    avg: AggregationName = "avg"
+    cls = "cls"
+    sum = "sum"
+    avg = "avg"
+
+
+MetricName = Literal[MetricType.accuracy, MetricType.f1]
+ClassifierName = Literal[
+    ClassifierType.logreg, ClassifierType.mlp, ClassifierType.mdlClassifierType
+]
+ProbingName = Literal[ProbingType.layerwise]
+AggregationName = Literal[AggregationType.cls, AggregationType.sum, AggregationType.avg]
