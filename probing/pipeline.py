@@ -67,18 +67,18 @@ class ProbingPipeline:
         self.criterion: Any = None
 
     def get_classifier(
-        self, classifier_name: MetricName, num_classes: int, embed_dim: int
+        self, classifier_name: ClassifierName, num_classes: int, embed_dim: int
     ) -> Union[LogReg, MLP, MDLLinearModel]:
-        if classifier_name == MetricType.logreg:
+        if classifier_name == ClassifierType.logreg:
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
-        elif classifier_name == MetricType.mlp:
+        elif classifier_name == ClassifierType.mlp:
             return MLP(
                 input_dim=embed_dim,
                 num_classes=num_classes,
                 hidden_size=self.hidden_size,
                 dropout_rate=self.dropout_rate,
             )
-        elif classifier_name == MetricType.mdl:
+        elif classifier_name == ClassifierType.mdl:
             return MDLLinearModel(
                 input_dim=embed_dim,
                 num_classes=num_classes,
