@@ -1,6 +1,6 @@
 import gc
 import typing
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -264,7 +264,7 @@ class TransformersLoader:
     def encode_data(
         self,
         data: DataLoader,
-        stage: str,
+        stage: Literal["tr", "va", "te"],
         aggregation_embeddings: AggregationName,
         verbose: bool,
         do_control_task: bool = False,
@@ -347,7 +347,7 @@ class TransformersLoader:
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
-        aggregation_embeddings: str = "cls",
+        aggregation_embeddings: AggregationName = AggregationType.cls,
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[str, DataLoader], Dict[str, int]]:
