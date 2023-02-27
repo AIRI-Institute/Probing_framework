@@ -25,7 +25,7 @@ from probing.types import (
     ProbingName,
     ProbingType,
 )
-from probing.utils import KL_Loss, ProbingLog, lang_category_extraction, save_log
+from probing.utils import KL_Loss, ProbingLog, lang_category_extraction
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
@@ -248,6 +248,6 @@ class ProbingPipeline:
                 log_info["results"]["test_score"][m].add(layer, epoch_test_score[m])
 
         log_info["results"]["elapsed_time(sec)"] = time() - start_time
-        output_path = str(save_log(log_info, probe_task))
+        output_path = log_info.save_log(probe_task)
         if verbose:
-            print(f"Experiments were saved in the folder: {output_path}")
+            print(f"Experiments were saved in the folder: {str(output_path)}")

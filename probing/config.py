@@ -1,9 +1,9 @@
 from datetime import datetime
 from pathlib import Path
 
-home_path = Path(__file__).resolve().parent.parent
-data_folder = Path(home_path, "data/")
+HOME_PATH = Path(__file__).resolve().parent.parent
+DATA_FOLDER_PATH = Path(HOME_PATH, "data/")
 
 date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
 MAIN_RES_FOLDER = "results"
-results_folder = Path(home_path, MAIN_RES_FOLDER, f"experiment_{date}")
+results_folder = Path(HOME_PATH, MAIN_RES_FOLDER, f"experiment_{date}")

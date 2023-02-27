@@ -1,6 +1,5 @@
 import glob
 import json
-import logging
 import os
 import pathlib
 from collections import defaultdict
@@ -17,7 +16,7 @@ def get_probe_task_path(
     probe_task_name: str, file_path: Optional[os.PathLike] = None
 ) -> os.PathLike:
     if file_path is None:
-        path_to_folder = pathlib.Path(config.data_folder, probe_task_name)
+        path_to_folder = pathlib.Path(config.DATA_FOLDER_PATH, probe_task_name)
         path_to_file = glob.glob(f"{path_to_folder}*")
 
         if len(path_to_file) == 0:
@@ -32,33 +31,6 @@ def get_probe_task_path(
     return file_path
 
 
-def myconverter(obj: Any) -> Any:
-    if isinstance(obj, np.integer):
-        return int(obj)
-    if isinstance(obj, np.floating):
-        return float(obj)
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    if isinstance(obj, datetime):
-        return obj.__str__()
-    if isinstance(obj, pathlib.PosixPath):
-        return obj.__str__()
-    return obj
-
-
-def save_log(log: Dict, probe_task: str) -> os.PathLike:
-    log_file_name = "log.json"
-    date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
-    experiments_path = pathlib.Path(config.results_folder, f"{date}_{probe_task}")
-    if not probe_task.startswith("test_"):
-        os.makedirs(experiments_path, exist_ok=True)
-        log_path = pathlib.Path(experiments_path, log_file_name)
-
-        with open(log_path, "w") as outfile:
-            json.dump(log, outfile, indent=4, default=myconverter)
-    return experiments_path
-
-
 def lang_category_extraction(
     file_path: os.PathLike,
 ) -> Tuple[Optional[str], Optional[str]]:
@@ -68,24 +40,6 @@ def lang_category_extraction(
         task_category = path.split("_")[-1]
         return task_language, task_category
     return None, None
-
-
-def exclude_rows(tensor: torch.Tensor, rows_to_exclude: torch.Tensor) -> torch.Tensor:
-    if len(tensor.size()) == 1:
-        tensor = tensor.view(-1, 1)
-
-    tensor_shape = tensor.size()
-    assert len(tensor_shape) == 2
-    tensor = tensor.view(*tensor_shape, 1)
-
-    mask = torch.ones(tensor_shape, dtype=torch.bool)
-    mask[rows_to_exclude, :] = False
-    new_num_rows = tensor_shape[0] - len(rows_to_exclude)
-    if new_num_rows == 0:
-        logging.warning("All samples were excluded due to long sentences truncation")
-        return tensor[mask]
-    output = tensor[mask].view(new_num_rows, -1)
-    return output
 
 
 class ProbingLog(defaultdict):
@@ -99,6 +53,33 @@ class ProbingLog(defaultdict):
         if key not in self:
             self[key] = []
         self[key].append(value)
+
+    @staticmethod
+    def myconverter(obj: Any) -> Any:
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, datetime):
+            return obj.__str__()
+        if isinstance(obj, pathlib.PosixPath):
+            return obj.__str__()
+        return obj
+
+    def save_log(self, probe_task: str) -> os.PathLike:
+        saving_date = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
+        experiments_path = pathlib.Path(
+            config.results_folder, f"{saving_date}_{probe_task}"
+        )
+        if not probe_task.startswith("test_"):
+            os.makedirs(experiments_path, exist_ok=True)
+            log_path = pathlib.Path(experiments_path, "log.json")
+
+            with open(log_path, "w") as outfile:
+                json.dump(self, outfile, indent=4, default=ProbingLog.myconverter)
+        return experiments_path
 
 
 def kl_divergence(z, mu_theta, p_theta):

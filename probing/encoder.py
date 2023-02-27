@@ -1,4 +1,5 @@
 import gc
+import logging as info_logging
 import typing
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
@@ -12,7 +13,6 @@ from transformers.utils import logging
 
 from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
 from probing.types import AggregationName, AggregationType
-from probing.utils import exclude_rows
 
 logging.set_verbosity_warning()
 logger = logging.get_logger("probing")
@@ -124,6 +124,27 @@ class TransformersLoader:
         )
         return tokenized_text
 
+    def exclude_rows(
+        self, tensor: torch.Tensor, rows_to_exclude: torch.Tensor
+    ) -> torch.Tensor:
+        if len(tensor.size()) == 1:
+            tensor = tensor.view(-1, 1)
+
+        tensor_shape = tensor.size()
+        assert len(tensor_shape) == 2
+        tensor = tensor.view(*tensor_shape, 1)
+
+        mask = torch.ones(tensor_shape, dtype=torch.bool)
+        mask[rows_to_exclude, :] = False
+        new_num_rows = tensor_shape[0] - len(rows_to_exclude)
+        if new_num_rows == 0:
+            info_logging.warning(
+                "All samples were excluded due to long sentences truncation"
+            )
+            return tensor[mask]
+        output = tensor[mask].view(new_num_rows, -1)
+        return output
+
     @typing.no_type_check
     def _fix_tokenized_tensors(
         self, tokenized_text: Dict[str, torch.Tensor]
@@ -143,10 +164,10 @@ class TransformersLoader:
             if isinstance(row_ids_to_exclude, tuple):
                 row_ids_to_exclude = row_ids_to_exclude[0]
 
-            input_ids = exclude_rows(input_ids, row_ids_to_exclude)[
+            input_ids = self.exclude_rows(input_ids, row_ids_to_exclude)[
                 :, : self.model_max_length
             ]
-            attention_mask = exclude_rows(attention_mask, row_ids_to_exclude)[
+            attention_mask = self.exclude_rows(attention_mask, row_ids_to_exclude)[
                 :, : self.model_max_length
             ]
             row_ids_to_exclude = row_ids_to_exclude.tolist()
@@ -219,7 +240,7 @@ class TransformersLoader:
                 {
                     "input_ids": input_ids,
                     "attention_mask": attention_mask,
-                    "labels": exclude_rows(
+                    "labels": self.exclude_rows(
                         torch.tensor(labels), row_ids_to_exclude
                     ).view(-1),
                 }
