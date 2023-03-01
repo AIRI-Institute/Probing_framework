@@ -3,11 +3,11 @@ from typing import Callable, Dict, List, Union
 import torch
 from sklearn.metrics import f1_score as f1
 
-from probing.types import MetricName, MetricType
+from probing.types import MetricType
 
 
 class Metric:
-    def __init__(self, metric_names: Union[MetricName, List[MetricName]]):
+    def __init__(self, metric_names: Union[MetricType, List[MetricType]]):
         self.metric_names = metric_names
 
     def accuracy(self, predictions: List[int], true_labels: List[int]) -> float:
@@ -18,12 +18,12 @@ class Metric:
     def f1_score(self, predictions: List[int], true_labels: List[int]) -> float:
         return f1(true_labels, predictions, average="weighted")
 
-    def get_metrics_dict(self) -> Dict[MetricName, Callable]:
+    def get_metrics_dict(self) -> Dict[MetricType, Callable]:
         metrics_dict = {}
-        if MetricType.accuracy in self.metric_names:
-            metrics_dict[MetricType.accuracy] = self.accuracy
-        if MetricType.f1 in self.metric_names:
-            metrics_dict[MetricType.f1] = self.f1_score
+        if MetricType("accuracy") in self.metric_names:
+            metrics_dict[MetricType("accuracy")] = self.accuracy
+        if MetricType("f1") in self.metric_names:
+            metrics_dict[MetricType("f1")] = self.f1_score
 
         if not metrics_dict:
             raise NotImplementedError("None known metrics were provided")
@@ -31,7 +31,7 @@ class Metric:
 
     def compute(
         self, predictions: List[int], true_labels: List[int]
-    ) -> Dict[MetricName, float]:
+    ) -> Dict[MetricType, float]:
         res_metrics = {}
         for m, f in self.get_metrics_dict().items():
             res_metrics[m] = f(predictions, true_labels)

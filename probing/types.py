@@ -3,30 +3,26 @@ from typing import Literal
 
 
 class MetricType(str, Enum):
-    accuracy = "accuracy"
-    f1 = "f1"
+    ACCURACY = "accuracy"
+    F1 = "f1"
 
 
 class ClassifierType(str, Enum):
-    logreg = "logreg"
-    mlp = "mlp"
-    mdl = "mdl"
+    LOGREG = "logreg"
+    MLP = "mlp"
+    MDL = "mdl"
 
 
 class ProbingType(str, Enum):
-    layerwise = "layerwise"
+    LAYERWISE = "layerwise"
 
 
 class AggregationType(str, Enum):
-    cls = "cls"
-    sum = "sum"
-    avg = "avg"
+    CLS = "cls"
+    SUM = "sum"
+    AVG = "avg"
 
 
-MetricName = Literal[MetricType.accuracy, MetricType.f1]
-ClassifierName = Literal[ClassifierType.logreg, ClassifierType.mlp, ClassifierType.mdl]
-ProbingName = Literal[ProbingType.layerwise]
-AggregationName = Literal[AggregationType.cls, AggregationType.sum, AggregationType.avg]
 UDProbingTaskName = Literal[
     "conj_type",
     "gapping",
