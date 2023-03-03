@@ -1,7 +1,7 @@
 # Probing-framework
 This framework includes:
-* [UD-parser](https://github.com/AIRI-Institute/Probing_framework/blob/main/probing/ud_parser/README.md): Converter of conllu files from Universal Dependencies to the appropriate format for probing.
-* [UD-filter]
+* [UD-PARSER](https://github.com/AIRI-Institute/Probing_framework/blob/main/probing/ud_parser/README.md): Converter of conllu files from Universal Dependencies to the appropriate format for probing.
+* [UD-FILTER]
 * [Probing framework itself]
 
 ### Install requirements and appropriate torch version 
