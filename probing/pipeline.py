@@ -15,13 +15,9 @@ from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
 from probing.metric import Metric
 from probing.types import (
-    AggregationName,
     AggregationType,
-    ClassifierName,
     ClassifierType,
-    MetricName,
     MetricType,
-    ProbingName,
     ProbingType,
     UDProbingTaskName,
 )
@@ -35,11 +31,11 @@ class ProbingPipeline:
     def __init__(
         self,
         hf_model_name: Optional[str] = None,
-        probing_type: Optional[ProbingName] = ProbingType.layerwise,
+        probing_type: Optional[ProbingType] = ProbingType("layerwise"),
         device: Optional[str] = None,
-        classifier_name: ClassifierName = ClassifierType.logreg,
-        metric_names: Union[MetricName, List[MetricName]] = MetricType.f1,
-        aggregation_embeddings: AggregationName = AggregationType.cls,
+        classifier_name: ClassifierType = ClassifierType("logreg"),
+        metric_names: Union[MetricType, List[MetricType]] = MetricType("f1"),
+        aggregation_embeddings: AggregationType = AggregationType("cls"),
         encoding_batch_size: int = 32,
         classifier_batch_size: int = 64,
         dropout_rate: float = 0.2,
@@ -67,18 +63,18 @@ class ProbingPipeline:
         self.criterion: Any = None
 
     def get_classifier(
-        self, classifier_name: ClassifierName, num_classes: int, embed_dim: int
+        self, classifier_name: ClassifierType, num_classes: int, embed_dim: int
     ) -> Union[LogReg, MLP, MDLLinearModel]:
-        if classifier_name == ClassifierType.logreg:
+        if classifier_name == ClassifierType("logreg"):
             return LogReg(input_dim=embed_dim, num_classes=num_classes)
-        if classifier_name == ClassifierType.mlp:
+        if classifier_name == ClassifierType("mlp"):
             return MLP(
                 input_dim=embed_dim,
                 num_classes=num_classes,
                 hidden_size=self.hidden_size,
                 dropout_rate=self.dropout_rate,
             )
-        if classifier_name == ClassifierType.mdl:
+        if classifier_name == ClassifierType("mdl"):
             return MDLLinearModel(
                 input_dim=embed_dim,
                 num_classes=num_classes,
@@ -112,7 +108,7 @@ class ProbingPipeline:
 
     def evaluate(
         self, dataloader: DataLoader, layer: int, save_checkpoints: bool = False
-    ) -> Tuple[List[float], Dict[MetricName, float]]:
+    ) -> Tuple[List[float], Dict[MetricType, float]]:
         epoch_losses = []
         epoch_predictions = []
         epoch_true_labels = []
@@ -209,7 +205,7 @@ class ProbingPipeline:
             ).to(self.transformer_model.device)
 
             loss_func = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
-            if self.classifier == ClassifierType.mdl:
+            if self.classifier == ClassifierType("mdl"):
                 self.criterion = KL_Loss(loss=loss_func)
             else:
                 self.criterion = loss_func

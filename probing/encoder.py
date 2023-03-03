@@ -12,7 +12,7 @@ from transformers.utils import logging
 
 from probing.cacher import Cacher
 from probing.data_former import EncodedVectorFormer, TokenizedVectorFormer
-from probing.types import AggregationName, AggregationType
+from probing.types import AggregationType
 from probing.utils import clear_memory
 
 logging.set_verbosity_warning()
@@ -152,15 +152,15 @@ class TransformersLoader:
     def _get_embeddings_by_layers(
         self,
         model_outputs: Tuple[torch.Tensor],
-        aggregation_embeddings: AggregationName,
+        aggregation_embeddings: AggregationType,
     ) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:  # type: ignore
-            if aggregation_embeddings == AggregationType.cls:
+            if aggregation_embeddings == AggregationType("cls"):
                 sent_vector = output[:, 0, :]  # type: ignore
-            elif aggregation_embeddings == AggregationType.sum:
+            elif aggregation_embeddings == AggregationType("sum"):
                 sent_vector = torch.sum(output, dim=1)
-            elif aggregation_embeddings == AggregationType.avg:
+            elif aggregation_embeddings == AggregationType("avg"):
                 sent_vector = torch.mean(output, dim=1)
             else:
                 raise NotImplementedError(
@@ -229,7 +229,7 @@ class TransformersLoader:
         self,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
-        aggregation_embeddings: AggregationName,
+        aggregation_embeddings: AggregationType,
     ) -> List[torch.Tensor]:
         if hasattr(self.model, "encoder") and hasattr(self.model, "decoder"):
             # In case of encoder-decoder model, for embeddings we use only encoder
@@ -260,7 +260,7 @@ class TransformersLoader:
         self,
         data: DataLoader,
         stage: Literal["tr", "va", "te"],
-        aggregation_embeddings: AggregationName,
+        aggregation_embeddings: AggregationType,
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:
@@ -343,7 +343,7 @@ class TransformersLoader:
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
-        aggregation_embeddings: AggregationName = AggregationType.cls,
+        aggregation_embeddings: AggregationType = AggregationType("cls"),
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
