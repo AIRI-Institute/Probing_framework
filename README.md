@@ -9,7 +9,7 @@ This framework includes:
 bash cuda_install_requirements.sh
 ```
 
-### Usage examples:
+### Usage examples of Probing framework:
 Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_framework/tree/main/scripts) for the samples how to launch
 * __Jupyter__:
     ```python3
