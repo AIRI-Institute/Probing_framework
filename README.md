@@ -73,7 +73,7 @@ Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_fram
     ```
 
 # Our articles:
- - Original paper of this framework: https://arxiv.org/abs/2210.13236
+ - Original paper of this framework: https://aclanthology.org/2022.blackboxnlp-1.37/
     ```
     @inproceedings{serikov-etal-2022-universal,
         title = "Universal and Independent: Multilingual Probing Framework for Exhaustive Model Interpretation and Evaluation",
