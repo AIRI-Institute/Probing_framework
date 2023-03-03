@@ -231,7 +231,7 @@ class TransformersLoader:
         attention_mask: torch.Tensor,
         aggregation_embeddings: AggregationType,
     ) -> List[torch.Tensor]:
-        if hasattr(self.model, "encoder") and hasattr(self.model, "decoder"):
+        if self.config.is_encoder_decoder:
             # In case of encoder-decoder model, for embeddings we use only encoder
             model_outputs = self.model.encoder(
                 input_ids=input_ids,
