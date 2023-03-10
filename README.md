@@ -23,7 +23,7 @@ Behavourial probes do not require any classifier on top of vector representation
 
 • **Structural probes**: to predict labels	          
 
-![illustration_1.png](img/illustration_1.png)
+![illustartion_1.png](img/illustartion_1.png)
 
 **Behavioural probes**: to predict a word
 
