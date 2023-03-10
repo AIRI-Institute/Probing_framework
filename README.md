@@ -1,3 +1,9 @@
+<style>
+        .column-list {
+	display: flex;
+	justify-content: space-between;
+}
+</style>
 # Readme for Probing Framework
 
 Probing Framework provides a full pipeline for probing experiments, i. e. experiments for interpretation of large language models (for more see About Probing). In a nutshell, Probing Framework supports:
@@ -21,13 +27,8 @@ The structutal probing method is to take **a sentence vector** from a large lang
 
 Behavourial probes do not require any classifier on top of vector representations from a model. An example of behavourial probes is a masking task when a language model that is probed has to fill in a masked token, for example, to put a right verb form in a sentence.
 
-• **Structural probes**: to predict labels	          
-
-![illustartion_1.png](img/illustartion_1.png)
-
-**Behavioural probes**: to predict a word
-
-![illustration_2.png](img/illustration_2.png)
+<div class="column-list"><div id="99f124ab-a1c5-4b1d-b1f9-2d15a0973c08" style="width:50%" class="column"><p id="da0d4cd2-176a-4dc5-af83-6782b63fb80f" class="">• <strong>Structural probes</strong>: to predict labels	          </p><figure id="88d063b1-b391-4c69-82bf-ae1cbe42e6c2" class="image" style="text-align:center"><a href="img/illustartion_1.png"><img style="width:192px" src="img/illustartion_1.png"/></a></figure></div><div id="fc1cd286-a78d-4837-aef0-e28b383c0eda" style="width:50%" class="column"><p id="49c42a69-6338-4c62-a17e-8c6f60aa1a19" class=""><strong>Behavioural probes</strong>: to predict a word</p><p id="8f078c75-b01d-4f11-bc69-a572cf512eb9" class="">
+</p><figure id="dfe503c4-6f38-4463-bdcb-e554721a8411" class="image" style="text-align:center"><a href="img/illustration_2.png"><img style="width:144px" src="img/illustration_2.png"/></a></figure>
 
 Probing methods get critical response for relying on the resusts of logistic regression that might be biased because of the data distribution. For this reason, other probing techniques are used, such as control tasks with selectivity [(Hewitt and Liang, 2019)](https://aclanthology.org/D19-1275/) and Minimum Description Length (MDL) [(Voita and Titov, 2020](https://aclanthology.org/2020.emnlp-main.14/)). For more information about these methods see original papers and [Probing Pipeline documentation.](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing)
 
