@@ -10,7 +10,6 @@ Probing Framework provides a full pipeline for probing experiments, i. e. experi
 - different metrics, including standard ones (such as F1-score and accuracy) and selectivity (the difference between experiments and control tasks);
 - visualisation and aggregation tools for further analysis of experiments.
 
-### **Table of Context**
 
 ### About probing
 
@@ -94,7 +93,7 @@ The framework consists of four main parts:
 
 ### How to cite
 
-```latex
+```
 @inproceedings{serikov-etal-2022-universal,
     title = "Universal and Independent: Multilingual Probing Framework for Exhaustive Model Interpretation and Evaluation",
     author = "Serikov, Oleg  and
