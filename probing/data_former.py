@@ -59,14 +59,14 @@ class TextFormer:
 
 
 class EncodedVectorFormer(Dataset):
-    def __init__(self, text_vectors, label_vectors):
+    def __init__(self, text_vectors: torch.Tensor, label_vectors: torch.Tensor):
         self.label_vectors = label_vectors
         self.text_vectors = text_vectors
 
     def __len__(self):
         return len(self.label_vectors)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         label = self.label_vectors[idx]
         text = self.text_vectors[idx]
         sample = (text, label)
@@ -82,7 +82,7 @@ class TokenizedVectorFormer(Dataset):
     def __len__(self):
         return len(self.input_ids)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         input_ids = self.input_ids[idx]
         attention_mask = self.attention_masks[idx]
         labels = self.labels[idx]
