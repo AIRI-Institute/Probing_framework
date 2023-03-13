@@ -1,76 +1,108 @@
-# Probing-framework
-Framework for probing tasks.
+# Readme for Probing Framework
 
-### Install requirements and appropriate torch version 
+Probing Framework provides a full pipeline for probing experiments, i. e. experiments for interpretation of large language models (for more see About Probing). In a nutshell, Probing Framework supports:
+
+- automatic generation of probing tasks on the basis of [Universal Dependencies](https://universaldependencies.org/) annotation;
+- generation of probing tasks based on manual queries to data in the [CONLL-U](https://universaldependencies.org/format.html) format;
+- basic probing experiments with several classifers, such as Logistic Regression and Multilayer Perceptron;
+- other probing methods, such as Minimum Description Length (MDL);
+- baselines for probing experiments, such as label shuffling;
+- different metrics, including standard ones (such as F1-score and accuracy) and selectivity (the difference between experiments and control tasks);
+- visualisation and aggregation tools for further analysis of experiments.
+
+
+### About probing
+
+As [Conneau et al. (2018)](https://aclanthology.org/P18-1198/) state, “a probing task is a classification problem that focuses on simple linguistic properties of sentences''. The main assumption behind probing is that models require linguistic knowledge that they are tested on for better performance on natural language generation and other tasks that a model can be used for ([Saphra, 2021](https://era.ed.ac.uk/handle/1842/38154)). 
+
+[Belinkov (2020)](https://aclanthology.org/2020.acl-tutorials.1/) classifies existing methods as **structural** and **behavioural**. 
+
+The structutal probing method is to take **a sentence vector** from a large language model and then give it as an input to a probing classifier, for example, logistic regression. The task of this diagnostic classifier is to put a label of linguistic feature to each sentence vectors.
+
+Behavourial probes do not require any classifier on top of vector representations from a model. An example of behavourial probes is a masking task when a language model that is probed has to fill in a masked token, for example, to put a right verb form in a sentence.
+
+<div style="display: flex; justify-content: space-between;"><div style="width:50%; padding: 0 1em;"><p class="">• <strong>Structural probes</strong>: to predict labels	          </p><figure style="text-align:center; border: none; margin: 1.5em 0; padding: 0; border-radius: 0; text-align: center;"><a href="img/illustartion_1.png"><img style="width:192px" src="img/illustartion_1.png"/></a></figure></div><div style="width:50%; padding: 0 1em;"><p iclass=""><strong>Behavioural probes</strong>: to predict a word</p><p class="">
+</p><figure style="text-align:center; border: none; margin: 1.5em 0; padding: 0; border-radius: 0; text-align: center;"><a href="img/illustration_2.png"><img style="width:144px" src="img/illustration_2.png"/></a></figure>
+
+Probing methods get critical response for relying on the resusts of logistic regression that might be biased because of the data distribution. For this reason, other probing techniques are used, such as control tasks with selectivity [(Hewitt and Liang, 2019)](https://aclanthology.org/D19-1275/) and Minimum Description Length (MDL) [(Voita and Titov, 2020](https://aclanthology.org/2020.emnlp-main.14/)). For more information about these methods see original papers and [Probing Pipeline documentation.](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing)
+
+### Web Interface
+
+The framework allows to make queries to CONNL-U data and run probing experiments in a web interface. Moreover, the web-interface supports different visualisations of the results of probing experiments in several ways, such as charts (TBA) or a map. The web-version will be available soon.
+
+![page1.jpg](img/page1.jpg)
+
+![page2.jpg](img/page2.jpg)
+
+![gui_2.png](img/gui_2.png)
+
+### Getting started
+
+1. Clone the repository with code:
+
+```python
+git clone https://github.com/AIRI-Institute/Probing_framework
+cd Probing_framework/ 
 ```
+
+1. Install requirements and appropriate torch version:
+
+```python
 bash cuda_install_requirements.sh
 ```
 
-### Example of how SentEval Converter works:
-* __Jupyter__:
-    ```python3
-    from probing.ud_parser.ud_parser import ConlluUDParser
+1. Install all other necessary packages:
 
-    splitter = ConlluUDParser()
+```python
+pip install -r requirements.txt
+```
 
-    # You can provide a direct path to the folder with conllu files
-    splitter.convert(path_dir_conllu=<folder path>)
+### Usage Example
 
-    # Or you can pass paths to each of three possible conllu files
-    splitter.convert(tr_path=..., va_path=..., te_path=...)
-    ```
+Here the basic example of Framework usage is presented. For further examples, see [Probing Pipeline documentation](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing).
 
-* __Output__:
-    ```
-    WARNING:root:Category "Abbr" has only one class
-    WARNING:root:Category "AdpType" has only one class
-    WARNING:root:The classes in train and validation parts are different for category "Case"
-    WARNING:root:Category "Degree" has only one class
-    WARNING:root:Category "Foreign" has only one class
-    WARNING:root:Category "PartType" has only one class
-    WARNING:root:Category "Poss" has only one class
-    WARNING:root:The classes in train and test parts are different for category "PronType"
-    WARNING:root:Category "Reflex" has only one class
-    WARNING:root:The classes in train and validation parts are different for category "Tense"
-    WARNING:root:Category "Variant" has only one class
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Case.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Definite.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Gender.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Mood.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_NumForm.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_NumType.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Number.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Number[psor].csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Person.csv
-    Writing to file: /home/jovyan/datasets/UD/UD/UD_Romanian-RRT/ro_rrt_Polarity.csv
-    ```
+```python
+from probing.pipeline import ProbingPipeline
 
-
-### Usage examples:
-Check out [```probing/scripts```](https://github.com/AIRI-Institute/Probing_framework/tree/main/scripts) for the samples how to launch
-* __Jupyter__:
-    ```python3
-    from probing.pipeline import ProbingPipeline
-
-    experiment = ProbingPipeline(
+experiment = ProbingPipeline(
         hf_model_name="bert-base-uncased",
-        device="cuda:1",
-        classifier_name="logreg",
-        )
+        device="cuda:0",
+        metric_names=["f1", "accuracy"],
+        encoding_batch_size=32,
+        classifier_batch_size=32)
 
-    experiment.run(probe_task="sent_len")
-    ```
+experiment.run(probe_task=Path("example.csv").stem,
+               path_to_task_file="example.csv",
+               verbose=True,
+               train_epochs=20,)
+```
 
-* __Output__:
-    ```
-    Task in progress: sent_len.
-    Path to data: /home/jovyan/test/TEST/Probing_framework/data/sent_len.txt
-    Data encoding train: 100%|████████████████████████████████████████████████████████████████████████████████| 782/782 [01:26<00:00,  9.06it/s]
-    Data encoding val: 100%|██████████████████████████████████████████████████████████████████████████████████| 79/79 [00:08<00:00,  8.94it/s]
-    Data encoding test: 100%|██████████████████████████████████████████████████████████████████████████████████| 79/79 [00:08<00:00,  9.33it/s]
-    Probing by layers: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 12/12 [04:04<00:00, 20.40s/it]
-    Experiments were saved in folder:  /home/test/test/TEST/Probing_framework/results/sent_len_2022_02_18-05:51:47_PM
-    ```
+### Documentation
 
-# Our article:
-You can cite our framework, this is our article: https://arxiv.org/abs/2210.13236
+The framework consists of four main parts:
+
+- Module to generate probing tasks with **automatic** **morphological** annotation out of Universal Dependencies data. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing/ud_parser).
+- Module to generate probing tasks with **syntactic** annotation out of Universal Dependencies data based on **a user’s query**. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/ud_filter/probing/ud_filter).
+- Module that provides a end-to-end pipeline for probing experiments. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing).
+- Module that provides tools for visualisation of probing experiments. See the documentation of this module here.
+
+### How to cite
+
+```
+@inproceedings{serikov-etal-2022-universal,
+    title = "Universal and Independent: Multilingual Probing Framework for Exhaustive Model Interpretation and Evaluation",
+    author = "Serikov, Oleg  and
+      Protasov, Vitaly  and
+      Voloshina, Ekaterina  and
+      Knyazkova, Viktoria  and
+      Shavrina, Tatiana",
+    booktitle = "Proceedings of the Fifth BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks for NLP",
+    month = dec,
+    year = "2022",
+    address = "Abu Dhabi, United Arab Emirates (Hybrid)",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.blackboxnlp-1.37",
+    pages = "441--456",
+    abstract = "Linguistic analysis of language models is one of the ways to explain and describe their reasoning, weaknesses, and limitations. In the probing part of the model interpretability research, studies concern individual languages as well as individual linguistic structures. The question arises: are the detected regularities linguistically coherent, or on the contrary, do they dissonate at the typological scale? Moreover, the majority of studies address the inherent set of languages and linguistic structures, leaving the actual typological diversity knowledge out of scope.In this paper, we present and apply the GUI-assisted framework allowing us to easily probe massive amounts of languages for all the morphosyntactic features present in the Universal Dependencies data. We show that reflecting the anglo-centric trend in NLP over the past years, most of the regularities revealed in the mBERT model are typical for the western-European languages. Our framework can be integrated with the existing probing toolboxes, model cards, and leaderboards, allowing practitioners to use and share their familiar probing methods to interpret multilingual models.Thus we propose a toolkit to systematize the multilingual flaws in multilingual models, providing a reproducible experimental setup for 104 languages and 80 morphosyntactic features.",
+}
+```
