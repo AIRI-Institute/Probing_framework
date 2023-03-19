@@ -17,38 +17,44 @@ class TestSentenceFilter(unittest.TestCase):
 
     def test_token_match_node(self):
         sf = SentenceFilter(self.trees_testfile[0])
-        token = self.trees_testfile[0][5]
+        token = self.trees_testfile[0][5]  # (I) was
         patterns = [
-            {"V": {"upos": "AUX"}},
-            {"V": {"upos": "VERB"}},
-            {"V": {"Number": "Sing", "Person": "1"}},
-            {"V": {"Number": "Plur", "Person": "1"}},
-            {"V": {"exclude": ["Definite", "PronType"]}},
-            {"V": {"exclude": ["PronType", "Number"]}},
-            {"V": {"deprels": "aux"}},
+            {"V": {"upos": "AUX"}},  # True
+            {"V": {"upos": "VERB"}},  # False
+            {"V": {"upos": "^(?!VERB$).*$"}},  # True
+            {"V": {"Number": "Sing", "Person": "1"}},  # True
+            {"V": {"Number": "Plur", "Person": "1"}},  # False
+            {"V": {"Number": "Plur|Sing", "Person": "1"}},  # True
+            {"V": {"exclude": ["Definite", "PronType"]}},  # True
+            {"V": {"exclude": ["PronType", "Number"]}},  # False
         ]
         results = [sf.token_match_node(token, node_pattern=p["V"]) for p in patterns]
-        answers = [True, False, True, False, True, False, False]
+        answers = [True, False, True, True, False, True, True, False]
         self.assertEqual(results, answers)
 
     def test_search_suitable_tokens(self):
-        sent = self.trees_testfile[0]
+        sent = self.trees_testfile[0]  # I would understand if I was being treated this way by a staff member but the club's actual OWNER?!
         sf = SentenceFilter(sent)
         node_pattern = {
-            "N": {"Number": "Sing"},  # слова в ед.ч.
+            "N": {"Number": "Sing"},  # words in singular number
             "M": {
                 "upos": "^(?!NOUN|PRON$).*$",
                 "Number": "Sing",
-            },  # слова в ед.ч, но не местоимения с существительными
+            },  # words in singular number except for pronouns and nouns
             "K": {
                 "Number": "Sing",
                 "exclude": ["PronType"],
-            },  # слова в ед.ч но без категории 'PronType'
+            },  # words in singular number but without 'PronType' category
         }
         answers = {
             "N": ["I", "I", "be", "this", "way", "staff", "member", "club", "owner"],
             "M": ["be", "this"],
             "K": ["be", "way", "staff", "member", "club", "owner"],
+        }
+        wrong_answers = {
+            "N": ["I", "I", "be", "this", "way", "staff", "member", "club", "owner", "if"],
+            "M": ["be", "this", "club"],
+            "K": ["be", "way", "staff", "member", "club", "owner", "I"],
         }
         sf.node_pattern = node_pattern
         sf.nodes_tokens = {node: [] for node in sf.node_pattern}
@@ -59,27 +65,31 @@ class TestSentenceFilter(unittest.TestCase):
             for n in sf.nodes_tokens
         }
         self.assertEqual(results, answers)
+        self.assertNotEqual(results, wrong_answers)
 
-    def test_find_all_nodes(self):
-        sf = SentenceFilter(self.trees_testfile[4])
+    def test_find_all_nodes_bypassive(self):
+        sf_true = SentenceFilter(self.trees_testfile[4])  # sentence with by-passive
 
-        sf.node_pattern = by_passive[0]
-        sf.nodes_tokens = {node: [] for node in sf.node_pattern}
-        self.assertTrue(sf.find_all_nodes())
+        sf_true.node_pattern = by_passive[0]
+        sf_true.nodes_tokens = {node: [] for node in sf_true.node_pattern}
+        self.assertTrue(sf_true.find_all_nodes())
 
-        sf.node_pattern = ADPdistance[0]
-        sf.nodes_tokens = {node: [] for node in sf.node_pattern}
-        self.assertTrue(sf.find_all_nodes())
+        sf_false = SentenceFilter(self.trees_testfile[7])  # sentence without by-passive
+        sf_false.node_pattern = by_passive[0]
+        sf_false.nodes_tokens = {node: [] for node in sf_false.node_pattern}
+        self.assertFalse(sf_false.find_all_nodes())
 
-        sf = SentenceFilter(self.trees_testfile[7])
+    def test_find_all_nodes_ADPdistance(self):
+        sf_true = SentenceFilter(self.trees_testfile[4])  # sentence with preposition and some other word
 
-        sf.node_pattern = ADPdistance[0]
-        sf.nodes_tokens = {node: [] for node in sf.node_pattern}
-        self.assertFalse(sf.find_all_nodes())
+        sf_true.node_pattern = ADPdistance[0]
+        sf_true.nodes_tokens = {node: [] for node in sf_true.node_pattern}
+        self.assertTrue(sf_true.find_all_nodes())
 
-        sf.node_pattern = by_passive[0]
-        sf.nodes_tokens = {node: [] for node in sf.node_pattern}
-        self.assertFalse(sf.find_all_nodes())
+        sf_false = SentenceFilter(self.trees_testfile[7])  # sentence without preposition
+        sf_false.node_pattern = ADPdistance[0]
+        sf_false.nodes_tokens = {node: [] for node in sf_false.node_pattern}
+        self.assertFalse(sf_false.find_all_nodes())
 
     def test_pattern_relations(self):
         sent = self.trees_testfile[0]
@@ -87,14 +97,14 @@ class TestSentenceFilter(unittest.TestCase):
         sf.sent_deprels = sf.all_deprels()
         patterns = [
             "nsubj(:.*)?",  # nsubj, nsubj:pass
-            ".mod(:.*)?",  # amod, nmid:poss
-            "aux",
-        ]  # aux
-        answers = [["nsubj", "nsubj:pass"], ["nmod:poss", "amod"], ["aux"]]
+            ".mod(:.*)?",  # amod, nmod:poss
+            "nsubj",  # only nsubj,  as «^nsubj$», not «.*nsubj.*»
+        ]
+        answers = [["nsubj", "nsubj:pass"], ["nmod:poss", "amod"], ["nsubj"]]
         for p, a in zip(patterns, answers):
             self.assertEqual(sf.pattern_relations(p), a)
 
-    def test_pairs_matching_relpattern(self):
+    def test_pairs_matching_relpattern_answer(self):
         sent = self.trees_testfile[0]
         sf = SentenceFilter(sent)
         relpattern = {("N", "M"): {"deprels": "nsubj(:.*)?"}}
@@ -112,6 +122,25 @@ class TestSentenceFilter(unittest.TestCase):
 
         self.assertEqual(answer, sf.pairs_matching_relpattern(("N", "M")))
 
+    def test_pairs_matching_relpattern_not_in_sent_deprels(self):
+        sent = self.trees_testfile[0]
+        sf = SentenceFilter(sent)
+        relpattern = {("N", "M"): {"deprels": "obl:tmod"}}
+        answer = set()
+
+        sf.nodes_tokens = {
+            "N": [i for i in range(len(sent)) if i != 16],
+            "M": [i for i in range(len(sent)) if i != 16],
+        }
+        sf.possible_token_pairs = {
+            ("N", "M"): list(product(sf.nodes_tokens["N"], sf.nodes_tokens["M"]))
+        }
+        sf.sent_deprels = sf.all_deprels()
+        sf.constraints = relpattern
+
+        self.assertNotIn(relpattern[("N", "M")]["deprels"], sf.sent_deprels)
+        self.assertEqual(answer, sf.pairs_matching_relpattern(("N", "M")))
+
     def test_linear_distance(self):
         sent = self.trees_testfile[0]
         sf = SentenceFilter(sent)
@@ -120,7 +149,7 @@ class TestSentenceFilter(unittest.TestCase):
         answer = {(2, 3), (15, 12)}
         self.assertEqual(sf.linear_distance(("N", "M")), answer)
 
-    def test_pair_match_fconstraint(self):
+    def test_pair_match_fconstraint_true(self):
         sent = self.trees_testfile[1]
         sf = SentenceFilter(sent)
         fconstraints = {"intersec": ["VerbForm", "Number"], "disjoint": ["Tense"]}
@@ -133,6 +162,21 @@ class TestSentenceFilter(unittest.TestCase):
         answers = [True, False, False, False]
         results = [sf.pair_match_fconstraint(tp, fconstraints) for tp in token_pairs]
         self.assertEqual(answers, results)
+
+    def test_pair_match_fconstraint_wrong_type(self):
+        sent = self.trees_testfile[1]
+        sf = SentenceFilter(sent)
+        fconstraints = {"wrong_fconstraint_type": ["VerbForm", "Number"]}
+        token_pairs = [
+            (4, 11),  # matches
+            (4, 35),  # Same value for Tense, while should be different
+            (11, 35),  # Different value for Number, while should be the same
+            (35, 36),  # One token doesn't have pne of the categories
+        ]
+
+        for tp in token_pairs:
+            with self.assertRaises(ValueError):
+                sf.pair_match_fconstraint(tp, fconstraints)
 
     def test_feature_constraint(self):
         sent = self.trees_testfile[1]
@@ -168,8 +212,8 @@ class TestSentenceFilter(unittest.TestCase):
         }
         self.assertTrue(sf.find_isomorphism())
 
-    def test_filter_sentence(self):
-        # all tokens are found, but constraints??
+    def test_filter_sentence_false_constraints(self):
+        # all tokens are found, but constraints are not observed
         sf = SentenceFilter(self.trees_testfile[4])
         self.assertFalse(
             sf.filter_sentence(by_passive[0], by_passive[1])
@@ -180,23 +224,34 @@ class TestSentenceFilter(unittest.TestCase):
         # 'deprels': 'obj'}
         self.assertTrue(
             sf.filter_sentence(ADPdistance[0], ADPdistance[1])
-        )  # все прошло
+        )  # okay
 
-        # all tokens are found, every constraint has a possible pair, but isomorphism??
+    def test_filter_sentence_not_isomorphic(self):
         sf = SentenceFilter(self.trees_testfile[3])
         self.assertTrue(
             sf.filter_sentence(SOmatchingNumber[0], SOmatchingNumber[1])
-        )  # все ок
+        )  # okay
         sf = SentenceFilter(self.trees_testfile[6])
         self.assertFalse(
             sf.filter_sentence(SOmatchingNumber[0], SOmatchingNumber[1])
-        )  # нашлись все токены,
-        # но проверку на граф не прошли
+        )  # all all tokens are found, every constraint has a possible pair, but there is not isomorphism
 
+    def test_filter_sentence_not_all_tokens(self):
         # some tokens are not found
         sf = SentenceFilter(self.trees_testfile[7])
         self.assertFalse(sf.filter_sentence(by_passive[0], by_passive[1]))
         self.assertFalse(sf.filter_sentence(ADPdistance[0], ADPdistance[1]))
 
+    def test_filter_sentence_all_tokens_without_constraints(self):
         # find only tokens without constraints
+        sf = SentenceFilter(self.trees_testfile[7])
         self.assertTrue(sf.filter_sentence({"be": {"lemma": "be"}}, {}))
+
+    def test_filter_sentence_wrong_constraint_type(self):
+        sf = SentenceFilter(self.trees_testfile[4])
+        wrong_constraint_type_query = [
+            {"P": {"upos": "ADP"}, "N": {"upos": "NOUN"}},
+            {("N", "P"): {"wrong_constraint": "case"}},
+        ]
+        with self.assertRaises(KeyError):
+            sf.filter_sentence(*wrong_constraint_type_query)

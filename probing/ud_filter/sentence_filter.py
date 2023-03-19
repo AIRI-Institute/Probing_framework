@@ -211,8 +211,9 @@ class SentenceFilter:
                     self.possible_token_pairs[np] = self.linear_distance(np)
                 elif constraint == "fconstraint":
                     self.possible_token_pairs[np] = self.feature_constraint(np)
-                else:
-                    raise ValueError("Wrong constraint type")
+                # else:
+                #     raise ValueError("Wrong constraint type")
+                # (not possible, this is controlled by ud_filter.utils.check_constraints)
                 if not self.possible_token_pairs[np]:
                     return False
                 else:

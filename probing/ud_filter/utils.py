@@ -82,6 +82,8 @@ def subsamples_split(
                     split[1]: [X_test, y_test],
                     split[2]: [X_val, y_val],
                 }
+        else:
+            raise Exception(f"There is not enough sentences for {partition} partition.")  # TODO
     return parts
 
 

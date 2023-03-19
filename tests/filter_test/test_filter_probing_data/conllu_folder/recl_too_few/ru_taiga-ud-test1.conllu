@@ -1,0 +1,122 @@
+# sent_id = 3
+# genre = social
+# text = Она решила попытаться остановить машину — хотя выйдя под дождь, сразу же промокла насквозь.
+1	Она	она	PRON	_	Case=Nom|Gender=Fem|Number=Sing|Person=3|PronType=Prs	2	nsubj	_	_
+2	решила	решить	VERB	_	Aspect=Perf|Gender=Fem|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	_
+3	попытаться	попытаться	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Mid	2	xcomp	_	_
+4	остановить	остановить	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	3	xcomp	_	_
+5	машину	машина	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	4	obj	_	_
+6	—	—	PUNCT	_	_	14	punct	_	_
+7	хотя	хотя	SCONJ	_	_	14	mark	_	_
+8	выйдя	выйти	VERB	_	Aspect=Perf|Tense=Past|VerbForm=Conv|Voice=Act	14	advcl	_	_
+9	под	под	ADP	_	_	10	case	_	_
+10	дождь	дождь	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	8	obl	_	SpaceAfter=No
+11	,	,	PUNCT	_	_	8	punct	_	_
+12	сразу	сразу	ADV	_	Degree=Pos	14	advmod	_	_
+13	же	же	PART	_	_	12	advmod	_	_
+14	промокла	промокнуть	VERB	_	Aspect=Perf|Gender=Fem|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	2	advcl	_	_
+15	насквозь	насквозь	ADV	_	Degree=Pos	14	advmod	_	SpaceAfter=No
+16	.	.	PUNCT	_	_	2	punct	_	_
+
+# sent_id = 7
+# genre = social
+# text = И пусть всё то, что кажется так сложно, решается красиво и легко!
+1	И	и	CCONJ	_	_	11	cc	_	_
+2	пусть	пусть	PART	_	_	11	advmod	_	_
+3	всё	весь	DET	_	Case=Nom|Gender=Neut|Number=Sing|PronType=Tot	4	det	_	_
+4	то	то	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Dem	11	nsubj:pass	_	SpaceAfter=No
+5	,	,	PUNCT	_	_	7	punct	_	_
+6	что	что	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Rel	7	nsubj	_	_
+7	кажется	казаться	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Mid	4	acl:relcl	_	_
+8	так	так	ADV	_	Degree=Pos|PronType=Dem	9	advmod	_	_
+9	сложно	сложный	ADJ	_	Degree=Pos|Gender=Neut|Number=Sing|Variant=Short	7	xcomp	_	SpaceAfter=No
+10	,	,	PUNCT	_	_	7	punct	_	_
+11	решается	решаться	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Mid	0	root	_	_
+12	красиво	красиво	ADV	_	Degree=Pos	11	advmod	_	_
+13	и	и	CCONJ	_	_	14	cc	_	_
+14	легко	легко	ADV	_	Degree=Pos	12	conj	_	SpaceAfter=No
+15	!	!	PUNCT	_	_	11	punct	_	_
+
+# sent_id = 31
+# genre = social
+# text = И охота завыть, вскинув морду к луне.
+1	И	и	CCONJ	_	_	2	cc	_	_
+2	охота	охота	VERB	_	_	0	root	_	_
+3	завыть	завыть	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	2	csubj	_	SpaceAfter=No
+4	,	,	PUNCT	_	_	5	punct	_	_
+5	вскинув	вскинуть	VERB	_	Aspect=Perf|Tense=Past|VerbForm=Conv|Voice=Act	3	advcl	_	_
+6	морду	морда	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	5	obj	_	_
+7	к	к	ADP	_	_	8	case	_	_
+8	луне	луна	NOUN	_	Animacy=Inan|Case=Dat|Gender=Fem|Number=Sing	5	obl	_	SpaceAfter=No
+9	.	.	PUNCT	_	_	2	punct	_	_
+
+# sent_id = 69
+# genre = social
+# text = Шейх Салих аль- Фаузан сказал: :"Кто противоречит этому манхаджу, начиная свой призыв с чего-то другого, тот противоречит призыву посланников.
+1	Шейх	шейх	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	6	nsubj	_	_
+2	Салих	Салих	PROPN	_	Animacy=Anim|Case=Nom|Gender=Masc|NameType=Giv|Number=Sing	1	appos	_	_
+3	аль	аль	PART	_	_	2	flat:name	_	SpaceAfter=No
+4	-	-	PUNCT	_	_	2	punct	_	_
+5	Фаузан	Фаузан	PROPN	_	Animacy=Anim|Case=Nom|Gender=Masc|NameType=Sur|Number=Sing	2	flat:name	_	_
+6	сказал	сказать	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	SpaceAfter=No
+7	:	:	PUNCT	_	_	10	punct	_	_
+8	:	:	PUNCT	_	_	10	punct	_	SpaceAfter=No
+9	"	"	PUNCT	_	_	10	punct	_	SpaceAfter=No
+10	Кто	кто	PRON	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing|PronType=Rel	11	nsubj	_	_
+11	противоречит	противоречить	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	22	acl	_	_
+12	этому	этот	DET	_	Case=Dat|Gender=Masc|Number=Sing|PronType=Dem	13	det	_	_
+13	манхаджу	манхадж	NOUN	_	Animacy=Inan|Case=Dat|Gender=Masc|Number=Sing	11	obj	_	SpaceAfter=No
+14	,	,	PUNCT	_	_	15	punct	_	_
+15	начиная	начинать	VERB	_	Aspect=Imp|Tense=Pres|VerbForm=Conv|Voice=Act	11	advcl	_	_
+16	свой	свой	DET	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing|Poss=Yes|PronType=Prs|Reflex=Yes	17	det	_	_
+17	призыв	призыв	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	15	obj	_	_
+18	с	с	ADP	_	_	19	case	_	_
+19	чего-то	что-то	PRON	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing|PronType=Ind	15	obl	_	_
+20	другого	другой	DET	_	Case=Gen|Gender=Neut|Number=Sing|PronType=Tot	19	det	_	SpaceAfter=No
+21	,	,	PUNCT	_	_	15	punct	_	_
+22	тот	тот	PRON	_	Case=Nom|Gender=Masc|Number=Sing|PronType=Dem	23	nsubj	_	_
+23	противоречит	противоречить	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	6	parataxis	_	_
+24	призыву	призыв	NOUN	_	Animacy=Inan|Case=Dat|Gender=Masc|Number=Sing	23	obj	_	_
+25	посланников	посланник	NOUN	_	Animacy=Anim|Case=Gen|Gender=Masc|Number=Plur	24	nmod	_	SpaceAfter=No
+26	.	.	PUNCT	_	_	6	punct	_	_
+
+# sent_id = 89
+# genre = social
+# text = 100 г растительного масла
+1	100	100	NUM	_	NumForm=Digit|NumType=Card	2	nummod:gov	_	_
+2	г	грамм	NOUN	_	Abbr=Yes	0	root	_	_
+3	растительного	растительный	ADJ	_	Case=Gen|Degree=Pos|Gender=Neut|Number=Sing	4	amod	_	_
+4	масла	масло	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	2	nmod	_	_
+
+# sent_id = 91
+# genre = social
+# text = И не предложит выпить, если ты решил жить трезвым.
+1	И	и	CCONJ	_	_	3	cc	_	_
+2	не	не	PART	_	Polarity=Neg	3	advmod	_	_
+3	предложит	предложить	VERB	_	Aspect=Perf|Mood=Ind|Number=Sing|Person=3|Tense=Fut|VerbForm=Fin|Voice=Act	0	root	_	_
+4	выпить	выпить	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	3	xcomp	_	SpaceAfter=No
+5	,	,	PUNCT	_	_	8	punct	_	_
+6	если	если	SCONJ	_	_	8	mark	_	_
+7	ты	ты	PRON	_	Case=Nom|Number=Sing|Person=2|PronType=Prs	8	nsubj	_	_
+8	решил	решить	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	3	advcl	_	_
+9	жить	жить	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	8	xcomp	_	_
+10	трезвым	трезвый	ADJ	_	Case=Ins|Degree=Pos|Gender=Masc|Number=Sing	9	xcomp	_	SpaceAfter=No
+11	.	.	PUNCT	_	_	3	punct	_	_
+
+# sent_id = 2019
+# genre = poetry
+# text = Смерть твоя — настолько благая весть, что посовестись — и умри!
+1	Смерть	смерть	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	6	nsubj	_	_
+2	твоя	твой	DET	_	Case=Nom|Gender=Fem|Number=Sing|Poss=Yes|PronType=Prs	1	det	_	_
+3	—	—	PUNCT	_	_	1	punct	_	_
+4	настолько	настолько	ADV	_	Degree=Pos|PronType=Dem	5	advmod	_	_
+5	благая	благой	ADJ	_	Case=Nom|Degree=Pos|Gender=Fem|Number=Sing	6	amod	_	_
+6	весть	весть	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	0	root	_	SpaceAfter=No
+7	,	,	PUNCT	_	_	9	punct	_	_
+8	что	что	SCONJ	_	_	9	mark	_	_
+9	посовестись	посовеститься	VERB	_	Aspect=Perf|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Mid	4	advcl	_	_
+10	—	—	PUNCT	_	_	12	punct	_	_
+11	и	и	CCONJ	_	_	12	cc	_	_
+12	умри	умереть	VERB	_	Aspect=Perf|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Act	9	conj	_	SpaceAfter=No
+13	!	!	PUNCT	_	_	6	punct	_	_
+
