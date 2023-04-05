@@ -33,7 +33,9 @@ class TestSentenceFilter(unittest.TestCase):
         self.assertEqual(results, answers)
 
     def test_search_suitable_tokens(self):
-        sent = self.trees_testfile[0]  # I would understand if I was being treated this way by a staff member but the club's actual OWNER?!
+        sent = self.trees_testfile[
+            0
+        ]  # I would understand if I was being treated this way by a staff member but the club's actual OWNER?!
         sf = SentenceFilter(sent)
         node_pattern = {
             "N": {"Number": "Sing"},  # words in singular number
@@ -52,7 +54,18 @@ class TestSentenceFilter(unittest.TestCase):
             "K": ["be", "way", "staff", "member", "club", "owner"],
         }
         wrong_answers = {
-            "N": ["I", "I", "be", "this", "way", "staff", "member", "club", "owner", "if"],
+            "N": [
+                "I",
+                "I",
+                "be",
+                "this",
+                "way",
+                "staff",
+                "member",
+                "club",
+                "owner",
+                "if",
+            ],
             "M": ["be", "this", "club"],
             "K": ["be", "way", "staff", "member", "club", "owner", "I"],
         }
@@ -80,13 +93,17 @@ class TestSentenceFilter(unittest.TestCase):
         self.assertFalse(sf_false.find_all_nodes())
 
     def test_find_all_nodes_ADPdistance(self):
-        sf_true = SentenceFilter(self.trees_testfile[4])  # sentence with preposition and some other word
+        sf_true = SentenceFilter(
+            self.trees_testfile[4]
+        )  # sentence with preposition and some other word
 
         sf_true.node_pattern = ADPdistance[0]
         sf_true.nodes_tokens = {node: [] for node in sf_true.node_pattern}
         self.assertTrue(sf_true.find_all_nodes())
 
-        sf_false = SentenceFilter(self.trees_testfile[7])  # sentence without preposition
+        sf_false = SentenceFilter(
+            self.trees_testfile[7]
+        )  # sentence without preposition
         sf_false.node_pattern = ADPdistance[0]
         sf_false.nodes_tokens = {node: [] for node in sf_false.node_pattern}
         self.assertFalse(sf_false.find_all_nodes())
@@ -222,9 +239,7 @@ class TestSentenceFilter(unittest.TestCase):
             sf.filter_sentence(SOmatchingNumber[0], SOmatchingNumber[1])
         )  # no ('V', 'O'): {
         # 'deprels': 'obj'}
-        self.assertTrue(
-            sf.filter_sentence(ADPdistance[0], ADPdistance[1])
-        )  # okay
+        self.assertTrue(sf.filter_sentence(ADPdistance[0], ADPdistance[1]))  # okay
 
     def test_filter_sentence_not_isomorphic(self):
         sf = SentenceFilter(self.trees_testfile[3])

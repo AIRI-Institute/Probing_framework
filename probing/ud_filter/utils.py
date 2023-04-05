@@ -42,8 +42,10 @@ def subsamples_split(
             for s in sentences:
                 probing_data.append((s, class_name))
         else:
-            print(f'Class {class_name} has less sentences ({len(sentences)}) '
-                  f'than the number of classes ({num_classes}), so it is excluded.')
+            print(
+                f"Class {class_name} has less sentences ({len(sentences)}) "
+                f"than the number of classes ({num_classes}), so it is excluded."
+            )
     if not probing_data:
         raise Exception("All classes have less sentences than the number of classes")
     parts = {}
@@ -83,7 +85,9 @@ def subsamples_split(
                     split[2]: [X_val, y_val],
                 }
         else:
-            raise Exception(f"There is not enough sentences for {partition} partition.")  # TODO
+            raise Exception(
+                f"There is not enough sentences for {partition} partition."
+            )  # TODO
     return parts
 
 
