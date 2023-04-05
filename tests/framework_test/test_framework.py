@@ -3,8 +3,6 @@ from pathlib import Path
 
 import pytest
 
-from probing.config import data_folder
-from probing.data_former import TextFormer
 from probing.pipeline import ProbingPipeline
 
 
