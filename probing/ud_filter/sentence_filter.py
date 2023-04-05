@@ -34,7 +34,6 @@ class SentenceFilter:
     """
 
     def __init__(self, sentence: models.TokenList):
-
         self.sentence = sentence
         self.node_pattern: Dict[str, Dict[str, str]] = {}
         self.constraints: Dict[Tuple[str, str], Dict[Any, Any]] = {}

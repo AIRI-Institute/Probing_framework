@@ -34,7 +34,6 @@ class ProbingConlluFilter:
     """
 
     def __init__(self, shuffle: bool = True):
-
         self.shuffle = shuffle
         self.paths: List[Path] = []
         self.language: str = ""
