@@ -25,7 +25,7 @@ class TestProbingConlluFilter(unittest.TestCase):
             "ACL": ({"H": {}, "CL": {}}, {("H", "CL"): {"deprels": "^acl.*?$"}}),
         }
 
-        self.dir_conllu_path = "./test_filter_probing_data/conllu_folder/recl"
+        self.dir_conllu_path = "test_filter_probing_data/conllu_folder/recl"
 
     def test__filter_conllu_all_found(self):
         self.probing_filter.sentences = self.trees_testfile
@@ -71,8 +71,8 @@ class TestProbingConlluFilter(unittest.TestCase):
 
     def test_upload_files_conllu_paths(self):
         conllu_paths = [
-            "./test_filter_probing_data/conllu_folder/recl/ru_taiga-ud-test1.conllu",
-            "./test_filter_probing_data/conllu_folder/recl/ru_taiga-ud-test2.conllu",
+            "test_filter_probing_data/conllu_folder/recl/ru_taiga-ud-test1.conllu",
+            "test_filter_probing_data/conllu_folder/recl/ru_taiga-ud-test2.conllu",
         ]
         self.probing_filter.upload_files(conllu_paths=conllu_paths)
         self.assertEqual("ru_taiga", self.probing_filter.language)
@@ -84,12 +84,12 @@ class TestProbingConlluFilter(unittest.TestCase):
         self.assertEqual(32, len(self.probing_filter.sentences))
 
     def test_upload_files_empty_folder(self):
-        empty_path = "./test_filter_probing_data/empty_folder"
+        empty_path = "test_filter_probing_data/empty_folder"
         with self.assertRaises(AssertionError):
             self.probing_filter.upload_files(dir_conllu_path=empty_path)
 
     def test_upload_files_not_conllu_folder(self):
-        not_conllu_path = "./test_filter_probing_data/not_conllu_folder"
+        not_conllu_path = "test_filter_probing_data/not_conllu_folder"
         with self.assertRaises(AssertionError):
             self.probing_filter.upload_files(dir_conllu_path=not_conllu_path)
 
@@ -146,7 +146,7 @@ class TestProbingConlluFilter(unittest.TestCase):
 
     def test_filter_and_convert_too_few_sentences(self):
         self.probing_filter.upload_files(
-            dir_conllu_path="./test_filter_probing_data/conllu_folder/recl_too_few"
+            dir_conllu_path="test_filter_probing_data/conllu_folder/recl_too_few"
         )
         with self.assertRaises(Exception):
             self.probing_filter.filter_and_convert(queries=self.queries, task_name="cl")
