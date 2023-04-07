@@ -1,4 +1,54 @@
-# Syntactic UD probing
+# UD Filter (syntactic UD probing)
+Tool that allows you to construct datasets for more complex and customizable probing tasks. It filters CoNLL-U files by syntax and morphology at the same time. 
+Query language is in the form of python dictionaries (based on Grew-match).
+
+## Usage example
+1. Import the module and create an instance of the class
+```python
+from probing.ud_filter.filtering_probing import ProbingConlluFilter 
+
+probing_filter = ProbingConlluFilter()
+```
+
+2. Upload files from a list of paths to files or a path to the directory.
+```python
+my_path = './conllu_files_dir'
+probing_filter.upload_files(dir_conllu_path=my_path)
+```
+
+3. Create a query
+   * simple query with one class (all unmatched sentences will be in the negative class)
+   * complex query with multiple classes (only your classes will be used)
+```python
+# adverbal clause modifier
+simple_query = {
+    'ADVCL': (
+        {'H': {}, 'CL': {}},
+        {("H", "CL"): {"deprels": "^advcl$"}})
+}
+
+# adverbial clausal modifiers VS clausal modifiers of a noun
+complex_query = {
+    'ADVCL': (
+        {'H': {}, 'CL': {}}, 
+        {("H", "CL"): {"deprels": "^advcl$"}}),
+    'ACL': (
+        {'H':{}, 'CL':{},}, 
+        {("H", "CL"): {"deprels": "^acl$"}})
+}
+```
+
+4. Get files for your probing task
+```python
+probing_filter.filter_and_convert(queries=simple_query, 
+                                  task_name='advcl_presence', 
+                                  save_dir_path='advcl_prob_tasks')
+
+probing_filter.filter_and_convert(queries=complex_query, 
+                                  task_name='advcl_acl', 
+                                  save_dir_path='advcl_acl_prob_tasks')
+```
+
 ## Query guidelines
 
 <div class="page-body"><div><table id="8060f964-e1f1-47a8-8d75-03c808e02bb8" class="simple-table"><tbody><tr id="28a5fe4e-ccc2-460e-bef7-9b06630f30a2"><td id="KPlQ" class="" style="width:232.66666666666666px"><strong>description</strong></td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><strong>grew-match</strong></td><td id="iMHy" class="" style="width:232.66666666666666px"><strong>python dictionary</strong></td></tr><tr id="0cf1cce1-b7bf-482b-a7be-3acff7d8ecda"><td id="KPlQ" class="block-color-red_background" style="width:232.66666666666666px">NODES</td><td id="&gt;w{S" class="block-color-red_background" style="width:232.66666666666666px">NODES</td><td id="iMHy" class="block-color-red_background" style="width:232.66666666666666px">NODES</td></tr><tr id="4326b0bf-991f-49e2-a097-511a02577176"><td id="KPlQ" class="" style="width:232.66666666666666px">Match<strong> any node</strong> and give it the name N</td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><code>pattern { N [] }</code></td><td id="iMHy" class="" style="width:232.66666666666666px"><code>{&quot;N&quot;: {}}</code></td></tr><tr id="16391051-3027-4a5f-9b5d-e21c7a8d0af5"><td id="KPlQ" class="" style="width:232.66666666666666px">several nodes</td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><code>pattern {<br>N [];<br>M [];<br>}</code></td><td id="iMHy" class="" style="width:232.66666666666666px"><code>{&quot;N&quot;: {}, &quot;M&quot;: {}}</code></td></tr><tr id="09c89746-9c5e-4b5e-8f33-5a3e8f67d1e6"><td id="KPlQ" class="" style="width:232.66666666666666px">Impose several <strong>restrictions</strong> on the feature structure</td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><code>pattern { N [ upos=VERB, Mood=Ind, Person=&quot;1&quot; ] }</code></td><td id="iMHy" class="" style="width:232.66666666666666px"><code>{&quot;N&quot;: {&quot;upos&quot;: &quot;VERB&quot;, &quot;mood&quot;: &quot;Ind&quot;, &quot;Person&quot;=&quot;1&quot;}} </code></td></tr><tr id="c1546e5a-afa1-4d63-9498-8259920559e5"><td id="KPlQ" class="" style="width:232.66666666666666px">Use <strong>disjunction</strong> on the feature values</td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><code>pattern { N [ upos=VERB, lemma=&quot;run&quot;|&quot;walk&quot;, Mood=Ind|Imp ] }</code></td><td id="iMHy" class="" style="width:232.66666666666666px"><code>{&quot;N&quot;: {&quot;upos&quot;: &quot;VERB&quot;, &quot;lemma&quot;: &quot;run|walk&quot;, &quot;Mood&quot;: &quot;Ind|Imp&quot;}} </code></td></tr><tr id="4e3ee281-9ce4-49ff-a126-b6203c43ba4e"><td id="KPlQ" class="" style="width:232.66666666666666px">Use <strong>negation</strong> on feature values</td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><code>pattern { V [ upos=VERB, VerbForm &lt;&gt; Fin|Inf ] }</code></td><td id="iMHy" class="" style="width:232.66666666666666px"><code>{&quot;V&quot;: {&quot;upos&quot;: &quot;VERB&quot;, &quot;VerbForm&quot;: &quot;</code><strong><code>^(?!</code></strong><code>Fin|Inf</code><strong><code>$).*$&quot;</code></strong><code>}}</code></td></tr><tr id="ec236bad-c75b-4f0b-8803-8b9aff1cfaf3"><td id="KPlQ" class="" style="width:232.66666666666666px"><strong>Regular expression</strong> can be used for feature filtering</td><td id="&gt;w{S" class="" style="width:232.66666666666666px"><code>pattern {N [ form = re&quot;.*ing&quot; ]}
