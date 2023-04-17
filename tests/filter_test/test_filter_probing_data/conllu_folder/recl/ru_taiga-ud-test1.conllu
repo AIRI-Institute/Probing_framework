@@ -1,0 +1,350 @@
+# sent_id = 3
+# genre = social
+# text = Она решила попытаться остановить машину — хотя выйдя под дождь, сразу же промокла насквозь.
+1	Она	она	PRON	_	Case=Nom|Gender=Fem|Number=Sing|Person=3|PronType=Prs	2	nsubj	_	_
+2	решила	решить	VERB	_	Aspect=Perf|Gender=Fem|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	_
+3	попытаться	попытаться	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Mid	2	xcomp	_	_
+4	остановить	остановить	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	3	xcomp	_	_
+5	машину	машина	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	4	obj	_	_
+6	—	—	PUNCT	_	_	14	punct	_	_
+7	хотя	хотя	SCONJ	_	_	14	mark	_	_
+8	выйдя	выйти	VERB	_	Aspect=Perf|Tense=Past|VerbForm=Conv|Voice=Act	14	advcl	_	_
+9	под	под	ADP	_	_	10	case	_	_
+10	дождь	дождь	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	8	obl	_	SpaceAfter=No
+11	,	,	PUNCT	_	_	8	punct	_	_
+12	сразу	сразу	ADV	_	Degree=Pos	14	advmod	_	_
+13	же	же	PART	_	_	12	advmod	_	_
+14	промокла	промокнуть	VERB	_	Aspect=Perf|Gender=Fem|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	2	advcl	_	_
+15	насквозь	насквозь	ADV	_	Degree=Pos	14	advmod	_	SpaceAfter=No
+16	.	.	PUNCT	_	_	2	punct	_	_
+
+# sent_id = 7
+# genre = social
+# text = И пусть всё то, что кажется так сложно, решается красиво и легко!
+1	И	и	CCONJ	_	_	11	cc	_	_
+2	пусть	пусть	PART	_	_	11	advmod	_	_
+3	всё	весь	DET	_	Case=Nom|Gender=Neut|Number=Sing|PronType=Tot	4	det	_	_
+4	то	то	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Dem	11	nsubj:pass	_	SpaceAfter=No
+5	,	,	PUNCT	_	_	7	punct	_	_
+6	что	что	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Rel	7	nsubj	_	_
+7	кажется	казаться	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Mid	4	acl:relcl	_	_
+8	так	так	ADV	_	Degree=Pos|PronType=Dem	9	advmod	_	_
+9	сложно	сложный	ADJ	_	Degree=Pos|Gender=Neut|Number=Sing|Variant=Short	7	xcomp	_	SpaceAfter=No
+10	,	,	PUNCT	_	_	7	punct	_	_
+11	решается	решаться	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Mid	0	root	_	_
+12	красиво	красиво	ADV	_	Degree=Pos	11	advmod	_	_
+13	и	и	CCONJ	_	_	14	cc	_	_
+14	легко	легко	ADV	_	Degree=Pos	12	conj	_	SpaceAfter=No
+15	!	!	PUNCT	_	_	11	punct	_	_
+
+# sent_id = 31
+# genre = social
+# text = И охота завыть, вскинув морду к луне.
+1	И	и	CCONJ	_	_	2	cc	_	_
+2	охота	охота	VERB	_	_	0	root	_	_
+3	завыть	завыть	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	2	csubj	_	SpaceAfter=No
+4	,	,	PUNCT	_	_	5	punct	_	_
+5	вскинув	вскинуть	VERB	_	Aspect=Perf|Tense=Past|VerbForm=Conv|Voice=Act	3	advcl	_	_
+6	морду	морда	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	5	obj	_	_
+7	к	к	ADP	_	_	8	case	_	_
+8	луне	луна	NOUN	_	Animacy=Inan|Case=Dat|Gender=Fem|Number=Sing	5	obl	_	SpaceAfter=No
+9	.	.	PUNCT	_	_	2	punct	_	_
+
+# sent_id = 69
+# genre = social
+# text = Шейх Салих аль- Фаузан сказал: :"Кто противоречит этому манхаджу, начиная свой призыв с чего-то другого, тот противоречит призыву посланников.
+1	Шейх	шейх	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	6	nsubj	_	_
+2	Салих	Салих	PROPN	_	Animacy=Anim|Case=Nom|Gender=Masc|NameType=Giv|Number=Sing	1	appos	_	_
+3	аль	аль	PART	_	_	2	flat:name	_	SpaceAfter=No
+4	-	-	PUNCT	_	_	2	punct	_	_
+5	Фаузан	Фаузан	PROPN	_	Animacy=Anim|Case=Nom|Gender=Masc|NameType=Sur|Number=Sing	2	flat:name	_	_
+6	сказал	сказать	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	SpaceAfter=No
+7	:	:	PUNCT	_	_	10	punct	_	_
+8	:	:	PUNCT	_	_	10	punct	_	SpaceAfter=No
+9	"	"	PUNCT	_	_	10	punct	_	SpaceAfter=No
+10	Кто	кто	PRON	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing|PronType=Rel	11	nsubj	_	_
+11	противоречит	противоречить	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	22	acl	_	_
+12	этому	этот	DET	_	Case=Dat|Gender=Masc|Number=Sing|PronType=Dem	13	det	_	_
+13	манхаджу	манхадж	NOUN	_	Animacy=Inan|Case=Dat|Gender=Masc|Number=Sing	11	obj	_	SpaceAfter=No
+14	,	,	PUNCT	_	_	15	punct	_	_
+15	начиная	начинать	VERB	_	Aspect=Imp|Tense=Pres|VerbForm=Conv|Voice=Act	11	advcl	_	_
+16	свой	свой	DET	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing|Poss=Yes|PronType=Prs|Reflex=Yes	17	det	_	_
+17	призыв	призыв	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	15	obj	_	_
+18	с	с	ADP	_	_	19	case	_	_
+19	чего-то	что-то	PRON	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing|PronType=Ind	15	obl	_	_
+20	другого	другой	DET	_	Case=Gen|Gender=Neut|Number=Sing|PronType=Tot	19	det	_	SpaceAfter=No
+21	,	,	PUNCT	_	_	15	punct	_	_
+22	тот	тот	PRON	_	Case=Nom|Gender=Masc|Number=Sing|PronType=Dem	23	nsubj	_	_
+23	противоречит	противоречить	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	6	parataxis	_	_
+24	призыву	призыв	NOUN	_	Animacy=Inan|Case=Dat|Gender=Masc|Number=Sing	23	obj	_	_
+25	посланников	посланник	NOUN	_	Animacy=Anim|Case=Gen|Gender=Masc|Number=Plur	24	nmod	_	SpaceAfter=No
+26	.	.	PUNCT	_	_	6	punct	_	_
+
+# sent_id = 89
+# genre = social
+# text = 100 г растительного масла
+1	100	100	NUM	_	NumForm=Digit|NumType=Card	2	nummod:gov	_	_
+2	г	грамм	NOUN	_	Abbr=Yes	0	root	_	_
+3	растительного	растительный	ADJ	_	Case=Gen|Degree=Pos|Gender=Neut|Number=Sing	4	amod	_	_
+4	масла	масло	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	2	nmod	_	_
+
+# sent_id = 91
+# genre = social
+# text = И не предложит выпить, если ты решил жить трезвым.
+1	И	и	CCONJ	_	_	3	cc	_	_
+2	не	не	PART	_	Polarity=Neg	3	advmod	_	_
+3	предложит	предложить	VERB	_	Aspect=Perf|Mood=Ind|Number=Sing|Person=3|Tense=Fut|VerbForm=Fin|Voice=Act	0	root	_	_
+4	выпить	выпить	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	3	xcomp	_	SpaceAfter=No
+5	,	,	PUNCT	_	_	8	punct	_	_
+6	если	если	SCONJ	_	_	8	mark	_	_
+7	ты	ты	PRON	_	Case=Nom|Number=Sing|Person=2|PronType=Prs	8	nsubj	_	_
+8	решил	решить	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	3	advcl	_	_
+9	жить	жить	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	8	xcomp	_	_
+10	трезвым	трезвый	ADJ	_	Case=Ins|Degree=Pos|Gender=Masc|Number=Sing	9	xcomp	_	SpaceAfter=No
+11	.	.	PUNCT	_	_	3	punct	_	_
+
+# sent_id = 2019
+# genre = poetry
+# text = Смерть твоя — настолько благая весть, что посовестись — и умри!
+1	Смерть	смерть	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	6	nsubj	_	_
+2	твоя	твой	DET	_	Case=Nom|Gender=Fem|Number=Sing|Poss=Yes|PronType=Prs	1	det	_	_
+3	—	—	PUNCT	_	_	1	punct	_	_
+4	настолько	настолько	ADV	_	Degree=Pos|PronType=Dem	5	advmod	_	_
+5	благая	благой	ADJ	_	Case=Nom|Degree=Pos|Gender=Fem|Number=Sing	6	amod	_	_
+6	весть	весть	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	0	root	_	SpaceAfter=No
+7	,	,	PUNCT	_	_	9	punct	_	_
+8	что	что	SCONJ	_	_	9	mark	_	_
+9	посовестись	посовеститься	VERB	_	Aspect=Perf|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Mid	4	advcl	_	_
+10	—	—	PUNCT	_	_	12	punct	_	_
+11	и	и	CCONJ	_	_	12	cc	_	_
+12	умри	умереть	VERB	_	Aspect=Perf|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Act	9	conj	_	SpaceAfter=No
+13	!	!	PUNCT	_	_	6	punct	_	_
+
+# sent_id = 2021
+# genre = poetry
+# text = Ну, ложись им под ноги, в прах ложись, потому что уже пора!
+1	Ну	ну	PART	_	_	3	parataxis	_	SpaceAfter=No
+2	,	,	PUNCT	_	_	1	punct	_	_
+3	ложись	ложиться	VERB	_	Aspect=Imp|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Mid	0	root	_	_
+4	им	они	PRON	_	Case=Dat|Number=Plur|Person=3|PronType=Prs	3	iobj	_	_
+5	под	под	ADP	_	_	6	case	_	_
+6	ноги	нога	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Plur	3	obl	_	SpaceAfter=No
+7	,	,	PUNCT	_	_	10	punct	_	_
+8	в	в	ADP	_	_	9	case	_	_
+9	прах	прах	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	10	obl	_	_
+10	ложись	ложиться	VERB	_	Aspect=Imp|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Mid	3	conj	_	SpaceAfter=No
+11	,	,	PUNCT	_	_	15	punct	_	_
+12	потому	потому	ADV	_	Degree=Pos|PronType=Dem	15	mark	_	_
+13	что	что	SCONJ	_	_	12	fixed	_	_
+14	уже	уже	ADV	_	Degree=Pos	15	advmod	_	_
+15	пора	пора	NOUN	_	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	3	advcl	_	SpaceAfter=No
+16	!	!	PUNCT	_	_	3	punct	_	_
+
+# sent_id = 2041
+# genre = poetry
+# text = В печали ль, в радости ль, во хмелю, в потемках земельных недр, Я вас всей кровью своей люблю, сады мои — метр на метр!
+1	В	в	ADP	_	_	2	case	_	_
+2	печали	печаль	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing	22	advcl	_	_
+3	ль	ль	PART	_	_	2	advmod	_	SpaceAfter=No
+4	,	,	PUNCT	_	_	6	punct	_	_
+5	в	в	ADP	_	_	6	case	_	_
+6	радости	радость	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing	2	conj	_	_
+7	ль	ль	PART	_	_	6	advmod	_	SpaceAfter=No
+8	,	,	PUNCT	_	_	10	punct	_	_
+9	во	во	ADP	_	_	10	case	_	_
+10	хмелю	хмель	NOUN	_	Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing	2	conj	_	SpaceAfter=No
+11	,	,	PUNCT	_	_	13	punct	_	_
+12	в	в	ADP	_	_	13	case	_	_
+13	потемках	потемки	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Plur	2	conj	_	_
+14	земельных	земельный	ADJ	_	Case=Gen|Degree=Pos|Number=Plur	15	amod	_	_
+15	недр	недра	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Plur	13	nmod	_	SpaceAfter=No
+16	,	,	PUNCT	_	_	13	punct	_	_
+17	Я	я	PRON	_	Case=Nom|Number=Sing|Person=1|PronType=Prs	22	nsubj	_	_
+18	вас	вы	PRON	_	Case=Acc|Number=Plur|Person=2|PronType=Prs	22	obj	_	_
+19	всей	весь	DET	_	Case=Ins|Gender=Fem|Number=Sing|PronType=Tot	20	det	_	_
+20	кровью	кровь	NOUN	_	Animacy=Inan|Case=Ins|Gender=Fem|Number=Sing	22	obl	_	_
+21	своей	свой	DET	_	Case=Ins|Gender=Fem|Number=Sing|Poss=Yes|PronType=Prs|Reflex=Yes	20	det	_	_
+22	люблю	любить	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=1|Tense=Pres|VerbForm=Fin|Voice=Act	0	root	_	SpaceAfter=No
+23	,	,	PUNCT	_	_	24	punct	_	_
+24	сады	сад	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Plur	22	vocative	_	_
+25	мои	мой	DET	_	Case=Nom|Number=Plur|Poss=Yes|PronType=Prs	24	det	_	_
+26	—	—	PUNCT	_	_	24	punct	_	_
+27	метр	метр	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	24	nmod	_	_
+28	на	на	ADP	_	_	29	case	_	_
+29	метр	метр	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	24	nmod	_	SpaceAfter=No
+30	!	!	PUNCT	_	_	22	punct	_	_
+
+# sent_id = 2045
+# genre = poetry
+# text = Как защитить их, себя казня, до жуткой храня поры?
+1	Как	как	ADV	_	Degree=Pos|PronType=Int	2	advmod	_	_
+2	защитить	защитить	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	0	root	_	_
+3	их	они	PRON	_	Case=Acc|Number=Plur|Person=3|PronType=Prs	2	obj	_	SpaceAfter=No
+4	,	,	PUNCT	_	_	6	punct	_	_
+5	себя	себя	PRON	_	Case=Acc|PronType=Prs|Reflex=Yes	6	obj	_	_
+6	казня	казнить	VERB	_	Aspect=Imp|Tense=Pres|VerbForm=Conv|Voice=Act	2	advcl	_	SpaceAfter=No
+7	,	,	PUNCT	_	_	6	punct	_	_
+8	до	до	ADP	_	_	11	case	_	_
+9	жуткой	жуткий	ADJ	_	Case=Gen|Degree=Pos|Gender=Fem|Number=Sing	11	amod	_	_
+10	храня	хранить	VERB	_	Aspect=Imp|Tense=Pres|VerbForm=Conv|Voice=Act	6	conj	_	_
+11	поры	пора	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	10	obl	_	SpaceAfter=No
+12	?	?	PUNCT	_	_	2	punct	_	_
+
+# sent_id = 3005
+# genre = news
+# text = Как сообщается в пресс-релизе университета, программу можно использовать на любом смартфоне.
+1	Как	как	SCONJ	_	_	8	mark	_	_
+2	сообщается	сообщаться	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Mid	8	advcl	_	_
+3	в	в	ADP	_	_	4	case	_	_
+4	пресс-релизе	пресс-релиз	NOUN	_	Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing	2	obl	_	SpacesAfter=\n
+5	университета	университет	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing	4	nmod	_	SpaceAfter=No
+6	,	,	PUNCT	_	_	5	punct	_	_
+7	программу	программа	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	9	obj	_	_
+8	можно	можно	VERB	_	_	0	root	_	_
+9	использовать	использовать	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	8	csubj	_	SpacesAfter=\n
+10	на	на	ADP	_	_	12	case	_	_
+11	любом	любой	DET	_	Case=Loc|Gender=Masc|Number=Sing|PronType=Tot	12	det	_	_
+12	смартфоне	смартфон	NOUN	_	Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing	9	obl	_	SpaceAfter=No
+13	.	.	PUNCT	_	_	8	punct	_	SpacesAfter=\n
+
+# newpar
+# sent_id = 4041
+# genre = social
+# text = Вячеслав, почему бы Вам не возглавить КПРФ Пока оно ещё есть.
+1	Вячеслав	Вячеслав	PROPN	_	Animacy=Anim|Case=Nom|Gender=Masc|NameType=Giv|Number=Sing	7	vocative	_	SpaceAfter=No
+2	,	,	PUNCT	_	_	1	punct	_	_
+3	почему	почему	ADV	_	Degree=Pos|PronType=Rel	7	advmod	_	_
+4	бы	бы	AUX	_	Mood=Cnd	7	aux	_	_
+5	Вам	вы	PRON	_	Case=Dat|Number=Plur|Person=2|PronType=Prs	7	iobj	_	_
+6	не	не	PART	_	Polarity=Neg	7	advmod	_	_
+7	возглавить	возглавить	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	0	root	_	_
+8	КПРФ	КПРФ	PROPN	_	Abbr=Yes|NameType=Com	7	obj	_	_
+9	Пока	пока	SCONJ	_	_	12	mark	_	_
+10	оно	оно	PRON	_	Case=Nom|Gender=Neut|Number=Sing|Person=3|PronType=Prs	12	nsubj	_	_
+11	ещё	еще	ADV	_	Degree=Pos	12	advcl	_	_
+12	есть	быть	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	7	advcl	_	SpaceAfter=No
+12	есть	быть	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	7	advcl	_	SpaceAfter=No
+13	.	.	PUNCT	_	_	7	punct	_	_
+
+# sent_id = 1
+# text = Если ты устал, иди спать.
+1	Если	если	SCONJ	_	_	3	mark	_	TokenRange=0:4
+2	ты	ты	PRON	_	Case=Nom|Number=Sing|Person=2|PronType=Prs	3	nsubj	_	TokenRange=5:7
+3	устал	устать	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	5	advcl	_	SpaceAfter=No|TokenRange=8:13
+4	,	,	PUNCT	_	_	3	punct	_	TokenRange=13:14
+5	иди	идти	VERB	_	Aspect=Imp|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=15:18
+6	спать	спать	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	5	xcomp	_	SpaceAfter=No|TokenRange=19:24
+7	.	.	PUNCT	_	_	5	punct	_	SpacesAfter=\r\n|TokenRange=24:25
+
+# sent_id = 2
+# text = Если ты голодный, иди есть.
+1	Если	если	SCONJ	_	_	3	mark	_	TokenRange=27:31
+2	ты	ты	PRON	_	Case=Nom|Number=Sing|Person=2|PronType=Prs	3	nsubj	_	TokenRange=32:34
+3	голодный	голодный	ADJ	_	Case=Nom|Degree=Pos|Gender=Masc|Number=Sing	5	advcl	_	SpaceAfter=No|TokenRange=35:43
+4	,	,	PUNCT	_	_	3	punct	_	TokenRange=43:44
+5	иди	идти	VERB	_	Aspect=Imp|Mood=Imp|Number=Sing|Person=2|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=45:48
+6	есть	быть	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	5	xcomp	_	SpaceAfter=No|TokenRange=49:53
+7	.	.	PUNCT	_	_	5	punct	_	SpacesAfter=\r\n|TokenRange=53:54
+
+# sent_id = 3
+# text = Когда на улице темно, надо быть осторожным.
+1	Когда	когда	SCONJ	_	_	4	mark	_	TokenRange=56:61
+2	на	на	ADP	_	_	3	case	_	TokenRange=62:64
+3	улице	улица	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing	4	obl	_	TokenRange=65:70
+4	темно	темный	ADJ	_	Degree=Pos|Gender=Neut|Number=Sing|Variant=Short	6	advcl	_	SpaceAfter=No|TokenRange=71:76
+5	,	,	PUNCT	_	_	4	punct	_	TokenRange=76:77
+6	надо	надо	VERB	_	_	0	root	_	TokenRange=78:82
+7	быть	быть	AUX	_	Aspect=Imp|VerbForm=Inf|Voice=Act	8	cop	_	TokenRange=83:87
+8	осторожным	осторожный	ADJ	_	Case=Ins|Degree=Pos|Gender=Neut|Number=Sing	6	csubj	_	SpaceAfter=No|TokenRange=88:98
+9	.	.	PUNCT	_	_	6	punct	_	SpacesAfter=\r\n|TokenRange=98:99
+
+# sent_id = 4
+# text = Когда друзья тебя не слышат, не надо быть настойчивым.
+1	Когда	когда	SCONJ	_	_	5	mark	_	TokenRange=101:106
+2	друзья	друг	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Plur	5	nsubj	_	TokenRange=107:113
+3	тебя	ты	PRON	_	Case=Acc|Number=Sing|Person=2|PronType=Prs	5	obj	_	TokenRange=114:118
+4	не	не	PART	_	Polarity=Neg	5	advmod	_	TokenRange=119:121
+5	слышат	слышать	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	8	advcl	_	SpaceAfter=No|TokenRange=122:128
+6	,	,	PUNCT	_	_	5	punct	_	TokenRange=128:129
+7	не	не	PART	_	Polarity=Neg	8	advmod	_	TokenRange=130:132
+8	надо	надо	VERB	_	_	0	root	_	TokenRange=133:137
+9	быть	быть	AUX	_	Aspect=Imp|VerbForm=Inf|Voice=Act	10	cop	_	TokenRange=138:142
+10	настойчивым	настойчивый	ADJ	_	Case=Ins|Degree=Pos|Gender=Masc|Number=Sing	8	csubj	_	SpaceAfter=No|TokenRange=143:154
+11	.	.	PUNCT	_	_	8	punct	_	SpacesAfter=\r\n|TokenRange=154:155
+
+# sent_id = 5
+# text = Мы всё сдадим, потому что мы хорошие студенты.
+1	Мы	мы	PRON	_	Case=Nom|Number=Plur|Person=1|PronType=Prs	3	nsubj	_	TokenRange=157:159
+2	всё	всё	PRON	_	Animacy=Inan|Case=Acc|Gender=Neut|Number=Sing|PronType=Tot	3	obj	_	TokenRange=160:163
+3	сдадим	сдадить	VERB	_	Aspect=Perf|Mood=Ind|Number=Plur|Person=1|Tense=Fut|VerbForm=Fin|Voice=Act	0	root	_	SpaceAfter=No|TokenRange=164:170
+4	,	,	PUNCT	_	_	9	punct	_	TokenRange=170:171
+5	потому	потому	ADV	_	Degree=Pos|PronType=Dem	9	mark	_	TokenRange=172:178
+6	что	что	SCONJ	_	_	5	fixed	_	TokenRange=179:182
+7	мы	мы	PRON	_	Case=Nom|Number=Plur|Person=1|PronType=Prs	9	nsubj	_	TokenRange=183:185
+8	хорошие	хороший	ADJ	_	Case=Nom|Degree=Pos|Number=Plur	9	amod	_	TokenRange=186:193
+9	студенты	студент	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Plur	3	advcl	_	SpaceAfter=No|TokenRange=194:202
+10	.	.	PUNCT	_	_	3	punct	_	SpacesAfter=\r\n|TokenRange=202:203
+
+# sent_id = 6
+# text = Пришел мальчик, которому мама не дает конфеты.
+1	Пришел	прийти	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=205:211
+2	мальчик	мальчик	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	1	nsubj	_	SpaceAfter=No|TokenRange=212:219
+3	,	,	PUNCT	_	_	7	punct	_	TokenRange=219:220
+4	которому	который	PRON	_	Case=Dat|Gender=Masc|Number=Sing|PronType=Rel	7	iobj	_	TokenRange=221:229
+5	мама	мама	NOUN	_	Animacy=Anim|Case=Nom|Gender=Fem|Number=Sing	7	nsubj	_	TokenRange=230:234
+6	не	не	PART	_	Polarity=Neg	7	advmod	_	TokenRange=235:237
+7	дает	давать	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	2	acl:relcl	_	TokenRange=238:242
+8	конфеты	конфета	NOUN	_	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	7	obj	_	SpaceAfter=No|TokenRange=243:250
+9	.	.	PUNCT	_	_	1	punct	_	SpacesAfter=\r\n|TokenRange=250:251
+
+# sent_id = 7
+# text = Я увидел девочку, которая очень хочет спать.
+1	Я	я	PRON	_	Case=Nom|Number=Sing|Person=1|PronType=Prs	2	nsubj	_	TokenRange=253:254
+2	увидел	увидеть	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=255:261
+3	девочку	девочка	NOUN	_	Animacy=Anim|Case=Acc|Gender=Fem|Number=Sing	2	obj	_	SpaceAfter=No|TokenRange=262:269
+4	,	,	PUNCT	_	_	7	punct	_	TokenRange=269:270
+5	которая	который	PRON	_	Case=Nom|Gender=Fem|Number=Sing|PronType=Rel	7	nsubj	_	TokenRange=271:278
+6	очень	очень	ADV	_	Degree=Pos	7	advmod	_	TokenRange=279:284
+7	хочет	хотеть	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	3	acl:relcl	_	TokenRange=285:290
+8	спать	спать	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	7	xcomp	_	SpaceAfter=No|TokenRange=291:296
+9	.	.	PUNCT	_	_	2	punct	_	SpacesAfter=\r\n|TokenRange=296:297
+
+# sent_id = 8
+# text = Я увидел женщину, которую показывали в новостях.
+1	Я	я	PRON	_	Case=Nom|Number=Sing|Person=1|PronType=Prs	2	nsubj	_	TokenRange=299:300
+2	увидел	увидеть	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=301:307
+3	женщину	женщина	NOUN	_	Animacy=Anim|Case=Acc|Gender=Fem|Number=Sing	2	obj	_	SpaceAfter=No|TokenRange=308:315
+4	,	,	PUNCT	_	_	6	punct	_	TokenRange=315:316
+5	которую	который	PRON	_	Case=Acc|Gender=Fem|Number=Sing|PronType=Rel	6	obj	_	TokenRange=317:324
+6	показывали	показывать	VERB	_	Aspect=Imp|Mood=Ind|Number=Plur|Tense=Past|VerbForm=Fin|Voice=Act	3	acl:relcl	_	TokenRange=325:335
+7	в	в	ADP	_	_	8	case	_	TokenRange=336:337
+8	новостях	новость	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Plur	6	obl	_	SpaceAfter=No|TokenRange=338:346
+9	.	.	PUNCT	_	_	2	punct	_	SpacesAfter=\r\n|TokenRange=346:347
+
+# sent_id = 9
+# text = Мальчик взял игрушку, с которой не расставался с самого рождения.
+1	Мальчик	мальчик	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	2	nsubj	_	TokenRange=349:356
+2	взял	взять	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=357:361
+3	игрушку	игрушка	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	2	obj	_	SpaceAfter=No|TokenRange=362:369
+4	,	,	PUNCT	_	_	8	punct	_	TokenRange=369:370
+5	с	с	ADP	_	_	6	case	_	TokenRange=371:372
+6	которой	который	PRON	_	Case=Gen|Gender=Fem|Number=Sing|PronType=Rel	8	obl	_	TokenRange=373:380
+7	не	не	PART	_	Polarity=Neg	8	advmod	_	TokenRange=381:383
+8	расставался	расставаться	VERB	_	Aspect=Imp|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Mid	3	acl:relcl	_	TokenRange=384:395
+9	с	с	ADP	_	_	11	case	_	TokenRange=396:397
+10	самого	самый	DET	_	Case=Gen|Gender=Neut|Number=Sing	11	det	_	TokenRange=398:404
+11	рождения	рождение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	8	obl	_	SpaceAfter=No|TokenRange=405:413
+12	.	.	PUNCT	_	_	2	punct	_	SpacesAfter=\r\n|TokenRange=413:414
+
+# sent_id = 10
+# text = Девочка съела кашу, которую для нее приготовил папа.
+1	Девочка	девочка	NOUN	_	Animacy=Anim|Case=Nom|Gender=Fem|Number=Sing	2	nsubj	_	TokenRange=416:423
+2	съела	съесть	VERB	_	Aspect=Perf|Gender=Fem|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	TokenRange=424:429
+3	кашу	каша	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	2	obj	_	SpaceAfter=No|TokenRange=430:434
+4	,	,	PUNCT	_	_	8	punct	_	TokenRange=434:435
+5	которую	который	PRON	_	Case=Acc|Gender=Fem|Number=Sing|PronType=Rel	8	obj	_	TokenRange=436:443
+6	для	для	ADP	_	_	7	case	_	TokenRange=444:447
+7	нее	она	PRON	_	Case=Gen|Gender=Fem|Number=Sing|Person=3|PronType=Prs	8	obl	_	TokenRange=448:451
+8	приготовил	приготовить	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	3	acl:relcl	_	TokenRange=452:462
+9	папа	папа	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	8	nsubj	_	SpaceAfter=No|TokenRange=463:467
+10	.	.	PUNCT	_	_	2	punct	_	SpaceAfter=No|TokenRange=467:468

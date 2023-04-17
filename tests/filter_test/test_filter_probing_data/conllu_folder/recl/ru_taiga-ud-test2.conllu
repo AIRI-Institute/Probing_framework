@@ -1,0 +1,170 @@
+# newpar
+# sent_id = 6433
+# genre = social
+# text = Поверните голову сначала 5 раз вправо, а затем 5 раз влево.
+1	Поверните	повернуть	VERB	_	Aspect=Perf|Mood=Imp|Number=Plur|Person=2|VerbForm=Fin|Voice=Act	0	root	_	_
+2	голову	голова	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	1	obj	_	_
+3	сначала	сначала	ADV	_	Degree=Pos	6	advmod	_	_
+4	5	5	NUM	_	NumForm=Digit|NumType=Card	5	nummod:gov	_	_
+5	раз	раз	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Plur	6	obl	_	_
+6	вправо	вправо	ADV	_	Degree=Pos	1	advmod	_	SpaceAfter=No
+7	,	,	PUNCT	_	_	12	punct	_	_
+8	а	а	CCONJ	_	_	12	cc	_	_
+9	затем	затем	ADV	_	Degree=Pos|PronType=Dem	12	advmod	_	_
+10	5	5	NUM	_	NumForm=Digit|NumType=Card	11	nummod:gov	_	_
+11	раз	раз	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Plur	12	obl	_	_
+12	влево	влево	ADV	_	Degree=Pos	6	conj	_	SpaceAfter=No
+13	.	.	PUNCT	_	_	1	punct	_	_
+
+# sent_id = 15
+# genre = social
+# text = Счастье это качество, не имеющее будущего и прошлого.
+1	Счастье	счастье	NOUN	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing	3	nsubj	_	_
+2	это	это	PART	_	_	3	expl	_	_
+3	качество	качество	NOUN	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing	0	root	_	SpaceAfter=No
+4	,	,	PUNCT	_	_	6	punct	_	_
+5	не	не	PART	_	Polarity=Neg	6	advmod	_	_
+6	имеющее	иметь	VERB	_	Aspect=Imp|Case=Nom|Gender=Neut|Number=Sing|Tense=Pres|VerbForm=Part|Voice=Act	3	acl	_	_
+7	будущего	будущее	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	6	obj	_	_
+8	и	и	CCONJ	_	_	9	cc	_	_
+9	прошлого	прошлое	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	7	conj	_	SpaceAfter=No
+10	.	.	PUNCT	_	_	3	punct	_	_
+
+# sent_id = 39
+# genre = social
+# text = Но есть мужчина, которого я не хотела бы потерять...
+1	Но	но	CCONJ	_	_	2	cc	_	_
+2	есть	быть	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	0	root	_	_
+3	мужчина	мужчина	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	2	nsubj	_	SpaceAfter=No
+4	,	,	PUNCT	_	_	8	punct	_	_
+5	которого	который	PRON	_	Animacy=Anim|Case=Acc|Gender=Masc|Number=Sing|PronType=Rel	10	obj	_	_
+6	я	я	PRON	_	Case=Nom|Number=Sing|Person=1|PronType=Prs	8	nsubj	_	_
+7	не	не	PART	_	Polarity=Neg	8	advmod	_	_
+8	хотела	хотеть	VERB	_	Aspect=Imp|Gender=Fem|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	3	acl:relcl	_	_
+9	бы	бы	AUX	_	Mood=Cnd	8	aux	_	_
+10	потерять	потерять	VERB	_	Aspect=Perf|VerbForm=Inf|Voice=Act	8	xcomp	_	SpaceAfter=No
+11	...	...	PUNCT	_	_	2	punct	_	_
+
+# sent_id = 43
+# genre = social
+# text = Если вы перебрали со спиртным, и это привело к головокружению
+1	Если	если	SCONJ	_	_	3	mark	_	_
+2	вы	вы	PRON	_	Case=Nom|Number=Plur|Person=2|PronType=Prs	3	nsubj	_	_
+3	перебрали	перебрать	VERB	_	Aspect=Perf|Mood=Ind|Number=Plur|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	_
+4	со	со	ADP	_	_	5	case	_	_
+5	спиртным	спиртное	NOUN	_	Animacy=Inan|Case=Ins|Gender=Neut|Number=Sing	3	obl	_	SpaceAfter=No
+6	,	,	PUNCT	_	_	9	punct	_	_
+7	и	и	CCONJ	_	_	9	cc	_	_
+8	это	это	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Dem	9	nsubj	_	_
+9	привело	привести	VERB	_	Aspect=Perf|Gender=Neut|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	3	conj	_	_
+10	к	к	ADP	_	_	11	case	_	_
+11	головокружению	головокружение	NOUN	_	Animacy=Inan|Case=Dat|Gender=Neut|Number=Sing	9	obl	_	_
+
+# sent_id = 49
+# genre = social
+# text = Среди разных сыновей был один, который звал себя Сыном Божьим.
+1	Среди	среди	ADP	_	_	3	case	_	_
+2	разных	разный	ADJ	_	Case=Gen|Degree=Pos|Number=Plur	3	amod	_	_
+3	сыновей	сын	NOUN	_	Animacy=Anim|Case=Gen|Gender=Masc|Number=Plur	0	root	_	_
+4	был	быть	AUX	_	Aspect=Imp|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	3	cop	_	_
+5	один	один	DET	_	Case=Nom|Gender=Masc|Number=Sing|PronType=Ind	3	nsubj	_	SpaceAfter=No
+6	,	,	PUNCT	_	_	8	punct	_	_
+7	который	который	PRON	_	Case=Nom|Gender=Masc|Number=Sing|PronType=Rel	8	nsubj	_	_
+8	звал	звать	VERB	_	Aspect=Imp|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	5	acl:relcl	_	_
+9	себя	себя	PRON	_	Case=Acc|PronType=Prs|Reflex=Yes	8	obj	_	_
+10	Сыном	сын	NOUN	_	Animacy=Anim|Case=Ins|Gender=Masc|Number=Sing	8	iobj	_	_
+11	Божьим	божий	ADJ	_	Case=Ins|Degree=Pos|Gender=Masc|Number=Sing|Poss=Yes	10	amod	_	SpaceAfter=No
+12	.	.	PUNCT	_	_	3	punct	_	_
+
+# sent_id = 2057
+# genre = poetry
+# text = Неужто вправду сгорел тот мост, которым я к ним пройду?!
+1	Неужто	неужто	ADV	_	Degree=Pos	2	advmod	_	_
+2	вправду	вправду	ADV	_	Degree=Pos	3	advmod	_	_
+3	сгорел	сгореть	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	_
+4	тот	тот	DET	_	Case=Nom|Gender=Masc|Number=Sing|PronType=Dem	5	det	_	_
+5	мост	мост	NOUN	_	Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing	3	nsubj	_	SpaceAfter=No
+6	,	,	PUNCT	_	_	11	punct	_	_
+7	которым	который	PRON	_	Case=Ins|Gender=Masc|Number=Sing|PronType=Rel	11	iobj	_	_
+8	я	я	PRON	_	Case=Nom|Number=Sing|Person=1|PronType=Prs	11	nsubj	_	_
+9	к	к	ADP	_	_	10	case	_	_
+10	ним	они	PRON	_	Case=Dat|Number=Plur|Person=3|PronType=Prs	11	obl	_	_
+11	пройду	пройти	VERB	_	Aspect=Perf|Mood=Ind|Number=Sing|Person=1|Tense=Fut|VerbForm=Fin|Voice=Act	5	acl:relcl	_	SpaceAfter=No
+12	?!	?!	PUNCT	_	_	11	punct	_	_
+
+# sent_id = 2133
+# genre = poetry
+# text = Над моей головой пляшет красный лев, Всё, что есть на земле, гривой щекоча.
+1	Над	над	ADP	_	_	3	case	_	_
+2	моей	мой	DET	_	Case=Ins|Gender=Fem|Number=Sing|Poss=Yes|PronType=Prs	3	det	_	_
+3	головой	голова	NOUN	_	Animacy=Inan|Case=Ins|Gender=Fem|Number=Sing	4	obl	_	_
+4	пляшет	плясать	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	0	root	_	_
+5	красный	красный	ADJ	_	Case=Nom|Degree=Pos|Gender=Masc|Number=Sing	6	amod	_	_
+6	лев	лев	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	4	nsubj	_	SpaceAfter=No
+7	,	,	PUNCT	_	_	16	punct	_	_
+8	Всё	всё	PRON	_	Animacy=Inan|Case=Acc|Gender=Neut|Number=Sing|PronType=Tot	16	obj	_	SpaceAfter=No
+9	,	,	PUNCT	_	_	13	punct	_	_
+10	что	что	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Rel	13	nsubj	_	_
+11	есть	быть	AUX	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	13	cop	_	_
+12	на	на	ADP	_	_	13	case	_	_
+13	земле	земля	NOUN	_	Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing	8	acl:relcl	_	SpaceAfter=No
+14	,	,	PUNCT	_	_	13	punct	_	_
+15	гривой	грива	NOUN	_	Animacy=Inan|Case=Ins|Gender=Fem|Number=Sing	16	iobj	_	_
+16	щекоча	щекотать	VERB	_	Aspect=Imp|Tense=Pres|VerbForm=Conv|Voice=Act	4	advcl	_	SpaceAfter=No
+17	.	.	PUNCT	_	_	4	punct	_	_
+
+# sent_id = 3007
+# genre = news
+# text = Она заставляет смартфон постоянно испускать высокочастотный звук, неразличимый для человеческого уха, но улавливаемый микрофоном устройства.
+1	Она	она	PRON	_	Case=Nom|Gender=Fem|Number=Sing|Person=3|PronType=Prs	2	nsubj	_	_
+2	заставляет	заставлять	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	0	root	_	_
+3	смартфон	смартфон	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	2	obj	_	SpacesAfter=\n
+4	постоянно	постоянно	ADV	_	Degree=Pos	5	advmod	_	_
+5	испускать	испускать	VERB	_	Aspect=Imp|VerbForm=Inf|Voice=Act	2	xcomp	_	_
+6	высокочастотный	высокочастотный	ADJ	_	Animacy=Inan|Case=Acc|Degree=Pos|Gender=Masc|Number=Sing	7	amod	_	_
+7	звук	звук	NOUN	_	Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing	5	obj	_	SpaceAfter=No
+8	,	,	PUNCT	_	_	9	punct	_	_
+9	неразличимый	неразличимый	ADJ	_	Animacy=Inan|Case=Acc|Degree=Pos|Gender=Masc|Number=Sing	7	acl	_	_
+10	для	для	ADP	_	_	12	case	_	_
+11	человеческого	человеческий	ADJ	_	Case=Gen|Degree=Pos|Gender=Neut|Number=Sing	12	amod	_	_
+12	уха	ухо	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	9	obl	_	SpaceAfter=No
+13	,	,	PUNCT	_	_	15	punct	_	_
+14	но	но	CCONJ	_	_	15	cc	_	_
+15	улавливаемый	улавливать	VERB	_	Animacy=Inan|Aspect=Imp|Case=Acc|Gender=Masc|Number=Sing|Tense=Pres|VerbForm=Part|Voice=Pass	9	conj	_	_
+16	микрофоном	микрофон	NOUN	_	Animacy=Inan|Case=Ins|Gender=Masc|Number=Sing	15	obl:agent	_	_
+17	устройства	устройство	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	16	nmod	_	SpaceAfter=No
+18	.	.	PUNCT	_	_	2	punct	_	_
+
+# newpar
+# sent_id = 4039
+# genre = social
+# text = То, что никакого отношения к ним не имеет
+1	То	то	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Dem	0	root	_	SpaceAfter=No
+2	,	,	PUNCT	_	_	9	punct	_	_
+3	что	что	PRON	_	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing|PronType=Rel	9	nsubj	_	_
+4	никакого	никакой	DET	_	Case=Gen|Gender=Neut|Number=Sing|PronType=Neg	5	det	_	_
+5	отношения	отношение	NOUN	_	Animacy=Inan|Case=Gen|Gender=Neut|Number=Sing	9	obj	_	_
+6	к	к	ADP	_	_	7	case	_	_
+7	ним	они	PRON	_	Case=Dat|Number=Plur|Person=3|PronType=Prs	9	obl	_	_
+8	не	не	PART	_	Polarity=Neg	9	advmod	_	_
+9	имеет	иметь	VERB	_	Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Act	1	acl:relcl	_	_
+
+# sent_id = 4255
+# genre = social
+# text = Депутат ЛДПР, которого не пустили в "Европейский", объяснил причину конфликта с охранниками
+1	Депутат	депутат	NOUN	_	Animacy=Anim|Case=Nom|Gender=Masc|Number=Sing	12	nsubj	_	_
+2	ЛДПР	ЛДПР	PROPN	_	Abbr=Yes|NameType=Com	1	nmod	_	SpaceAfter=No
+3	,	,	PUNCT	_	_	6	punct	_	_
+4	которого	который	PRON	_	Animacy=Anim|Case=Acc|Gender=Masc|Number=Sing|PronType=Rel	6	obj	_	_
+5	не	не	PART	_	Polarity=Neg	6	advmod	_	_
+6	пустили	пустить	VERB	_	Aspect=Perf|Mood=Ind|Number=Plur|Tense=Past|VerbForm=Fin|Voice=Act	2	acl:relcl	_	_
+7	в	в	ADP	_	_	9	case	_	_
+8	"	"	PUNCT	_	_	9	punct	_	SpaceAfter=No
+9	Европейский	европейский	ADJ	_	Animacy=Inan|Case=Acc|Degree=Pos|Gender=Masc|Number=Sing	6	obl	_	SpaceAfter=No
+10	"	"	PUNCT	_	_	9	punct	_	SpaceAfter=No
+11	,	,	PUNCT	_	_	6	punct	_	_
+12	объяснил	объяснить	VERB	_	Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act	0	root	_	_
+13	причину	причина	NOUN	_	Animacy=Inan|Case=Acc|Gender=Fem|Number=Sing	12	obj	_	_
+14	конфликта	конфликт	NOUN	_	Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing	13	nmod	_	_
+15	с	с	ADP	_	_	16	case	_	_
+16	охранниками	охранник	NOUN	_	Animacy=Anim|Case=Ins|Gender=Masc|Number=Plur	14	nmod	_	_
