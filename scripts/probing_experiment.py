@@ -59,7 +59,7 @@ def main(
         "English",
     ]
     for lang in tqdm(bloom_langs, desc="Processing by languages"):
-        experiment.transformer_model.Caching.clear()  # clear cache for optimal work before a new language
+        experiment.transformer_model.Caching.cache.clear()  # clear cache for optimal work before a new language
         torch.cuda.empty_cache()
         gc.collect()
 
