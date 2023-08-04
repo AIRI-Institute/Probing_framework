@@ -1,13 +1,14 @@
 import logging as info_logging
 import typing
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
+from typing_extensions import Literal
 
 import numpy as np
 import torch
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import AutoConfig, AutoModel, AutoTokenizer
+from transformers import AutoConfig, AutoModel, AutoTokenizer, AutoModelForCausalLM
 from transformers.utils import logging
 
 from probing.cacher import Cacher
@@ -33,25 +34,20 @@ class TransformersLoader:
         output_attentions: bool = True,
         model_max_length: int = 512,
     ):
-        self.config = (
-            AutoConfig.from_pretrained(
-                model_name,
-                output_hidden_states=output_hidden_states,
-                output_attentions=output_attentions,
-            )
-            if model_name
-            else None
-        )
-        self.model = (
-            AutoModel.from_pretrained(model_name, config=self.config)
-            if model_name
-            else None
-        )
-        self.tokenizer = (
-            AutoTokenizer.from_pretrained(model_name, config=self.config)
-            if model_name
-            else None
-        )
+       # self.model = (
+       #     AutoModel.from_pretrained(model_name, config=self.config)
+       #     if model_name
+       #     else None
+       # )
+       # self.tokenizer = (
+       #     AutoTokenizer.from_pretrained(model_name, config=self.config)
+       #     if model_name
+       #     else None
+       # )
+        self.model_name = model_name
+        self.device = device
+        self.tokenizer = self.load_tokenizer()
+        self.model, self.config = self.load_model()
 
         self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
         self.truncation = truncation
@@ -59,10 +55,46 @@ class TransformersLoader:
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
-        self.device = device
         self.model_max_length = model_max_length
 
         self.init_device()
+        
+    def load_tokenizer(self) -> AutoTokenizer:
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        if 'bigcode' in self.model_name:
+            tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        return tokenizer
+    
+    def load_model(self) -> AutoModel:
+        if 'santacoder' in self.model_name:
+            model = AutoModelForCausalLM.from_pretrained(
+                self.model_name, trust_remote_code=True,
+                output_attentions=True, output_hidden_states=True,
+            ).base_model
+            config = (
+                AutoConfig.from_pretrained(
+                    self.model_name,
+                    output_hidden_states=True,
+                    output_attentions=True,
+                    trust_remote_code=True,
+                )
+                if self.model_name
+                else None
+            )
+        else:
+            model = AutoModel.from_pretrained(
+                self.model_name, output_attentions=True, output_hidden_states=True
+            )
+            config = (
+                AutoConfig.from_pretrained(
+                    self.model_name,
+                    output_hidden_states=True,
+                    output_attentions=True,
+                )
+                if self.model_name
+                else None
+            )
+        return model.eval().to(self.device), config
 
     def init_device(self):
         """

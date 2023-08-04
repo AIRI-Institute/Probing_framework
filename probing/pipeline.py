@@ -13,6 +13,7 @@ from transformers.utils import logging
 from probing.classifier import MLP, LogReg, MDLLinearModel
 from probing.data_former import TextFormer
 from probing.encoder import TransformersLoader
+from probing.modeling_utils import TransformerModel
 from probing.metric import Metric
 from probing.types import (
     AggregationType,
@@ -60,6 +61,7 @@ class ProbingPipeline:
         self.transformer_model = TransformersLoader(
             model_name=hf_model_name, device=device, truncation=truncation
         )
+       # self.transformer_model = TransformerModel(model_name=model_name, device=device)
         self.criterion: Any = None
 
     def get_classifier(

@@ -1,10 +1,12 @@
 from enum import Enum
-from typing import Literal
+#from typing import Literal
+from typing_extensions import Literal
 
 
 class MetricType(str, Enum):
     ACCURACY = "accuracy"
     F1 = "f1"
+    CLASSIFICATION_REPORT = "classification_report"
 
 
 class ClassifierType(str, Enum):

@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
@@ -43,9 +44,18 @@ class TextFormer:
     def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
-        f = open(self.data_path)
-        for line in list(f):
-            stage, label, text = line.strip().split("\t")
+        #with open(self.data_path) as file:
+        #    f = file.read()
+        #f = f.split("\n\n")
+        #for line in list(f):
+        #    print(line.split("\t", maxsplit=2))
+        #    stage, label, text = line.split("\t", maxsplit=2)
+        #    samples_dict[stage].append((text, label))
+        #    unique_labels.add(label)
+        
+        dataset = pd.read_csv(self.data_path, sep="\t", header=None)
+        
+        for num, (stage, label, text) in dataset.iterrows():
             samples_dict[stage].append((text, label))
             unique_labels.add(label)
 
