@@ -47,7 +47,7 @@ class TextFormer:
     ) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
-        dataset = pd.read_csv(self.data_path, sep=sep, header=None)
+        dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
         for _, (stage, label, text) in dataset.iterrows():
             samples_dict[stage].append((text, label))
             unique_labels.add(label)
