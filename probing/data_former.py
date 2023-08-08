@@ -17,13 +17,14 @@ class TextFormer:
         self,
         probe_task: Union[UDProbingTaskName, str],
         data_path: Optional[os.PathLike] = None,
+        sep: str = "\t",
         shuffle: bool = True,
     ):
         self.probe_task = probe_task
         self.shuffle = shuffle
         self.data_path = get_probe_task_path(probe_task, data_path)
 
-        self.samples, self.unique_labels = self.form_data()
+        self.samples, self.unique_labels = self.form_data(sep=sep)
 
     def __len__(self):
         return len(self.samples)

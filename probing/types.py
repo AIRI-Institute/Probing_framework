@@ -1,9 +1,9 @@
 from enum import Enum
 
 try:
-    from typing import Literal
+    from typing import Literal  # type: ignore
 except:
-    from typing_extensions import Literal
+    from typing_extensions import Literal  # type: ignore
 
 
 class MetricType(str, Enum):
