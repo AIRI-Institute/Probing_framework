@@ -1,6 +1,8 @@
-import fire
 import os
 from typing import Optional
+
+import fire
+
 from probing.ud_parser.ud_parser import ConlluUDParser
 
 

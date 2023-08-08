@@ -34,3 +34,6 @@ class Cacher:
             decoded_text = self.tokenizer.decode(input_ids_unpad)
             cached_tensors_list.append(self.cache[decoded_text])
         return cached_tensors_list
+
+    def clear(self):
+        self.cache = {}

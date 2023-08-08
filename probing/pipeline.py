@@ -146,8 +146,9 @@ class ProbingPipeline:
         save_checkpoints: bool = False,
         verbose: bool = True,
         do_control_task: bool = False,
+        sep: str = "\t",
     ) -> None:
-        task_data = TextFormer(probe_task, path_to_task_file)
+        task_data = TextFormer(probe_task, path_to_task_file, sep)
         task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
         task_language, task_category = lang_category_extraction(task_data.data_path)
 

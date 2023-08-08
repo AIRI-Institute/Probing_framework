@@ -5,4 +5,5 @@ conllu
 accelerate==0.12.0
 pydantic==1.8.2
 nltk==3.7
+pandas==1.3.5
 networkx

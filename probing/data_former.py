@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
@@ -16,13 +17,14 @@ class TextFormer:
         self,
         probe_task: Union[UDProbingTaskName, str],
         data_path: Optional[os.PathLike] = None,
+        sep: str = "\t",
         shuffle: bool = True,
     ):
         self.probe_task = probe_task
         self.shuffle = shuffle
         self.data_path = get_probe_task_path(probe_task, data_path)
 
-        self.samples, self.unique_labels = self.form_data()
+        self.samples, self.unique_labels = self.form_data(sep=sep)
 
     def __len__(self):
         return len(self.samples)
@@ -40,12 +42,13 @@ class TextFormer:
         return ratio_by_classes
 
     @typing.no_type_check
-    def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
+    def form_data(
+        self, sep: str = "\t"
+    ) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
-        f = open(self.data_path)
-        for line in list(f):
-            stage, label, text = line.strip().split("\t")
+        dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
+        for _, (stage, label, text) in dataset.iterrows():
             samples_dict[stage].append((text, label))
             unique_labels.add(label)
 
