@@ -1,16 +1,17 @@
-import glob
-from tqdm import tqdm
-from pathlib import Path
-import random
-import numpy as np
-import traceback
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
-import torch
-import fire
-import uuid
-from typing import Optional
 import gc
+import glob
 import os
+import random
+import traceback
+import uuid
+from pathlib import Path
+from typing import Optional
+
+import fire
+import numpy as np
+import torch
+from tqdm import tqdm
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 from probing.pipeline import ProbingPipeline
 
@@ -130,7 +131,7 @@ def main(
         "English",
     ]
     for lang in tqdm(bloom_langs, desc="Processing by languages"):
-        experiment.transformer_model.cache.clear()  # clear cache for optimal work before a new language
+        experiment.transformer_model.Caching.clear()  # clear cache for optimal work before a new language
         torch.cuda.empty_cache()
         gc.collect()
 

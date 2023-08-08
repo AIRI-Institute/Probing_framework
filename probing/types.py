@@ -1,5 +1,9 @@
 from enum import Enum
-from typing import Literal
+
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 
 class MetricType(str, Enum):

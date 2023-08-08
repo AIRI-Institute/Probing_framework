@@ -1,6 +1,11 @@
 import logging as info_logging
 import typing
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
+
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import numpy as np
 import torch
