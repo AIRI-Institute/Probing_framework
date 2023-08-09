@@ -16,7 +16,7 @@ class TestTruncation(unittest.TestCase):
     experiment1 = ProbingPipeline(
         hf_model_name="bert-base-multilingual-uncased", device="cpu"
     )
-    experiment2 = ProbingPipeline(hf_model_name="bigscience/bloom-560m", device="cpu")
+    experiment2 = ProbingPipeline(hf_model_name="t5-small", device="cpu")
 
     def test_launch_right(self):
         tokenized_text = self.experiment1.transformer_model.tokenize_text(
@@ -25,7 +25,11 @@ class TestTruncation(unittest.TestCase):
         _, _, excluded_rows = self.experiment1.transformer_model._fix_tokenized_tensors(
             tokenized_text
         )
-        self.assertEqual(len(excluded_rows), 1)
+        tokenized_tensor = tokenized_text["input_ids"][
+            :, self.experiment1.transformer_model.tokenizer.model_max_length :
+        ]
+        gold_answer = tokenized_tensor[tokenized_tensor[:, 0] != 0].shape[0]
+        self.assertEqual(len(excluded_rows), gold_answer)
 
     def test_launch_left(self):
         tokenized_text = self.experiment2.transformer_model.tokenize_text(
@@ -34,4 +38,8 @@ class TestTruncation(unittest.TestCase):
         _, _, excluded_rows = self.experiment2.transformer_model._fix_tokenized_tensors(
             tokenized_text
         )
-        self.assertEqual(len(excluded_rows), 4)
+        tokenized_tensor = tokenized_text["input_ids"][
+            :, self.experiment2.transformer_model.tokenizer.model_max_length :
+        ]
+        gold_answer = tokenized_tensor[tokenized_tensor[:, 0] != 0].shape[0]
+        self.assertEqual(len(excluded_rows), gold_answer)

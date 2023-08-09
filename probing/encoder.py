@@ -36,7 +36,6 @@ class TransformersLoader:
         return_dict: bool = True,
         output_hidden_states: bool = True,
         output_attentions: bool = True,
-        model_max_length: int = 512,
     ):
         self.config = (
             AutoConfig.from_pretrained(
@@ -58,14 +57,12 @@ class TransformersLoader:
             else None
         )
 
-        self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
         self.truncation = truncation
         self.padding = padding
         self.return_tensors = return_tensors
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
         self.device = device
-        self.model_max_length = model_max_length
 
         self.init_device()
 
@@ -130,24 +127,27 @@ class TransformersLoader:
     ) -> Tuple[torch.Tensor, torch.Tensor, List[int]]:
         input_ids = tokenized_text["input_ids"]
         attention_mask = tokenized_text["attention_mask"]
-        if not self.truncation and input_ids.size()[1] > self.model_max_length:
+        if (
+            not self.truncation
+            and input_ids.size()[1] > self.tokenizer.model_max_length
+        ):
             pad_token_id = self.tokenizer.pad_token_id
             if self.tokenizer.padding_side == "left":
                 row_ids_to_exclude = torch.where(
-                    input_ids[:, -self.model_max_length - 1] != pad_token_id
+                    input_ids[:, -self.tokenizer.model_max_length - 1] != pad_token_id
                 )
             else:
                 row_ids_to_exclude = torch.where(
-                    input_ids[:, self.model_max_length - 1] != pad_token_id
+                    input_ids[:, self.tokenizer.model_max_length - 1] != pad_token_id
                 )
             if isinstance(row_ids_to_exclude, tuple):
                 row_ids_to_exclude = row_ids_to_exclude[0]
 
             input_ids = self.exclude_rows(input_ids, row_ids_to_exclude)[
-                :, : self.model_max_length
+                :, : self.tokenizer.model_max_length
             ]
             attention_mask = self.exclude_rows(attention_mask, row_ids_to_exclude)[
-                :, : self.model_max_length
+                :, : self.tokenizer.model_max_length
             ]
             row_ids_to_exclude = row_ids_to_exclude.tolist()
         else:
@@ -352,10 +352,12 @@ class TransformersLoader:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
-        if self.tokenizer.model_max_length > self.model_max_length:
-            logger.warning(
-                f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
-            )
+        self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
+
+        # if self.tokenizer.model_max_length > self.model_max_length:
+        #     logger.warning(
+        #         f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
+        #     )
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
