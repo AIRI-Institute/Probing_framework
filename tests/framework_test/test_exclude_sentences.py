@@ -26,7 +26,7 @@ class TestTruncation(unittest.TestCase):
             tokenized_text
         )
         tokenized_tensor = tokenized_text["input_ids"][
-            :, self.experiment1.transformer_model.tokenizer.model_max_len :
+            :, self.experiment1.transformer_model.tokenizer.model_max_length :
         ]
         gold_answer = tokenized_tensor[tokenized_tensor[:, 0] != 0].shape[0]
         self.assertEqual(len(excluded_rows), gold_answer)
@@ -39,7 +39,7 @@ class TestTruncation(unittest.TestCase):
             tokenized_text
         )
         tokenized_tensor = tokenized_text["input_ids"][
-            :, self.experiment2.transformer_model.tokenizer.model_max_len :
+            :, self.experiment2.transformer_model.tokenizer.model_max_length :
         ]
         gold_answer = tokenized_tensor[tokenized_tensor[:, 0] != 0].shape[0]
         self.assertEqual(len(excluded_rows), gold_answer)
