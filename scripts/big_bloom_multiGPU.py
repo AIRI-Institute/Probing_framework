@@ -1,26 +1,10 @@
-import gc
-import glob
-import os
-import random
-import traceback
-import uuid
-from pathlib import Path
 from typing import Optional
 
 import fire
-import numpy as np
 import torch
-from tqdm import tqdm
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 from probing.pipeline import ProbingPipeline
-
-
-def init_seed(seed: int = 42):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
 
 
 def get_max_memory_per_gpu_dict(dtype, model_name):
@@ -79,9 +63,8 @@ def get_max_memory_per_gpu_dict(dtype, model_name):
     return {i: param_memory_per_gpu_in_bytes for i in range(torch.cuda.device_count())}
 
 
-def main(
+def load_model(
     model_name: str = "bigscience/bloom",
-    UD_folder: os.PathLike = "/home/jovyan/datasets/UD/",
     encoding_batch_size: int = 8,
     classifier_batch_size: int = 64,
     classifier_device: Optional[str] = "cuda:0",  # all calculations here
@@ -91,9 +74,6 @@ def main(
         encoding_batch_size=encoding_batch_size,
         classifier_batch_size=classifier_batch_size,
     )
-    # init
-    init_seed()
-    unique_id = uuid.uuid4().hex
 
     dtype = torch.bfloat16
     experiment.transformer_model.config = AutoConfig.from_pretrained(
@@ -111,48 +91,8 @@ def main(
     )
     experiment.transformer_model.device = classifier_device
 
-    bloom_langs = [
-        "Bambara",
-        "Wolof",
-        "Yoruba",
-        "Marathi",
-        "Urdu",
-        "Tamil",
-        "Bengali",
-        "Hindi",
-        "Basque",
-        "Indonesian",
-        "Catalan",
-        "Arabic",
-        "Portuguese",
-        "Spanish",
-        "French",
-        "Chinese",
-        "English",
-    ]
-    for lang in tqdm(bloom_langs, desc="Processing by languages"):
-        experiment.transformer_model.Caching.clear()  # clear cache for optimal work before a new language
-        torch.cuda.empty_cache()
-        gc.collect()
-
-        tasks_files = glob.glob(f"{UD_folder}UD*/*{lang}*/*.csv", recursive=True)
-        for f in tqdm(tasks_files):
-            try:
-                experiment.run(
-                    probe_task=Path(f).stem,
-                    path_to_task_file=f,
-                    verbose=True,
-                    train_epochs=20,
-                )
-            except Exception:
-                e = traceback.format_exc()
-
-                curr_path = Path().absolute()
-                log_errors = open(Path(curr_path, f"logErrors_{unique_id}.txt"), "a")
-                log_errors.write(f + "\n")
-                log_errors.write(e + "\n")
-                log_errors.close()
+    # next actions with the model here...
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    fire.Fire(load_model)
