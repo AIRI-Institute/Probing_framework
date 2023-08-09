@@ -33,7 +33,7 @@ class Metric:
         if MetricType("f1") in self.metric_names:
             metrics_dict[MetricType("f1")] = self.f1_score
         if MetricType("classification_report") in self.metric_names:
-            metrics_dict[MetricType("classification_report")] = self.cl_report
+            metrics_dict[MetricType("classification_report")] = self.cl_report  # type: ignore
 
         if not metrics_dict:
             raise NotImplementedError("None known metrics were provided")
