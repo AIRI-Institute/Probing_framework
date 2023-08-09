@@ -16,7 +16,7 @@ class TestTruncation(unittest.TestCase):
     experiment1 = ProbingPipeline(
         hf_model_name="bert-base-multilingual-uncased", device="cpu"
     )
-    experiment2 = ProbingPipeline(hf_model_name="bigscience/bloom-560m", device="cpu")
+    experiment2 = ProbingPipeline(hf_model_name="t5-small", device="cpu")
 
     def test_launch_right(self):
         tokenized_text = self.experiment1.transformer_model.tokenize_text(

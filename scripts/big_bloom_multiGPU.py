@@ -92,6 +92,7 @@ def load_model(
     experiment.transformer_model.device = classifier_device
 
     # next actions with the model here...
+    return experiment
 
 
 if __name__ == "__main__":
