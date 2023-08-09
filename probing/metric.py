@@ -19,7 +19,7 @@ class Metric:
     def f1_score(self, predictions: List[int], true_labels: List[int]) -> float:
         return f1(true_labels, predictions, average="weighted", zero_division=0)
 
-    def classification_report(
+    def cl_report(
         self, predictions: List[int], true_labels: List[int]
     ) -> Dict[str, Dict[str, float]]:
         return classification_report(
@@ -33,9 +33,7 @@ class Metric:
         if MetricType("f1") in self.metric_names:
             metrics_dict[MetricType("f1")] = self.f1_score
         if MetricType("classification_report") in self.metric_names:
-            metrics_dict[
-                MetricType("classification_report")
-            ] = self.classification_report
+            metrics_dict[MetricType("classification_report")] = self.cl_report
 
         if not metrics_dict:
             raise NotImplementedError("None known metrics were provided")
