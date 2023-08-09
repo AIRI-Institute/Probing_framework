@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
+from sklearn.utils.class_weight import compute_class_weight
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import trange
@@ -205,7 +206,18 @@ class ProbingPipeline:
                 self.transformer_model.config.hidden_size,
             ).to(self.transformer_model.device)
 
-            loss_func = torch.nn.CrossEntropyLoss().to(self.transformer_model.device)
+            # getting weights for each label in order to provide it further to the loss function
+            # be sure that the last element in each data sample is a label!
+            train_labels = task_dataset["tr"][:, -1]
+
+            class_weights = compute_class_weight(
+                "balanced", classes=np.unique(train_labels), y=train_labels
+            )
+            class_weights = torch.tensor(class_weights, dtype=torch.float)
+            loss_func = torch.nn.CrossEntropyLoss(weight=class_weights).to(
+                self.transformer_model.device
+            )
+
             if self.classifier == ClassifierType("mdl"):
                 self.criterion = KL_Loss(loss=loss_func)
             else:

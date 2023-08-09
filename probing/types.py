@@ -9,6 +9,7 @@ except:
 class MetricType(str, Enum):
     ACCURACY = "accuracy"
     F1 = "f1"
+    CLASSIFICATION_REPORT = "classification_report"
 
 
 class ClassifierType(str, Enum):
