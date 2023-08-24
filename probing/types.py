@@ -23,7 +23,8 @@ class ProbingType(str, Enum):
 
 
 class AggregationType(str, Enum):
-    CLS = "cls"
+    FIRST = "first"
+    LAST = "last"
     SUM = "sum"
     AVG = "avg"
 

@@ -1,4 +1,3 @@
-import logging as info_logging
 import typing
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -114,9 +113,7 @@ class TransformersLoader:
         mask[rows_to_exclude, :] = False
         new_num_rows = tensor_shape[0] - len(rows_to_exclude)
         if new_num_rows == 0:
-            info_logging.warning(
-                "All samples were excluded due to long sentences truncation"
-            )
+            logger.warning("All samples were excluded due to long sentences truncation")
             return tensor[mask]
         output = tensor[mask].view(new_num_rows, -1)
         return output
@@ -161,8 +158,10 @@ class TransformersLoader:
     ) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:  # type: ignore
-            if aggregation_embeddings == AggregationType("cls"):
+            if aggregation_embeddings == AggregationType("first"):
                 sent_vector = output[:, 0, :]  # type: ignore
+            elif aggregation_embeddings == AggregationType("last"):
+                sent_vector = output[:, -1, :]  # type: ignore
             elif aggregation_embeddings == AggregationType("sum"):
                 sent_vector = torch.sum(output, dim=1)
             elif aggregation_embeddings == AggregationType("avg"):
@@ -280,6 +279,7 @@ class TransformersLoader:
                 if verbose
                 else data
             )
+
             for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
                 in_cache_ids, out_cache_ids = self.Caching.check_cache_ids(
                     batch_input_ids
@@ -348,7 +348,7 @@ class TransformersLoader:
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
-        aggregation_embeddings: AggregationType = AggregationType("cls"),
+        aggregation_embeddings: AggregationType = AggregationType("first"),
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:

@@ -37,7 +37,7 @@ class ProbingPipeline:
         device: Optional[str] = None,
         classifier_name: ClassifierType = ClassifierType("logreg"),
         metric_names: Union[MetricType, List[MetricType]] = MetricType("f1"),
-        aggregation_embeddings: AggregationType = AggregationType("cls"),
+        aggregation_embeddings: AggregationType = AggregationType("first"),
         encoding_batch_size: int = 32,
         classifier_batch_size: int = 64,
         dropout_rate: float = 0.2,
@@ -209,13 +209,13 @@ class ProbingPipeline:
 
             # getting weights for each label in order to provide it further to the loss function
             # be sure that the last element in each data sample is a label!
-            train_labels = torch.cat(
+            tr_labels = torch.cat(
                 [element[-1] for element in list(probing_dataloaders["tr"])]
             ).tolist()
-            log_info["params"]["train_classes_ratio"] = Counter(train_labels)
+            log_info["params"]["train_classes_ratio"] = Counter(tr_labels)
 
             class_weights = compute_class_weight(
-                "balanced", classes=np.unique(train_labels), y=train_labels
+                "balanced", classes=np.unique(tr_labels), y=tr_labels
             )
             class_weights = torch.tensor(class_weights, dtype=torch.float)
             loss_func = torch.nn.CrossEntropyLoss(weight=class_weights).to(
