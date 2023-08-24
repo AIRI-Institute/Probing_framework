@@ -20,18 +20,18 @@ git clone https://github.com/AIRI-Institute/Probing_framework
 cd Probing_framework/ 
 ```
 
-1. Install requirements and appropriate torch version:
+2. Install requirements and appropriate torch version:
 
 ```python
 bash cuda_install_requirements.sh
 ```
 
-2. Install all other necessary packages:
+3. Install all other necessary packages:
 
 ```python
 pip install -r requirements.txt
 ```
-3. Check out this very comprehensive colab example: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1)
+4. Check out this very comprehensive colab example: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1)
 
 ### More details and examples
 
