@@ -11,7 +11,8 @@ This probing Framework provides a full pipeline for probing experiments, i. e. e
 - visualisation and aggregation tools for further analysis of experiments.
 
 
-### Getting started [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1) 
+### Getting started
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1) 
 
 1. Clone the repository with code:
 
