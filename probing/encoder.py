@@ -113,9 +113,7 @@ class TransformersLoader:
         mask[rows_to_exclude, :] = False
         new_num_rows = tensor_shape[0] - len(rows_to_exclude)
         if new_num_rows == 0:
-            logger.warning(
-                "All samples were excluded due to long sentences truncation"
-            )
+            logger.warning("All samples were excluded due to long sentences truncation")
             return tensor[mask]
         output = tensor[mask].view(new_num_rows, -1)
         return output
