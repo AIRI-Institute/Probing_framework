@@ -11,14 +11,6 @@ This probing Framework provides a full pipeline for probing experiments, i. e. e
 - visualisation and aggregation tools for further analysis of experiments.
 
 
-## More details and examples
-
-| Section | Description |
-|-|-|
-| [About probing](docs/about_probing.md) | General information about probing|
-| [Web interface](docs/web.md) | Information about visualization part|
-
-
 ### Getting started
 
 1. Clone the repository with code:
@@ -34,43 +26,22 @@ cd Probing_framework/
 bash cuda_install_requirements.sh
 ```
 
-1. Install all other necessary packages:
+2. Install all other necessary packages:
 
 ```python
 pip install -r requirements.txt
 ```
+3. Check out this very comprehensive colab example: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1)
 
-### Usage Example
+### More details and examples
 
-- Check out this very comprehensive colab example: [![Open In Colab](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1)
+| Section | Description |
+|-|-|
+| [About probing](docs/about_probing.md) | General information about probing|
+| [About framework](docs/about_framework.md) | General information about this framework|
+| [Web interface](docs/web.md) | Information about visualization part|
+| [How to use](docs/usage.md) | Information with usage examples|
 
-- For further examples, see [Probing Pipeline documentation](https://github.com/AIRI-Institute/Probing_framework/tree/main/scripts).
-
-- Basic example:
-```python
-from probing.pipeline import ProbingPipeline
-
-experiment = ProbingPipeline(
-        hf_model_name="bert-base-uncased",
-        device="cuda:0",
-        metric_names=["f1", "accuracy"],
-        encoding_batch_size=32,
-        classifier_batch_size=32)
-
-experiment.run(probe_task=Path("example.csv").stem,
-               path_to_task_file="example.csv",
-               verbose=True,
-               train_epochs=20,)
-```
-
-### Documentation
-
-The framework consists of four main parts:
-
-- Module to generate probing tasks with **automatic** **morphological** annotation out of Universal Dependencies data. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing/ud_parser).
-- Module to generate probing tasks with **syntactic** annotation out of Universal Dependencies data based on **a user’s query**. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/ud_filter/probing/ud_filter).
-- Module that provides a end-to-end pipeline for probing experiments. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing).
-- Module that provides tools for visualisation of probing experiments. See the documentation of this module here.
 
 ### How to cite
 
