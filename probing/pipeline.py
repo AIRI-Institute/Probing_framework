@@ -64,6 +64,8 @@ class ProbingPipeline:
         )
         self.criterion: Any = None
 
+        self.log_info = ProbingLog()
+
     def get_classifier(
         self, classifier_name: ClassifierType, num_classes: int, embed_dim: int
     ) -> Union[LogReg, MLP, MDLLinearModel]:
@@ -154,20 +156,19 @@ class ProbingPipeline:
         task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
         task_language, task_category = lang_category_extraction(task_data.data_path)
 
-        log_info = ProbingLog()
-        log_info["params"]["probing_task"] = probe_task
-        log_info["params"]["file_path"] = task_data.data_path
-        log_info["params"]["task_language"] = task_language
-        log_info["params"]["task_category"] = task_category
-        log_info["params"]["probing_type"] = self.probing_type
-        log_info["params"]["encoding_batch_size"] = self.encoding_batch_size
-        log_info["params"]["classifier_batch_size"] = self.classifier_batch_size
-        log_info["params"][
+        self.log_info["params"]["probing_task"] = probe_task
+        self.log_info["params"]["file_path"] = task_data.data_path
+        self.log_info["params"]["task_language"] = task_language
+        self.log_info["params"]["task_category"] = task_category
+        self.log_info["params"]["probing_type"] = self.probing_type
+        self.log_info["params"]["encoding_batch_size"] = self.encoding_batch_size
+        self.log_info["params"]["classifier_batch_size"] = self.classifier_batch_size
+        self.log_info["params"][
             "hf_model_name"
         ] = self.transformer_model.config._name_or_path
-        log_info["params"]["classifier_name"] = self.classifier_name
-        log_info["params"]["metric_names"] = self.metric_names
-        log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
+        self.log_info["params"]["classifier_name"] = self.classifier_name
+        self.log_info["params"]["metric_names"] = self.metric_names
+        self.log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
 
         if verbose:
             print(
@@ -197,8 +198,8 @@ class ProbingPipeline:
             if verbose
             else range(self.transformer_model.config.num_hidden_layers)
         )
-        log_info["params"]["tr_mapped_labels"] = mapped_labels
-        log_info["results"]["elapsed_time(sec)"] = 0
+        self.log_info["params"]["tr_mapped_labels"] = mapped_labels
+        self.log_info["results"]["elapsed_time(sec)"] = 0
 
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
@@ -212,7 +213,7 @@ class ProbingPipeline:
             tr_labels = torch.cat(
                 [element[-1] for element in list(probing_dataloaders["tr"])]
             ).tolist()
-            log_info["params"]["train_classes_ratio"] = Counter(tr_labels)
+            # self.log_info["params"]["train_classes_ratio"] = Counter(tr_labels)
 
             class_weights = compute_class_weight(
                 "balanced", classes=np.unique(tr_labels), y=tr_labels
@@ -246,20 +247,25 @@ class ProbingPipeline:
                     probing_dataloaders["va"], layer, save_checkpoints
                 )
 
-                log_info["results"]["train_loss"].add(layer, epoch_train_loss)
-                log_info["results"]["val_loss"].add(layer, epoch_val_loss)
+                self.log_info["results"]["train_loss"].add(layer, epoch_train_loss)
+                self.log_info["results"]["val_loss"].add(layer, epoch_val_loss)
 
                 for m in self.metric_names:
-                    log_info["results"]["val_score"][m].add(layer, epoch_val_score[m])
+                    self.log_info["results"]["val_score"][m].add(
+                        layer, epoch_val_score[m]
+                    )
 
             _, epoch_test_score = self.evaluate(
                 probing_dataloaders["te"], layer, save_checkpoints
             )
 
             for m in self.metric_names:
-                log_info["results"]["test_score"][m].add(layer, epoch_test_score[m])
+                self.log_info["results"]["test_score"][m].add(
+                    layer, epoch_test_score[m]
+                )
 
-        log_info["results"]["elapsed_time(sec)"] = time() - start_time
-        output_path = log_info.save_log(probe_task)
+        self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
+        output_path = self.log_info.save_log(probe_task)
         if verbose:
-            print(f"Experiments were saved by the path: {str(output_path)}")
+            print(f"Experiments were saved in the folder: {str(output_path)}")
+        self.log_info.clear()

@@ -62,6 +62,7 @@ class TransformersLoader:
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
         self.device = device
+        self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
 
         self.init_device()
 
@@ -352,8 +353,6 @@ class TransformersLoader:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
-        self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
-
         # if self.tokenizer.model_max_length > self.model_max_length:
         #     logger.warning(
         #         f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
