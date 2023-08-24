@@ -1,6 +1,6 @@
-# Readme for Probing Framework
+# Universal Probing Framework
 
-Probing Framework provides a full pipeline for probing experiments, i. e. experiments for interpretation of large language models (for more see About Probing). In a nutshell, Probing Framework supports:
+This probing Framework provides a full pipeline for probing experiments, i. e. experiments for interpretation of large language models. In a nutshell, Probing Framework supports:
 
 - automatic generation of probing tasks on the basis of [Universal Dependencies](https://universaldependencies.org/) annotation;
 - generation of probing tasks based on manual queries to data in the [CONLL-U](https://universaldependencies.org/format.html) format;
@@ -10,22 +10,6 @@ Probing Framework provides a full pipeline for probing experiments, i. e. experi
 - different metrics, including standard ones (such as F1-score and accuracy) and selectivity (the difference between experiments and control tasks);
 - visualisation and aggregation tools for further analysis of experiments.
 
-
-### About probing
-
-As [Conneau et al. (2018)](https://aclanthology.org/P18-1198/) state, “a probing task is a classification problem that focuses on simple linguistic properties of sentences''. The main assumption behind probing is that models require linguistic knowledge that they are tested on for better performance on natural language generation and other tasks that a model can be used for ([Saphra, 2021](https://era.ed.ac.uk/handle/1842/38154)). 
-
-[Belinkov (2020)](https://aclanthology.org/2020.acl-tutorials.1/) classifies existing methods as **structural** and **behavioural**. The structutal probing method is to take **a sentence vector** from a large language model and then give it as an input to a probing classifier, for example, logistic regression. The task of this diagnostic classifier is to put a label of linguistic feature to each sentence vectors. Behavourial probes do not require any classifier on top of vector representations from a model. An example of behavourial probes is a masking task when a language model that is probed has to fill in a masked token, for example, to put a right verb form in a sentence.
-
-Probing methods get critical response for relying on the resusts of logistic regression that might be biased because of the data distribution. For this reason, other probing techniques are used, such as control tasks with selectivity [(Hewitt and Liang, 2019)](https://aclanthology.org/D19-1275/) and Minimum Description Length (MDL) [(Voita and Titov, 2020](https://aclanthology.org/2020.emnlp-main.14/)). For more information about these methods see original papers and [Probing Pipeline documentation.](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing)
-
-### Web Interface
-
-The framework allows to make queries to CONNL-U data and run probing experiments in a web interface. Moreover, the web-interface supports different visualisations of the results of probing experiments in several ways, such as charts (TBA) or a map. The web-version will be available soon.
-
-<img src="img/page1.jpg" width=400px/>
-<img src="img/page2.jpg" width=400px/>
-<img src="img/gui_2.png" width=800px/>
 
 ### Getting started
 
@@ -42,40 +26,22 @@ cd Probing_framework/
 bash cuda_install_requirements.sh
 ```
 
-1. Install all other necessary packages:
+2. Install all other necessary packages:
 
 ```python
 pip install -r requirements.txt
 ```
+3. Check out this very comprehensive colab example: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qJzLjWN8oWCsaTGKMoGNGSHFS6au6KMd#scrollTo=3_r8gilG2y3Y&uniqifier=1)
 
-### Usage Example
+### More details and examples
 
-Here the basic example of Framework usage is presented. For further examples, see [Probing Pipeline documentation](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing).
+| Section | Description |
+|-|-|
+| [About probing](docs/about_probing.md) | General information about probing|
+| [About framework](docs/about_framework.md) | General information about this framework|
+| [Web interface](docs/web.md) | Information about visualization part|
+| [How to use](docs/usage.md) | Information with usage examples|
 
-```python
-from probing.pipeline import ProbingPipeline
-
-experiment = ProbingPipeline(
-        hf_model_name="bert-base-uncased",
-        device="cuda:0",
-        metric_names=["f1", "accuracy"],
-        encoding_batch_size=32,
-        classifier_batch_size=32)
-
-experiment.run(probe_task=Path("example.csv").stem,
-               path_to_task_file="example.csv",
-               verbose=True,
-               train_epochs=20,)
-```
-
-### Documentation
-
-The framework consists of four main parts:
-
-- Module to generate probing tasks with **automatic** **morphological** annotation out of Universal Dependencies data. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing/ud_parser).
-- Module to generate probing tasks with **syntactic** annotation out of Universal Dependencies data based on **a user’s query**. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/ud_filter/probing/ud_filter).
-- Module that provides a end-to-end pipeline for probing experiments. See the documentation of this module [here](https://github.com/AIRI-Institute/Probing_framework/tree/main/probing).
-- Module that provides tools for visualisation of probing experiments. See the documentation of this module here.
 
 ### How to cite
 
