@@ -8,7 +8,7 @@ import torch
 from sklearn.utils.class_weight import compute_class_weight
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
-from tqdm import trange
+from tqdm.auto import trange
 from transformers import get_linear_schedule_with_warmup
 from transformers.utils import logging
 
@@ -262,4 +262,4 @@ class ProbingPipeline:
         log_info["results"]["elapsed_time(sec)"] = time() - start_time
         output_path = log_info.save_log(probe_task)
         if verbose:
-            print(f"Experiments were saved in the folder: {str(output_path)}")
+            print(f"Experiments were saved by the path: {str(output_path)}")

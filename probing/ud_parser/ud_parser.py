@@ -418,7 +418,7 @@ class ConlluUDParser:
             splits = splits_by_files[len(paths)]
 
         for category, values in categories.items():
-            print(f"Collecting data for {category}")
+            print(f"Collecting data for category={category}")
             data.update(
                 self.prepare_data_for_probing(
                     values, list_texts, splits, partitions, category
@@ -484,7 +484,7 @@ class ConlluUDParser:
                     if p is not None
                 ]
             )
-            print(f"In progress:\n{paths_str}")
+            print(f"In progress data from path: {paths_str}")
 
         if path_dir_conllu:
             paths = [Path(p) for p in self.get_filepaths_from_dir(path_dir_conllu)]
@@ -504,4 +504,4 @@ class ConlluUDParser:
                     category_data, category, language, save_path_dir  # type: ignore
                 )
                 if self.verbose:
-                    print(f"Writing to file: {output_path}")
+                    print(f"Results are saved by the path: {output_path}")

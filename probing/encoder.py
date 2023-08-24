@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from transformers import AutoConfig, AutoModel, AutoTokenizer
 from transformers.utils import logging
 
