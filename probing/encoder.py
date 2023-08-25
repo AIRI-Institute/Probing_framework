@@ -66,7 +66,7 @@ class TransformersLoader:
         if self.tokenizer:
             self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
         else:
-            self.Caching = None
+            self.Caching = None  # type: ignore
 
         self.init_device()
 
@@ -364,7 +364,6 @@ class TransformersLoader:
         if self.Caching is None:
             if self.tokenizer is None:
                 raise RuntimeError("Tokenizer is None")
-
             self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
