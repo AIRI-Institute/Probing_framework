@@ -62,7 +62,11 @@ class TransformersLoader:
         self.add_special_tokens = add_special_tokens
         self.return_dict = return_dict
         self.device = device
-        self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
+
+        if self.tokenizer:
+            self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
+        else:
+            self.Caching = None
 
         self.init_device()
 
@@ -357,6 +361,11 @@ class TransformersLoader:
         #     logger.warning(
         #         f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
         #     )
+        if self.Caching is None:
+            if self.tokenizer is None:
+                raise RuntimeError("Tokenizer is None")
+
+            self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
