@@ -39,10 +39,10 @@ class BasicPlot:
         self.value_field = value_field
 
     @staticmethod
-    def get_logs(paths: List[Path]) -> List[Path]:
+    def get_logs(paths: List[Path], filename: str = "log.json") -> List[Path]:
         logs_path = []
         for path in paths:
-            internal_log_paths = path.glob("**/*/log.json")
+            internal_log_paths = path.glob(f"**/*/{filename}")
             for log_path in internal_log_paths:
                 if log_path not in logs_path:
                     logs_path.append(log_path)
