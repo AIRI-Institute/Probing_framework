@@ -1,7 +1,7 @@
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -55,7 +55,7 @@ class BasicPlot:
         metric_name: Literal["f1", "accuracy"] = "f1",
         stage: Literal["val", "test"] = "test",
     ) -> pd.DataFrame:
-        aggregated_data_dict = {
+        aggregated_data_dict: Dict[Any, Any] = {
             BasicPlot.LANGUAGE_FIELD: [],
             BasicPlot.TASK_FIELD: [],
             BasicPlot.MODEL_NAME_FIELD: [],
