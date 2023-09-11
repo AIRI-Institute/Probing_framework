@@ -159,27 +159,43 @@ class TransformersLoader:
     def _get_embeddings_by_layers(
         self,
         model_outputs: Tuple[torch.Tensor],
+        word_indices: torch.LongTensor,
         aggregation_embeddings: AggregationType,
+        word_level: bool,
     ) -> List[torch.Tensor]:
         layers_outputs = []
         for output in model_outputs[1:]:  # type: ignore
-            if aggregation_embeddings == AggregationType("first"):
-                sent_vector = output[:, 0, :]  # type: ignore
-            elif aggregation_embeddings == AggregationType("last"):
-                sent_vector = output[:, -1, :]  # type: ignore
-            elif aggregation_embeddings == AggregationType("sum"):
-                sent_vector = torch.sum(output, dim=1)
-            elif aggregation_embeddings == AggregationType("avg"):
-                sent_vector = torch.mean(output, dim=1)
+            if word_level:
+                offset = torch.arange(0, output.size(0) * output.size(1), output.size(1))
+                broadcasted_indices = word_indices + offset.unsqueeze(1)
+                sent_vector = output.reshape(-1, output.shape[-1])[broadcasted_indices].reshape(output.shape[0], -1)
+                # print(output.size(), word_indices.size(), sent_vector.size())
+                # print(output[:, 0, :].size())
+
+                # if aggregation_embeddings == AggregationType("first"):
+                #     sent_vector = output[:, 0, :]  # type: ignore
+                # elif aggregation_embeddings == AggregationType("last"):
+                #     sent_vector = output[:, -1, :]  # type: ignore
+                # elif aggregation_embeddings == AggregationType("sum"):
+                #     sent_vector = torch.sum(output, dim=1)
             else:
-                raise NotImplementedError(
-                    f"Unknown type of embedding's aggregation: {aggregation_embeddings}"
-                )
+                if aggregation_embeddings == AggregationType("first"):
+                    sent_vector = output[:, 0, :]  # type: ignore
+                elif aggregation_embeddings == AggregationType("last"):
+                    sent_vector = output[:, -1, :]  # type: ignore
+                elif aggregation_embeddings == AggregationType("sum"):
+                    sent_vector = torch.sum(output, dim=1)
+                elif aggregation_embeddings == AggregationType("avg"):
+                    sent_vector = torch.mean(output, dim=1)
+                else:
+                    raise NotImplementedError(
+                        f"Unknown type of embedding's aggregation: {aggregation_embeddings}"
+                    )
             layers_outputs.append(sent_vector)
         return layers_outputs
 
     def get_tokenized_datasets(
-        self, task_dataset: Dict[Literal["tr", "va", "te"], np.ndarray]
+        self, task_dataset: Dict[Literal["tr", "va", "te"], List[Tuple[str, str, List[int]]]]
     ) -> Dict[Literal["tr", "va", "te"], TokenizedVectorFormer]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
@@ -196,6 +212,10 @@ class TransformersLoader:
 
         for stage in task_dataset.keys():
             stage_data = task_dataset[stage]
+
+            word_indices = [x[2] for x in stage_data]
+            stage_data = np.array([x[:2] for x in stage_data])
+
             tokenized_text = self.tokenize_text(stage_data[:, 0].tolist())
             numeric_labels = stage_data[:, 1]
 
@@ -226,8 +246,12 @@ class TransformersLoader:
                     "labels": self.exclude_rows(
                         torch.tensor(labels), row_ids_to_exclude
                     ).view(-1),
+                    "word_indices": self.exclude_rows(
+                        torch.LongTensor(word_indices), row_ids_to_exclude
+                    ),
                 }
             )
+            thing = torch.LongTensor(word_indices)
             if stage == "tr":
                 stage_data_dict.mapped_labels = encoder_labels_mapping  # type: ignore
             encoded_stage_data_dict[stage] = stage_data_dict
@@ -238,7 +262,9 @@ class TransformersLoader:
         self,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
+        word_indices: torch.LongTensor,
         aggregation_embeddings: AggregationType,
+        word_level: bool,
     ) -> List[torch.Tensor]:
         if self.config.is_encoder_decoder:
             # In case of encoder-decoder model, for embeddings we use only encoder
@@ -261,7 +287,7 @@ class TransformersLoader:
             else model_outputs["encoder_hidden_states"]
         )
         layers_outputs = self._get_embeddings_by_layers(
-            model_outputs, aggregation_embeddings=aggregation_embeddings
+            model_outputs, word_indices, aggregation_embeddings=aggregation_embeddings, word_level=word_level
         )
         return layers_outputs
 
@@ -270,6 +296,7 @@ class TransformersLoader:
         data: DataLoader,
         stage: Literal["tr", "va", "te"],
         aggregation_embeddings: AggregationType,
+        word_level: bool,
         verbose: bool,
         do_control_task: bool = False,
     ) -> EncodedVectorFormer:
@@ -285,7 +312,7 @@ class TransformersLoader:
                 else data
             )
 
-            for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
+            for batch_input_ids, batch_attention_mask, batch_labels, batch_word_indices in iter_data:
                 in_cache_ids, out_cache_ids = self.Caching.check_cache_ids(
                     batch_input_ids
                 )
@@ -299,6 +326,10 @@ class TransformersLoader:
                 attention_mask_out = batch_attention_mask[out_cache_ids].to(
                     self.device, non_blocking=True
                 )
+
+                word_indices_out = batch_word_indices[out_cache_ids].to(
+                    self.device, non_blocking=True
+                )
                 # attention_mask_in = batch_attention_mask[in_cache_ids].to(self.device)
 
                 labels_out = batch_labels[out_cache_ids]
@@ -307,7 +338,7 @@ class TransformersLoader:
 
                 if len(input_ids_out):
                     layers_outputs = self.model_layers_forward(
-                        input_ids_out, attention_mask_out, aggregation_embeddings
+                        input_ids_out, attention_mask_out, word_indices_out, aggregation_embeddings, word_level
                     )
                     encoded_batch_text_tensor = torch.stack(layers_outputs)
                     out_cache_encoded_batch_vectors = encoded_batch_text_tensor.permute(
@@ -349,11 +380,12 @@ class TransformersLoader:
 
     def get_encoded_dataloaders(
         self,
-        task_dataset: Dict[Literal["tr", "va", "te"], np.ndarray],
+        task_dataset: Dict[Literal["tr", "va", "te"], List[Tuple[str, str, List[int]]]],
         encoding_batch_size: int = 64,
         classifier_batch_size: int = 64,
         shuffle: bool = True,
         aggregation_embeddings: AggregationType = AggregationType("first"),
+        word_level: bool = False,
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
@@ -377,6 +409,7 @@ class TransformersLoader:
                 stage_dataloader_tokenized,
                 stage,
                 aggregation_embeddings,
+                word_level,
                 verbose,
                 do_control_task=do_control_task,
             )

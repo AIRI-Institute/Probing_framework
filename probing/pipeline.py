@@ -34,6 +34,7 @@ class ProbingPipeline:
         self,
         hf_model_name: Optional[str] = None,
         probing_type: Optional[ProbingType] = ProbingType("layerwise"),
+        word_level: Optional[bool] = False,
         device: Optional[str] = None,
         classifier_name: ClassifierType = ClassifierType("logreg"),
         metric_names: Union[MetricType, List[MetricType]] = MetricType("f1"),
@@ -47,6 +48,7 @@ class ProbingPipeline:
     ):
         self.hf_model_name = hf_model_name
         self.probing_type = probing_type
+        self.word_level = word_level
         self.encoding_batch_size = encoding_batch_size
         self.classifier_batch_size = classifier_batch_size
         self.shuffle = shuffle
@@ -153,7 +155,7 @@ class ProbingPipeline:
         sep: str = "\t",
     ) -> None:
         task_data = TextFormer(probe_task, path_to_task_file, sep)
-        task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
+        task_dataset, num_classes, num_words = task_data.samples, len(task_data.unique_labels), task_data.num_words
         task_language, task_category = lang_category_extraction(task_data.data_path)
 
         self.log_info["params"]["probing_task"] = probe_task
@@ -161,6 +163,7 @@ class ProbingPipeline:
         self.log_info["params"]["task_language"] = task_language
         self.log_info["params"]["task_category"] = task_category
         self.log_info["params"]["probing_type"] = self.probing_type
+        self.log_info["params"]["word_level"] = True
         self.log_info["params"]["encoding_batch_size"] = self.encoding_batch_size
         self.log_info["params"]["classifier_batch_size"] = self.classifier_batch_size
         self.log_info["params"][
@@ -186,6 +189,7 @@ class ProbingPipeline:
             self.classifier_batch_size,
             self.shuffle,
             self.aggregation_embeddings,
+            self.word_level,
             verbose,
             do_control_task=do_control_task,
         )
@@ -202,10 +206,14 @@ class ProbingPipeline:
         self.log_info["results"]["elapsed_time(sec)"] = 0
 
         for layer in probing_iter_range:
+            embed_dim = self.transformer_model.config.hidden_size
+            if self.word_level:
+                embed_dim *= num_words # in case of word-level probing we might want to keep embeddings for several words
+
             self.classifier = self.get_classifier(
                 self.classifier_name,
                 num_classes,
-                self.transformer_model.config.hidden_size,
+                embed_dim,
             ).to(self.transformer_model.device)
 
             # getting weights for each label in order to provide it further to the loss function

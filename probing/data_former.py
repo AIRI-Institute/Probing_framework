@@ -24,7 +24,7 @@ class TextFormer:
         self.shuffle = shuffle
         self.data_path = get_probe_task_path(probe_task, data_path)
 
-        self.samples, self.unique_labels = self.form_data(sep=sep)
+        self.samples, self.unique_labels, self.num_words = self.form_data(sep=sep)
 
     def __len__(self):
         return len(self.samples)
@@ -44,21 +44,21 @@ class TextFormer:
     @typing.no_type_check
     def form_data(
         self, sep: str = "\t"
-    ) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
+    ) -> Tuple[DefaultDict[str, np.ndarray], Set[str], int]:
         samples_dict = defaultdict(list)
         unique_labels = set()
         dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
-        for _, (stage, label, text) in dataset.iterrows():
-            samples_dict[stage].append((text, label))
+        for _, (stage, label, text, word_indices) in dataset.iterrows():
+            word_indices = tuple(map(int, word_indices.split())) * 2
+            num_words = len(word_indices)
+            samples_dict[stage].append((text, label, word_indices))
             unique_labels.add(label)
 
         if self.shuffle:
-            samples_dict = {
-                k: np.random.permutation(v) for k, v in samples_dict.items()
-            }
-        else:
-            samples_dict = {k: np.array(v) for k, v in samples_dict.items()}
-        return samples_dict, unique_labels
+            for k in samples_dict:
+                np.random.shuffle(samples_dict[k]) # keeping list form here instead of np.array
+
+        return samples_dict, unique_labels, num_words
 
 
 class EncodedVectorFormer(Dataset):
@@ -81,6 +81,7 @@ class TokenizedVectorFormer(Dataset):
         self.input_ids = data["input_ids"]
         self.attention_masks = data["attention_mask"]
         self.labels = data["labels"]
+        self.word_indices = data["word_indices"]
 
     def __len__(self):
         return len(self.input_ids)
@@ -89,5 +90,6 @@ class TokenizedVectorFormer(Dataset):
         input_ids = self.input_ids[idx]
         attention_mask = self.attention_masks[idx]
         labels = self.labels[idx]
-        sample = (input_ids, attention_mask, labels)
+        word_indices = self.word_indices[idx]
+        sample = (input_ids, attention_mask, labels, word_indices)
         return sample

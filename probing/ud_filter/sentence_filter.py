@@ -71,6 +71,7 @@ class SentenceFilter:
         for token in self.sentence:
             if isinstance(token["head"], int) and isinstance(token["id"], int):
                 deprels[token["deprel"]].append((token["head"] - 1, token["id"] - 1))
+                print(token, token["id"])
         return deprels
 
     def search_suitable_tokens(self, node: str) -> None:
@@ -151,6 +152,8 @@ class SentenceFilter:
                         if ctype == "intersec":
                             if t1_feats[f] != t2_feats[f]:
                                 return False
+                            else:
+                                print(t1_feats, t2_feats)
                         elif ctype == "disjoint":
                             if t1_feats[f] == t2_feats[f]:
                                 return False
@@ -158,6 +161,10 @@ class SentenceFilter:
                             raise ValueError("Wrong feature constraint type")
                     else:
                         return False
+            print("here")
+            print(self.sentence[0])
+            print(self.sentence[token_pair[0]], token_pair[0], self.sentence[token_pair[0]]["id"])
+            print(self.sentence[token_pair[1]], token_pair[1], self.sentence[token_pair[1]]["id"])
             return True
         else:
             return False
@@ -189,7 +196,7 @@ class SentenceFilter:
                     k: {edges[i]} for i, k in enumerate(self.possible_token_pairs)
                 }
                 self.nodes_tokens = {
-                    np[i]: [list(self.possible_token_pairs[np])[0][i]]
+                    np[i]: list(self.possible_token_pairs[np])[0][i]
                     for np in self.possible_token_pairs
                     for i in range(2)
                 }
@@ -222,6 +229,7 @@ class SentenceFilter:
                     self.nodes_tokens[np[1]] = list(
                         set([p[1] for p in self.possible_token_pairs[np]])
                     )
+        print(self.possible_token_pairs)
         if not self.find_isomorphism():
             return False
         return True
@@ -230,7 +238,7 @@ class SentenceFilter:
         self,
         node_pattern: Dict[str, Dict[str, str]],
         constraints: Dict[Tuple[str, str], dict],
-    ) -> bool:
+    ):
         """Check if a sentence contains at least one instance of a node_pattern that matches
         all the given and isomophism constraints"""
         check_query(node_pattern, constraints)
@@ -243,6 +251,7 @@ class SentenceFilter:
         else:
             self.sent_deprels = self.all_deprels()
             if self.match_constraints():
-                return True
+                print(tuple(self.nodes_tokens.values()))
+                return tuple(self.nodes_tokens.values())
             else:
                 return False
