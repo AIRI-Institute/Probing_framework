@@ -167,7 +167,7 @@ class TransformersLoader:
         for output in model_outputs[1:]:  # type: ignore
             if word_level:
                 offset = torch.arange(0, output.size(0) * output.size(1), output.size(1))
-                broadcasted_indices = word_indices + offset.unsqueeze(1).unsqueeze(1)
+                broadcasted_indices = (word_indices + offset.unsqueeze(1).unsqueeze(1)).to(self.device)
                 output[:,0,:] = 0 # The 0th token in each sentence is the CLS token, it doesn't matter to us,
                                   # and 0 in word_indices means no token, so we should ignore it
                 sent_vector = output.reshape(-1, output.shape[-1])[broadcasted_indices].sum(axis=2).reshape(output.shape[0], -1)
