@@ -167,12 +167,10 @@ class TransformersLoader:
         for output in model_outputs[1:]:  # type: ignore
             if word_level:
                 offset = torch.arange(0, output.size(0) * output.size(1), output.size(1))
-                broadcasted_indices = (word_indices + offset.unsqueeze(1).unsqueeze(1)).to(self.device)
+                broadcasted_indices = (word_indices + offset.unsqueeze(1).unsqueeze(1).to(self.device))
                 output[:,0,:] = 0 # The 0th token in each sentence is the CLS token, it doesn't matter to us,
                                   # and 0 in word_indices means no token, so we should ignore it
                 sent_vector = output.reshape(-1, output.shape[-1])[broadcasted_indices].sum(axis=2).reshape(output.shape[0], -1)
-                # print(output.size(), word_indices.size(), sent_vector.size())
-                # print(output[:, 0, :].size())
 
                 # if aggregation_embeddings == AggregationType("first"):
                 #     sent_vector = output[:, 0, :]  # type: ignore
@@ -196,7 +194,7 @@ class TransformersLoader:
             layers_outputs.append(sent_vector)
         return layers_outputs
     
-    def get_token_ids(self, ud_tokenization: List[str], model_tokenization: List[str], word_indices: List[int]
+    def get_token_ids(self, ud_tokenization: List[str], model_tokenization: List[str], word_indices: List[int], verbose: bool
     ) -> List[List[int]]:
         mapping = []
         ind_model = 1 # Skipping [CLS]
@@ -217,20 +215,23 @@ class TransformersLoader:
                     ind_model += 1
                     mapping[-1].append(ind_model)
                 else:
-                    print("Could not match tokenizations")
-                    print(ud_tokenization)
-                    print(model_tokenization)
-                    print("at index", ind)
-                    raise "Could not match tokenizations"
-        
+                    if verbose:
+                        print("Could not match tokenizations")
+                        print(ud_tokenization)
+                        print(model_tokenization)
+                        print("at index", ind)
+                        return []
+
         result = []
         for i in word_indices:
+            if i >= len(mapping): # This is a temporary fix to counter mistakes in the indices obtained from the parser
+                return []
             result.append(mapping[i])
         
         return result
 
     def get_tokenized_datasets(
-        self, task_dataset: Dict[Literal["tr", "va", "te"], List[Tuple[str, str, List[int]]]]
+        self, task_dataset: Dict[Literal["tr", "va", "te"], List[Tuple[str, str, List[int]]]], verbose: bool
     ) -> Dict[Literal["tr", "va", "te"], TokenizedVectorFormer]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
@@ -278,12 +279,19 @@ class TransformersLoader:
             sentences_array = np.delete(stage_data[:, 0], row_ids_to_exclude)
             resulting_inds = []
             maxlen = 0
+            new_row_ids_to_exclude = []
             for ind in range(sentences_array.shape[0]):
                 ids = self.get_token_ids(sentences_array[ind].split(" "),
                                    self.tokenizer.convert_ids_to_tokens(tokenized_text["input_ids"][ind]),
-                                   word_indices_tensor[ind])
-                resulting_inds.append(ids)
-                maxlen = max(maxlen, max([len(word_tokens) for word_tokens in ids]))
+                                   word_indices_tensor[ind], verbose)
+                if ids == []:
+                    new_row_ids_to_exclude.append(ind)
+                else:
+                    resulting_inds.append(ids)
+                    maxlen = max(maxlen, max([len(word_tokens) for word_tokens in ids]))
+
+            if new_row_ids_to_exclude:
+                logger.warning(f"{len(new_row_ids_to_exclude)} sentences were excluded due to incompatible tokenizations")
             
             # All data has to be a homogenous 2d array to be able to be passed through dataloaders, so we will have to add zeroes
             for inds in resulting_inds:
@@ -291,11 +299,11 @@ class TransformersLoader:
 
             stage_data_dict = TokenizedVectorFormer(
                 {
-                    "input_ids": input_ids,
-                    "attention_mask": attention_mask,
-                    "labels": self.exclude_rows(
+                    "input_ids": self.exclude_rows(input_ids, new_row_ids_to_exclude),
+                    "attention_mask": self.exclude_rows(attention_mask, new_row_ids_to_exclude),
+                    "labels": self.exclude_rows(self.exclude_rows(
                         torch.tensor(labels), row_ids_to_exclude
-                    ).view(-1),
+                    ), new_row_ids_to_exclude).view(-1),
                     "word_indices": torch.LongTensor(resulting_inds),
                 }
             )
@@ -446,7 +454,7 @@ class TransformersLoader:
                 raise RuntimeError("Tokenizer is None")
             self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
 
-        tokenized_datasets = self.get_tokenized_datasets(task_dataset)
+        tokenized_datasets = self.get_tokenized_datasets(task_dataset, verbose)
         encoded_dataloaders = {}
         for stage, _ in tokenized_datasets.items():
             stage_dataloader_tokenized = DataLoader(
