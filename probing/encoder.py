@@ -231,7 +231,7 @@ class TransformersLoader:
         return result
 
     def get_tokenized_datasets(
-        self, task_dataset: Dict[Literal["tr", "va", "te"], List[Tuple[str, str, List[int]]]], verbose: bool
+        self, task_dataset: Dict[Literal["tr", "va", "te"], List[Tuple[str, str, List[int]]]], word_level: bool, verbose: bool
     ) -> Dict[Literal["tr", "va", "te"], TokenizedVectorFormer]:
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({"pad_token": "[PAD]"})
@@ -274,28 +274,32 @@ class TransformersLoader:
                 logger.warning(
                     f"Since you decided not to truncate long sentences, {len(row_ids_to_exclude)} sample(s) were excluded"
                 )
-            
-            word_indices_tensor = self.exclude_rows(torch.LongTensor(word_indices), row_ids_to_exclude)
-            sentences_array = np.delete(stage_data[:, 0], row_ids_to_exclude)
-            resulting_inds = []
-            maxlen = 0
-            new_row_ids_to_exclude = []
-            for ind in range(sentences_array.shape[0]):
-                ids = self.get_token_ids(sentences_array[ind].split(" "),
-                                   self.tokenizer.convert_ids_to_tokens(tokenized_text["input_ids"][ind]),
-                                   word_indices_tensor[ind], verbose)
-                if ids == []:
-                    new_row_ids_to_exclude.append(ind)
-                else:
-                    resulting_inds.append(ids)
-                    maxlen = max(maxlen, max([len(word_tokens) for word_tokens in ids]))
 
-            if new_row_ids_to_exclude:
-                logger.warning(f"{len(new_row_ids_to_exclude)} sentences were excluded due to incompatible tokenizations")
+            new_row_ids_to_exclude = []
+            if word_level:
+                word_indices_tensor = self.exclude_rows(torch.LongTensor(word_indices), row_ids_to_exclude)
+                sentences_array = np.delete(stage_data[:, 0], row_ids_to_exclude)
+                resulting_inds = []
+                maxlen = 0
+                for ind in range(sentences_array.shape[0]):
+                    ids = self.get_token_ids(sentences_array[ind].split(" "),
+                                    self.tokenizer.convert_ids_to_tokens(tokenized_text["input_ids"][ind]),
+                                    word_indices_tensor[ind], verbose)
+                    if ids == []:
+                        new_row_ids_to_exclude.append(ind)
+                    else:
+                        resulting_inds.append(ids)
+                        maxlen = max(maxlen, max([len(word_tokens) for word_tokens in ids]))
+
+                # All data has to be a homogenous 2d array to be able to be passed through dataloaders, so we will have to add zeroes
+                for inds in resulting_inds:
+                    inds = [word_tokens.extend([0 for _ in range(maxlen - len(word_tokens))]) for word_tokens in inds]
+
+                if new_row_ids_to_exclude:
+                    logger.warning(f"{len(new_row_ids_to_exclude)} sentences were excluded due to incompatible tokenizations")
+            else:
+                resulting_inds = [0 for _ in range(input_ids.size()[0])]
             
-            # All data has to be a homogenous 2d array to be able to be passed through dataloaders, so we will have to add zeroes
-            for inds in resulting_inds:
-                inds = [word_tokens.extend([0 for _ in range(maxlen - len(word_tokens))]) for word_tokens in inds]
 
             stage_data_dict = TokenizedVectorFormer(
                 {
@@ -454,7 +458,7 @@ class TransformersLoader:
                 raise RuntimeError("Tokenizer is None")
             self.Caching = Cacher(tokenizer=self.tokenizer, cache={})
 
-        tokenized_datasets = self.get_tokenized_datasets(task_dataset, verbose)
+        tokenized_datasets = self.get_tokenized_datasets(task_dataset, word_level, verbose)
         encoded_dataloaders = {}
         for stage, _ in tokenized_datasets.items():
             stage_dataloader_tokenized = DataLoader(
