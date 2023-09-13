@@ -220,7 +220,7 @@ class TransformersLoader:
                         print(ud_tokenization)
                         print(model_tokenization)
                         print("at index", ind)
-                        return []
+                    return []
 
         result = []
         for i in word_indices:
