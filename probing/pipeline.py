@@ -199,8 +199,6 @@ class ProbingPipeline:
                 self.transformer_model.config.num_hidden_layers,
                 desc="Probing by layers",
             )
-            if verbose
-            else range(self.transformer_model.config.num_hidden_layers)
         )
         self.log_info["params"]["tr_mapped_labels"] = mapped_labels
         self.log_info["results"]["elapsed_time(sec)"] = 0

@@ -368,8 +368,6 @@ class TransformersLoader:
         with torch.no_grad():
             iter_data = (
                 tqdm(data, total=len(data), desc=f"Data encoding {stage}")
-                if verbose
-                else data
             )
 
             for batch_input_ids, batch_attention_mask, batch_labels, batch_word_indices in iter_data:
