@@ -1,0 +1,3225 @@
+{
+    "bigscience/bloom": {
+        "Urdu": {
+            "Case": {
+                "training": {
+                    "Acc": 2690,
+                    "Acc,Dat": 43,
+                    "Acc,Gen": 3,
+                    "Acc,Ins": 1,
+                    "Nom": 1305
+                },
+                "validation": {
+                    "Acc": 385,
+                    "Acc,Dat": 1,
+                    "Nom": 166
+                },
+                "test": {
+                    "Acc": 407,
+                    "Acc,Dat": 4,
+                    "Nom": 124
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 847,
+                    "Masc": 3195
+                },
+                "validation": {
+                    "Fem": 105,
+                    "Masc": 447
+                },
+                "test": {
+                    "Fem": 136,
+                    "Masc": 399
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Imp": 11,
+                    "Ind": 2941,
+                    "Sub": 191
+                },
+                "validation": {
+                    "Ind": 422,
+                    "Sub": 12
+                },
+                "test": {
+                    "Ind": 345,
+                    "Sub": 22
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 1181,
+                    "Ord": 140
+                },
+                "validation": {
+                    "Card": 213,
+                    "Ord": 14
+                },
+                "test": {
+                    "Card": 159,
+                    "Ord": 24
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 430,
+                    "Sing": 3613
+                },
+                "validation": {
+                    "Plur": 49,
+                    "Sing": 503
+                },
+                "test": {
+                    "Plur": 33,
+                    "Sing": 502
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 29,
+                    "2": 7,
+                    "3": 4007
+                },
+                "validation": {
+                    "1": 7,
+                    "3": 545
+                },
+                "test": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 533
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Dem": 809,
+                    "Ind": 124,
+                    "Int": 11,
+                    "Neg": 99,
+                    "Prs": 1973
+                },
+                "validation": {
+                    "Dem": 119,
+                    "Ind": 39,
+                    "Int": 2,
+                    "Neg": 9,
+                    "Prs": 234
+                },
+                "test": {
+                    "Dem": 98,
+                    "Ind": 26,
+                    "Neg": 18,
+                    "Prs": 238
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 330,
+                    "Past": 597,
+                    "Pres": 2083
+                },
+                "validation": {
+                    "Fut": 58,
+                    "Past": 61,
+                    "Pres": 308
+                },
+                "test": {
+                    "Fut": 33,
+                    "Past": 68,
+                    "Pres": 251
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Conv": 5,
+                    "Fin": 714,
+                    "Inf": 237,
+                    "Part": 3051
+                },
+                "validation": {
+                    "Fin": 87,
+                    "Inf": 31,
+                    "Part": 428
+                },
+                "test": {
+                    "Fin": 78,
+                    "Inf": 27,
+                    "Part": 425
+                }
+            },
+            "Voice": {
+                "training": {
+                    "Act": 3590,
+                    "Pass": 438
+                },
+                "validation": {
+                    "Act": 470,
+                    "Pass": 73
+                },
+                "test": {
+                    "Act": 491,
+                    "Pass": 44
+                }
+            }
+        },
+        "Tamil": {
+            "Case": {
+                "training": {
+                    "Dat": 53,
+                    "Loc": 10,
+                    "Nom": 343
+                },
+                "validation": {
+                    "Dat": 7,
+                    "Loc": 1,
+                    "Nom": 43
+                },
+                "test": {
+                    "Dat": 6,
+                    "Loc": 2,
+                    "Nom": 43
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Com": 110,
+                    "Masc": 178,
+                    "Neut": 74
+                },
+                "validation": {
+                    "Com": 14,
+                    "Masc": 23,
+                    "Neut": 9
+                },
+                "test": {
+                    "Com": 14,
+                    "Masc": 22,
+                    "Neut": 9
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Imp": 16,
+                    "Ind": 34
+                },
+                "validation": {
+                    "Imp": 2,
+                    "Ind": 5
+                },
+                "test": {
+                    "Imp": 2,
+                    "Ind": 4
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 49,
+                    "Sing": 378
+                },
+                "validation": {
+                    "Plur": 6,
+                    "Sing": 48
+                },
+                "test": {
+                    "Plur": 6,
+                    "Sing": 47
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 22,
+                    "2": 25,
+                    "3": 380
+                },
+                "validation": {
+                    "1": 3,
+                    "2": 3,
+                    "3": 48
+                },
+                "test": {
+                    "1": 3,
+                    "2": 3,
+                    "3": 47
+                }
+            },
+            "Polarity": {
+                "training": {
+                    "Neg": 30,
+                    "Pos": 82
+                },
+                "validation": {
+                    "Neg": 4,
+                    "Pos": 11
+                },
+                "test": {
+                    "Neg": 4,
+                    "Pos": 10
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 49,
+                    "Past": 187,
+                    "Pres": 84
+                },
+                "validation": {
+                    "Fut": 6,
+                    "Past": 24,
+                    "Pres": 11
+                },
+                "test": {
+                    "Fut": 6,
+                    "Past": 24,
+                    "Pres": 10
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Conv": 44,
+                    "Fin": 51,
+                    "Inf": 37
+                },
+                "validation": {
+                    "Conv": 6,
+                    "Fin": 7,
+                    "Inf": 4
+                },
+                "test": {
+                    "Conv": 6,
+                    "Fin": 6,
+                    "Inf": 5
+                }
+            }
+        },
+        "Bengali": {
+            "Aspect": {
+                "training": {
+                    "Imp": 8,
+                    "Perf": 11
+                },
+                "validation": {
+                    "Imp": 1,
+                    "Perf": 2
+                },
+                "test": {
+                    "Imp": 1,
+                    "Perf": 1
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 16,
+                    "2": 17,
+                    "3": 7
+                },
+                "validation": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                },
+                "test": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 8,
+                    "Pres": 24
+                },
+                "validation": {
+                    "Fut": 1,
+                    "Pres": 3
+                },
+                "test": {
+                    "Fut": 1,
+                    "Pres": 3
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 22,
+                    "Part": 10
+                },
+                "validation": {
+                    "Fin": 3,
+                    "Part": 2
+                },
+                "test": {
+                    "Fin": 3,
+                    "Part": 1
+                }
+            }
+        },
+        "Hindi": {
+            "Aspect": {
+                "training": {
+                    "Imp": 326,
+                    "Perf": 449,
+                    "Prog": 24
+                },
+                "validation": {
+                    "Imp": 41,
+                    "Perf": 56,
+                    "Prog": 3
+                },
+                "test": {
+                    "Imp": 41,
+                    "Perf": 56,
+                    "Prog": 3
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 208,
+                    "Masc": 590
+                },
+                "validation": {
+                    "Fem": 26,
+                    "Masc": 74
+                },
+                "test": {
+                    "Fem": 26,
+                    "Masc": 74
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Imp": 8,
+                    "Ind": 10061,
+                    "Sub": 280
+                },
+                "validation": {
+                    "Ind": 1307,
+                    "Sub": 19
+                },
+                "test": {
+                    "Imp": 1,
+                    "Ind": 1302,
+                    "Sub": 25
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 3607,
+                    "Ord": 362
+                },
+                "validation": {
+                    "Card": 454,
+                    "Ord": 41
+                },
+                "test": {
+                    "Card": 443,
+                    "Ord": 54
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 111,
+                    "Sing": 689
+                },
+                "validation": {
+                    "Plur": 14,
+                    "Sing": 86
+                },
+                "test": {
+                    "Plur": 14,
+                    "Sing": 86
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Dem": 2371,
+                    "Ind": 889,
+                    "Int": 66,
+                    "Neg": 281,
+                    "Prs": 6206
+                },
+                "validation": {
+                    "Dem": 258,
+                    "Ind": 109,
+                    "Int": 5,
+                    "Neg": 29,
+                    "Prs": 805
+                },
+                "test": {
+                    "Dem": 284,
+                    "Ind": 119,
+                    "Int": 5,
+                    "Neg": 22,
+                    "Prs": 745
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 33,
+                    "Past": 423,
+                    "Pres": 340
+                },
+                "validation": {
+                    "Fut": 4,
+                    "Past": 53,
+                    "Pres": 43
+                },
+                "test": {
+                    "Fut": 4,
+                    "Past": 53,
+                    "Pres": 42
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Conv": 193,
+                    "Fin": 2518,
+                    "Inf": 1049,
+                    "Part": 9528
+                },
+                "validation": {
+                    "Conv": 21,
+                    "Fin": 328,
+                    "Inf": 110,
+                    "Part": 1198
+                },
+                "test": {
+                    "Conv": 18,
+                    "Fin": 341,
+                    "Inf": 122,
+                    "Part": 1203
+                }
+            },
+            "Voice": {
+                "training": {
+                    "Act": 12057,
+                    "Pass": 1237
+                },
+                "validation": {
+                    "Act": 1521,
+                    "Pass": 137
+                },
+                "test": {
+                    "Act": 1525,
+                    "Pass": 158
+                }
+            },
+            "Animacy": {
+                "training": {
+                    "Anim": 254,
+                    "Inan": 545
+                },
+                "validation": {
+                    "Anim": 32,
+                    "Inan": 68
+                },
+                "test": {
+                    "Anim": 32,
+                    "Inan": 68
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 435,
+                    "Nom": 355
+                },
+                "validation": {
+                    "Acc": 55,
+                    "Nom": 45
+                },
+                "test": {
+                    "Acc": 55,
+                    "Nom": 44
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Def": 159,
+                    "Ind": 124
+                },
+                "validation": {
+                    "Def": 20,
+                    "Ind": 16
+                },
+                "test": {
+                    "Def": 20,
+                    "Ind": 15
+                }
+            },
+            "Gender[psor]": {
+                "training": {
+                    "Fem": 51,
+                    "Masc": 126
+                },
+                "validation": {
+                    "Fem": 7,
+                    "Masc": 16
+                },
+                "test": {
+                    "Fem": 6,
+                    "Masc": 16
+                }
+            },
+            "Number[psor]": {
+                "training": {
+                    "Plur": 49,
+                    "Sing": 145
+                },
+                "validation": {
+                    "Plur": 6,
+                    "Sing": 19
+                },
+                "test": {
+                    "Plur": 6,
+                    "Sing": 18
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 63,
+                    "2": 61,
+                    "3": 13157
+                },
+                "validation": {
+                    "1": 13,
+                    "2": 2,
+                    "3": 1644
+                },
+                "test": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 1681
+                }
+            }
+        },
+        "Bambara": {
+            "Aspect": {
+                "training": {
+                    "Imp": 121,
+                    "Perf": 519
+                },
+                "validation": {
+                    "Imp": 15,
+                    "Perf": 65
+                },
+                "test": {
+                    "Imp": 15,
+                    "Perf": 65
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 6,
+                    "Imp": 10,
+                    "Sub": 32
+                },
+                "validation": {
+                    "Cnd": 1,
+                    "Imp": 1,
+                    "Sub": 4
+                },
+                "test": {
+                    "Cnd": 1,
+                    "Imp": 1,
+                    "Sub": 4
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 100,
+                    "Sing": 527
+                },
+                "validation": {
+                    "Plur": 13,
+                    "Sing": 66
+                },
+                "test": {
+                    "Plur": 12,
+                    "Sing": 66
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 85,
+                    "2": 37,
+                    "3": 492
+                },
+                "validation": {
+                    "1": 11,
+                    "2": 5,
+                    "3": 61
+                },
+                "test": {
+                    "1": 10,
+                    "2": 5,
+                    "3": 62
+                }
+            },
+            "Polarity": {
+                "training": {
+                    "Neg": 82,
+                    "Pos": 616
+                },
+                "validation": {
+                    "Neg": 11,
+                    "Pos": 77
+                },
+                "test": {
+                    "Neg": 10,
+                    "Pos": 77
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Dem": 35,
+                    "Emp": 58,
+                    "Prs": 577
+                },
+                "validation": {
+                    "Dem": 4,
+                    "Emp": 8,
+                    "Prs": 73
+                },
+                "test": {
+                    "Dem": 5,
+                    "Emp": 7,
+                    "Prs": 72
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 8,
+                    "Past": 24
+                },
+                "validation": {
+                    "Fut": 1,
+                    "Past": 3
+                },
+                "test": {
+                    "Fut": 1,
+                    "Past": 3
+                }
+            },
+            "Valency": {
+                "training": {
+                    "1": 266,
+                    "2": 220
+                },
+                "validation": {
+                    "1": 34,
+                    "2": 27
+                },
+                "test": {
+                    "1": 33,
+                    "2": 28
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Part": 30,
+                    "Vnoun": 15
+                },
+                "validation": {
+                    "Part": 4,
+                    "Vnoun": 2
+                },
+                "test": {
+                    "Part": 4,
+                    "Vnoun": 2
+                }
+            }
+        },
+        "Wolof": {
+            "Aspect": {
+                "training": {
+                    "Hab": 23,
+                    "Imp": 344,
+                    "Perf": 409,
+                    "Prog": 44
+                },
+                "validation": {
+                    "Hab": 12,
+                    "Imp": 161,
+                    "Perf": 140,
+                    "Prog": 15
+                },
+                "test": {
+                    "Hab": 9,
+                    "Imp": 167,
+                    "Perf": 147,
+                    "Prog": 28
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 183,
+                    "Gen": 290,
+                    "Nom": 508
+                },
+                "validation": {
+                    "Acc": 67,
+                    "Gen": 99,
+                    "Nom": 217
+                },
+                "test": {
+                    "Acc": 51,
+                    "Gen": 137,
+                    "Nom": 192
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Def": 643,
+                    "Ind": 184
+                },
+                "validation": {
+                    "Def": 223,
+                    "Ind": 104
+                },
+                "test": {
+                    "Def": 265,
+                    "Ind": 81
+                }
+            },
+            "Deixis": {
+                "training": {
+                    "Med": 12,
+                    "Prox": 744,
+                    "Remt": 94
+                },
+                "validation": {
+                    "Med": 5,
+                    "Prox": 300,
+                    "Remt": 26
+                },
+                "test": {
+                    "Med": 6,
+                    "Prox": 317,
+                    "Remt": 33
+                }
+            },
+            "DeixisRef": {
+                "training": {
+                    "1": 101,
+                    "2": 213
+                },
+                "validation": {
+                    "1": 44,
+                    "2": 96
+                },
+                "test": {
+                    "1": 70,
+                    "2": 76
+                }
+            },
+            "FocusType": {
+                "training": {
+                    "Compl": 131,
+                    "Subj": 217,
+                    "Verb": 120
+                },
+                "validation": {
+                    "Compl": 54,
+                    "Subj": 77,
+                    "Verb": 59
+                },
+                "test": {
+                    "Compl": 47,
+                    "Subj": 99,
+                    "Verb": 69
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 10,
+                    "Masc": 3
+                },
+                "validation": {
+                    "Fem": 6,
+                    "Masc": 10
+                },
+                "test": {
+                    "Fem": 4,
+                    "Masc": 6
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 2,
+                    "Imp": 10,
+                    "Ind": 1144,
+                    "Opt": 7
+                },
+                "validation": {
+                    "Imp": 23,
+                    "Ind": 412,
+                    "Opt": 3
+                },
+                "test": {
+                    "Imp": 5,
+                    "Ind": 452,
+                    "Opt": 2
+                }
+            },
+            "NounClass": {
+                "training": {
+                    "Wol1": 101,
+                    "Wol10": 32,
+                    "Wol11": 37,
+                    "Wol12": 32,
+                    "Wol2": 49,
+                    "Wol3": 99,
+                    "Wol4": 36,
+                    "Wol5": 191,
+                    "Wol6": 65,
+                    "Wol7": 168,
+                    "Wol8": 210,
+                    "Wol9": 25
+                },
+                "validation": {
+                    "Wol1": 32,
+                    "Wol10": 19,
+                    "Wol11": 15,
+                    "Wol12": 8,
+                    "Wol2": 11,
+                    "Wol3": 37,
+                    "Wol4": 19,
+                    "Wol5": 76,
+                    "Wol6": 22,
+                    "Wol7": 89,
+                    "Wol8": 69,
+                    "Wol9": 15
+                },
+                "test": {
+                    "Wol1": 17,
+                    "Wol10": 21,
+                    "Wol11": 9,
+                    "Wol12": 16,
+                    "Wol2": 15,
+                    "Wol3": 39,
+                    "Wol4": 22,
+                    "Wol5": 81,
+                    "Wol6": 22,
+                    "Wol7": 83,
+                    "Wol8": 91,
+                    "Wol9": 3
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 167,
+                    "Ord": 9
+                },
+                "validation": {
+                    "Card": 59,
+                    "Ord": 2
+                },
+                "test": {
+                    "Card": 71,
+                    "Ord": 8
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 245,
+                    "Sing": 931
+                },
+                "validation": {
+                    "Plur": 82,
+                    "Sing": 362
+                },
+                "test": {
+                    "Plur": 96,
+                    "Sing": 371
+                }
+            },
+            "Person": {
+                "training": {
+                    "0": 48,
+                    "1": 102,
+                    "2": 39,
+                    "2,3": 11,
+                    "3": 943
+                },
+                "validation": {
+                    "0": 11,
+                    "1": 31,
+                    "2": 48,
+                    "2,3": 7,
+                    "3": 337
+                },
+                "test": {
+                    "0": 12,
+                    "1": 29,
+                    "2": 20,
+                    "2,3": 10,
+                    "3": 388
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Art": 209,
+                    "Dem": 182,
+                    "Ind": 7,
+                    "Ind,Neg": 23,
+                    "Int": 20,
+                    "Prs": 376,
+                    "Rel": 283,
+                    "Tot": 38
+                },
+                "validation": {
+                    "Art": 80,
+                    "Dem": 79,
+                    "Ind": 1,
+                    "Ind,Neg": 6,
+                    "Int": 15,
+                    "Prs": 140,
+                    "Rel": 107,
+                    "Tot": 4
+                },
+                "test": {
+                    "Art": 87,
+                    "Dem": 79,
+                    "Ind": 9,
+                    "Ind,Neg": 5,
+                    "Int": 17,
+                    "Prs": 133,
+                    "Rel": 118,
+                    "Tot": 5
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 25,
+                    "Past": 260,
+                    "Pres": 387
+                },
+                "validation": {
+                    "Fut": 8,
+                    "Past": 118,
+                    "Pres": 165
+                },
+                "test": {
+                    "Fut": 17,
+                    "Past": 108,
+                    "Pres": 174
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 1149,
+                    "Inf": 15
+                },
+                "validation": {
+                    "Fin": 427,
+                    "Inf": 12
+                },
+                "test": {
+                    "Fin": 453,
+                    "Inf": 10
+                }
+            }
+        },
+        "Yoruba": {
+            "Case": {
+                "training": {
+                    "Acc": 39,
+                    "Gen": 36,
+                    "Nom": 153
+                },
+                "validation": {
+                    "Acc": 5,
+                    "Gen": 5,
+                    "Nom": 19
+                },
+                "test": {
+                    "Acc": 5,
+                    "Gen": 4,
+                    "Nom": 20
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 100,
+                    "Sing": 131
+                },
+                "validation": {
+                    "Plur": 13,
+                    "Sing": 16
+                },
+                "test": {
+                    "Plur": 12,
+                    "Sing": 17
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 46,
+                    "2": 43,
+                    "3": 139
+                },
+                "validation": {
+                    "1": 6,
+                    "2": 6,
+                    "3": 17
+                },
+                "test": {
+                    "1": 6,
+                    "2": 5,
+                    "3": 18
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Dem": 22,
+                    "Ind": 16,
+                    "Prs": 156,
+                    "Rel": 38
+                },
+                "validation": {
+                    "Dem": 3,
+                    "Ind": 2,
+                    "Prs": 20,
+                    "Rel": 4
+                },
+                "test": {
+                    "Dem": 3,
+                    "Ind": 2,
+                    "Prs": 19,
+                    "Rel": 5
+                }
+            }
+        },
+        "Marathi": {
+            "Aspect": {
+                "training": {
+                    "Hab": 3,
+                    "Imp": 71,
+                    "Perf": 211,
+                    "Prosp": 8
+                },
+                "validation": {
+                    "Imp": 7,
+                    "Perf": 26,
+                    "Prosp": 2
+                },
+                "test": {
+                    "Hab": 1,
+                    "Imp": 8,
+                    "Perf": 26,
+                    "Prosp": 5
+                }
+            },
+            "Deixis": {
+                "training": {
+                    "Prox": 31,
+                    "Remt": 144
+                },
+                "validation": {
+                    "Prox": 3,
+                    "Remt": 12
+                },
+                "test": {
+                    "Prox": 3,
+                    "Remt": 18
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 103,
+                    "Masc": 179,
+                    "Neut": 78
+                },
+                "validation": {
+                    "Fem": 4,
+                    "Masc": 31,
+                    "Neut": 9
+                },
+                "test": {
+                    "Fem": 14,
+                    "Masc": 25,
+                    "Neut": 8
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 70,
+                    "Sing": 303
+                },
+                "validation": {
+                    "Plur": 11,
+                    "Sing": 35
+                },
+                "test": {
+                    "Plur": 5,
+                    "Sing": 42
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 34,
+                    "2": 53,
+                    "3": 281
+                },
+                "validation": {
+                    "1": 3,
+                    "2": 3,
+                    "3": 40
+                },
+                "test": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 39
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Dem": 56,
+                    "Ind": 25,
+                    "Int": 17,
+                    "Prs": 7,
+                    "Rel": 1,
+                    "Tot": 3
+                },
+                "validation": {
+                    "Dem": 8,
+                    "Ind": 3,
+                    "Int": 5,
+                    "Prs": 2,
+                    "Rel": 1
+                },
+                "test": {
+                    "Dem": 4,
+                    "Int": 5,
+                    "Prs": 1,
+                    "Rel": 1
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 15,
+                    "Past": 42,
+                    "Pres": 72
+                },
+                "validation": {
+                    "Fut": 4,
+                    "Past": 12,
+                    "Pres": 10
+                },
+                "test": {
+                    "Fut": 1,
+                    "Past": 8,
+                    "Pres": 11
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Conv": 9,
+                    "Fin": 295,
+                    "Inf": 16,
+                    "Part": 38,
+                    "Sup": 2
+                },
+                "validation": {
+                    "Conv": 4,
+                    "Fin": 35,
+                    "Inf": 5,
+                    "Part": 2
+                },
+                "test": {
+                    "Conv": 1,
+                    "Fin": 32,
+                    "Inf": 1,
+                    "Part": 9
+                }
+            }
+        },
+        "Catalan": {
+            "NumType": {
+                "training": {
+                    "Card": 3992,
+                    "Frac": 223,
+                    "Ord": 944
+                },
+                "validation": {
+                    "Card": 496,
+                    "Frac": 23,
+                    "Ord": 127
+                },
+                "test": {
+                    "Card": 567,
+                    "Frac": 57,
+                    "Ord": 125
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 2371,
+                    "Sing": 10703
+                },
+                "validation": {
+                    "Plur": 274,
+                    "Sing": 1432
+                },
+                "test": {
+                    "Plur": 348,
+                    "Sing": 1490
+                }
+            },
+            "Number[psor]": {
+                "training": {
+                    "Plur": 133,
+                    "Sing": 34
+                },
+                "validation": {
+                    "Plur": 14,
+                    "Sing": 2
+                },
+                "test": {
+                    "Plur": 20,
+                    "Sing": 5
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 462,
+                    "2": 24,
+                    "3": 12360
+                },
+                "validation": {
+                    "1": 28,
+                    "3": 1641
+                },
+                "test": {
+                    "1": 40,
+                    "3": 1752
+                }
+            },
+            "PrepCase": {
+                "training": {
+                    "Npr": 4344,
+                    "Pre": 31
+                },
+                "validation": {
+                    "Npr": 593,
+                    "Pre": 2
+                },
+                "test": {
+                    "Npr": 599,
+                    "Pre": 2
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Art": 8983,
+                    "Dem": 1139,
+                    "Ind": 1202,
+                    "Int": 76,
+                    "Prs": 1208,
+                    "Rel": 136,
+                    "Tot": 108
+                },
+                "validation": {
+                    "Art": 1212,
+                    "Dem": 130,
+                    "Ind": 146,
+                    "Int": 7,
+                    "Prs": 145,
+                    "Rel": 19,
+                    "Tot": 20
+                },
+                "test": {
+                    "Art": 1269,
+                    "Dem": 179,
+                    "Ind": 170,
+                    "Int": 14,
+                    "Prs": 148,
+                    "Rel": 10,
+                    "Tot": 17
+                }
+            },
+            "PunctSide": {
+                "training": {
+                    "Fin": 75,
+                    "Ini": 1065
+                },
+                "validation": {
+                    "Fin": 4,
+                    "Ini": 148
+                },
+                "test": {
+                    "Fin": 13,
+                    "Ini": 132
+                }
+            },
+            "PunctType": {
+                "training": {
+                    "Brck": 456,
+                    "Colo": 170,
+                    "Comm": 7502,
+                    "Dash": 368,
+                    "Excl": 4,
+                    "Peri": 3199,
+                    "Qest": 71,
+                    "Quot": 1317,
+                    "Semi": 35
+                },
+                "validation": {
+                    "Brck": 66,
+                    "Colo": 23,
+                    "Comm": 1014,
+                    "Dash": 25,
+                    "Peri": 416,
+                    "Qest": 4,
+                    "Quot": 155,
+                    "Semi": 6
+                },
+                "test": {
+                    "Brck": 57,
+                    "Colo": 22,
+                    "Comm": 1074,
+                    "Dash": 17,
+                    "Peri": 467,
+                    "Qest": 11,
+                    "Quot": 190,
+                    "Semi": 8
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 1434,
+                    "Imp": 514,
+                    "Past": 2941,
+                    "Pres": 7874
+                },
+                "validation": {
+                    "Fut": 146,
+                    "Imp": 72,
+                    "Past": 388,
+                    "Pres": 1052
+                },
+                "test": {
+                    "Fut": 225,
+                    "Imp": 49,
+                    "Past": 380,
+                    "Pres": 1126
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 6608,
+                    "Ger": 77,
+                    "Inf": 3049,
+                    "Part": 3155
+                },
+                "validation": {
+                    "Fin": 829,
+                    "Ger": 12,
+                    "Inf": 410,
+                    "Part": 426
+                },
+                "test": {
+                    "Fin": 945,
+                    "Ger": 12,
+                    "Inf": 428,
+                    "Part": 420
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 594,
+                    "Acc,Dat": 4335,
+                    "Dat": 249,
+                    "Gen": 137,
+                    "Loc": 661,
+                    "Nom": 60
+                },
+                "validation": {
+                    "Acc": 91,
+                    "Acc,Dat": 578,
+                    "Dat": 50,
+                    "Gen": 21,
+                    "Loc": 83
+                },
+                "test": {
+                    "Acc": 79,
+                    "Acc,Dat": 594,
+                    "Dat": 27,
+                    "Gen": 32,
+                    "Loc": 90,
+                    "Nom": 2
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 4248,
+                    "Fem,Masc": 8,
+                    "Masc": 8662,
+                    "Neut": 54
+                },
+                "validation": {
+                    "Fem": 605,
+                    "Fem,Masc": 1,
+                    "Masc": 1087,
+                    "Neut": 6
+                },
+                "test": {
+                    "Fem": 612,
+                    "Fem,Masc": 3,
+                    "Masc": 1209,
+                    "Neut": 6
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 183,
+                    "Imp": 10,
+                    "Ind": 12539,
+                    "Sub": 104
+                },
+                "validation": {
+                    "Cnd": 21,
+                    "Ind": 1634,
+                    "Sub": 13
+                },
+                "test": {
+                    "Cnd": 25,
+                    "Imp": 3,
+                    "Ind": 1754,
+                    "Sub": 9
+                }
+            }
+        },
+        "Arabic": {
+            "Animacy": {
+                "training": {
+                    "Hum": 179,
+                    "Nhum": 617
+                },
+                "validation": {
+                    "Hum": 23,
+                    "Nhum": 77
+                },
+                "test": {
+                    "Hum": 22,
+                    "Nhum": 77
+                }
+            },
+            "Aspect": {
+                "training": {
+                    "Imp": 4096,
+                    "Perf": 10054
+                },
+                "validation": {
+                    "Imp": 501,
+                    "Perf": 1185
+                },
+                "test": {
+                    "Imp": 488,
+                    "Perf": 1268
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 4246,
+                    "Gen": 3027,
+                    "Nom": 8090
+                },
+                "validation": {
+                    "Acc": 455,
+                    "Gen": 378,
+                    "Nom": 1070
+                },
+                "test": {
+                    "Acc": 525,
+                    "Gen": 366,
+                    "Nom": 1010
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Com": 4817,
+                    "Def": 5597,
+                    "Ind": 5297
+                },
+                "validation": {
+                    "Com": 588,
+                    "Def": 691,
+                    "Ind": 699
+                },
+                "test": {
+                    "Com": 536,
+                    "Def": 759,
+                    "Ind": 667
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 4003,
+                    "Masc": 11724
+                },
+                "validation": {
+                    "Fem": 475,
+                    "Masc": 1503
+                },
+                "test": {
+                    "Fem": 512,
+                    "Masc": 1450
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Ind": 13778,
+                    "Jus": 307,
+                    "Sub": 259
+                },
+                "validation": {
+                    "Ind": 1634,
+                    "Jus": 34,
+                    "Sub": 42
+                },
+                "test": {
+                    "Ind": 1714,
+                    "Jus": 39,
+                    "Sub": 27
+                }
+            },
+            "Number": {
+                "training": {
+                    "Dual": 90,
+                    "Plur": 671,
+                    "Sing": 14966
+                },
+                "validation": {
+                    "Dual": 13,
+                    "Plur": 96,
+                    "Sing": 1869
+                },
+                "test": {
+                    "Dual": 5,
+                    "Plur": 72,
+                    "Sing": 1885
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 673,
+                    "2": 111,
+                    "3": 13819
+                },
+                "validation": {
+                    "1": 71,
+                    "2": 8,
+                    "3": 1671
+                },
+                "test": {
+                    "1": 75,
+                    "2": 7,
+                    "3": 1732
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 25,
+                    "Past": 472,
+                    "Pres": 260
+                },
+                "validation": {
+                    "Fut": 4,
+                    "Past": 59,
+                    "Pres": 32
+                },
+                "test": {
+                    "Fut": 3,
+                    "Past": 59,
+                    "Pres": 33
+                }
+            },
+            "Voice": {
+                "training": {
+                    "Act": 13613,
+                    "Pass": 740
+                },
+                "validation": {
+                    "Act": 1613,
+                    "Pass": 99
+                },
+                "test": {
+                    "Act": 1690,
+                    "Pass": 91
+                }
+            },
+            "NumForm": {
+                "training": {
+                    "Digit": 4323,
+                    "Word": 973
+                },
+                "validation": {
+                    "Digit": 674,
+                    "Word": 135
+                },
+                "test": {
+                    "Digit": 638,
+                    "Word": 94
+                }
+            },
+            "NumValue": {
+                "training": {
+                    "1": 20,
+                    "2": 16,
+                    "3": 324
+                },
+                "validation": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 54
+                },
+                "test": {
+                    "1": 5,
+                    "3": 67
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Prs": 10218,
+                    "Rel": 120
+                },
+                "validation": {
+                    "Prs": 1244,
+                    "Rel": 12
+                },
+                "test": {
+                    "Prs": 1260,
+                    "Rel": 8
+                }
+            }
+        },
+        "Basque": {
+            "Animacy": {
+                "training": {
+                    "Anim": 436,
+                    "Inan": 3619
+                },
+                "validation": {
+                    "Anim": 166,
+                    "Inan": 1170
+                },
+                "test": {
+                    "Anim": 122,
+                    "Inan": 1221
+                }
+            },
+            "Aspect": {
+                "training": {
+                    "Imp": 586,
+                    "Perf": 2356,
+                    "Prog": 1660,
+                    "Prosp": 590
+                },
+                "validation": {
+                    "Imp": 204,
+                    "Perf": 777,
+                    "Prog": 525,
+                    "Prosp": 202
+                },
+                "test": {
+                    "Imp": 226,
+                    "Perf": 764,
+                    "Prog": 549,
+                    "Prosp": 177
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Def": 4440,
+                    "Ind": 838
+                },
+                "validation": {
+                    "Def": 1496,
+                    "Ind": 271
+                },
+                "test": {
+                    "Def": 1475,
+                    "Ind": 286
+                }
+            },
+            "Degree": {
+                "training": {
+                    "Abs": 13,
+                    "Cmp": 106,
+                    "Sup": 178
+                },
+                "validation": {
+                    "Abs": 5,
+                    "Cmp": 30,
+                    "Sup": 62
+                },
+                "test": {
+                    "Abs": 12,
+                    "Cmp": 29,
+                    "Sup": 67
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 20,
+                    "Masc": 14
+                },
+                "validation": {
+                    "Fem": 10,
+                    "Masc": 8
+                },
+                "test": {
+                    "Fem": 6,
+                    "Masc": 2
+                }
+            },
+            "Gender[erg]": {
+                "training": {
+                    "Fem": 2,
+                    "Masc": 2
+                },
+                "validation": {
+                    "Fem": 3,
+                    "Masc": 1
+                },
+                "test": {
+                    "Fem": 3,
+                    "Masc": 1
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 75,
+                    "Imp": 22,
+                    "Ind": 5116,
+                    "Pot": 92,
+                    "Sub": 12
+                },
+                "validation": {
+                    "Cnd": 16,
+                    "Imp": 8,
+                    "Ind": 1707,
+                    "Pot": 33,
+                    "Sub": 7
+                },
+                "test": {
+                    "Cnd": 22,
+                    "Imp": 9,
+                    "Ind": 1702,
+                    "Pot": 29,
+                    "Sub": 7
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 1477,
+                    "Ord": 450
+                },
+                "validation": {
+                    "Card": 449,
+                    "Ord": 191
+                },
+                "test": {
+                    "Card": 487,
+                    "Ord": 153
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 1100,
+                    "Sing": 4022
+                },
+                "validation": {
+                    "Plur": 372,
+                    "Sing": 1338
+                },
+                "test": {
+                    "Plur": 355,
+                    "Sing": 1346
+                }
+            },
+            "Number[abs]": {
+                "training": {
+                    "Plur": 1242,
+                    "Sing": 4075
+                },
+                "validation": {
+                    "Plur": 437,
+                    "Sing": 1334
+                },
+                "test": {
+                    "Plur": 415,
+                    "Sing": 1354
+                }
+            },
+            "Number[dat]": {
+                "training": {
+                    "Plur": 188,
+                    "Sing": 557
+                },
+                "validation": {
+                    "Plur": 66,
+                    "Sing": 180
+                },
+                "test": {
+                    "Plur": 63,
+                    "Sing": 187
+                }
+            },
+            "Number[erg]": {
+                "training": {
+                    "Plur": 1176,
+                    "Sing": 2331
+                },
+                "validation": {
+                    "Plur": 382,
+                    "Sing": 784
+                },
+                "test": {
+                    "Plur": 385,
+                    "Sing": 774
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 14,
+                    "2": 6,
+                    "3": 4
+                },
+                "validation": {
+                    "1": 8,
+                    "2": 1,
+                    "3": 1
+                },
+                "test": {
+                    "1": 10,
+                    "2": 2,
+                    "3": 3
+                }
+            },
+            "Person[abs]": {
+                "training": {
+                    "1": 142,
+                    "2": 49,
+                    "3": 5126
+                },
+                "validation": {
+                    "1": 57,
+                    "2": 12,
+                    "3": 1702
+                },
+                "test": {
+                    "1": 51,
+                    "2": 9,
+                    "3": 1709
+                }
+            },
+            "Person[dat]": {
+                "training": {
+                    "1": 108,
+                    "2": 31,
+                    "3": 606
+                },
+                "validation": {
+                    "1": 38,
+                    "2": 9,
+                    "3": 199
+                },
+                "test": {
+                    "1": 51,
+                    "2": 8,
+                    "3": 191
+                }
+            },
+            "Person[erg]": {
+                "training": {
+                    "1": 492,
+                    "2": 91,
+                    "3": 2924
+                },
+                "validation": {
+                    "1": 159,
+                    "2": 41,
+                    "3": 966
+                },
+                "test": {
+                    "1": 150,
+                    "2": 41,
+                    "3": 968
+                }
+            },
+            "Polarity": {
+                "training": {
+                    "Neg": 768,
+                    "Pos": 144
+                },
+                "validation": {
+                    "Neg": 249,
+                    "Pos": 44
+                },
+                "test": {
+                    "Neg": 247,
+                    "Pos": 30
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Int": 91,
+                    "Prs": 275
+                },
+                "validation": {
+                    "Int": 24,
+                    "Prs": 104
+                },
+                "test": {
+                    "Int": 39,
+                    "Prs": 103
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Inf": 744,
+                    "Part": 3842
+                },
+                "validation": {
+                    "Inf": 264,
+                    "Part": 1264
+                },
+                "test": {
+                    "Inf": 284,
+                    "Part": 1233
+                }
+            }
+        },
+        "Indonesian": {
+            "Clusivity": {
+                "training": {
+                    "Ex": 14,
+                    "In": 26
+                },
+                "validation": {
+                    "Ex": 2,
+                    "In": 7
+                },
+                "test": {
+                    "Ex": 3,
+                    "In": 7
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Def": 107,
+                    "Ind": 21
+                },
+                "validation": {
+                    "Def": 23,
+                    "Ind": 6
+                },
+                "test": {
+                    "Def": 24,
+                    "Ind": 5
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 373,
+                    "Ord": 20
+                },
+                "validation": {
+                    "Card": 104,
+                    "Ord": 3
+                },
+                "test": {
+                    "Card": 103,
+                    "Ord": 4
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 32,
+                    "Sing": 620
+                },
+                "validation": {
+                    "Plur": 7,
+                    "Sing": 178
+                },
+                "test": {
+                    "Plur": 7,
+                    "Sing": 178
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 47,
+                    "3": 230
+                },
+                "validation": {
+                    "1": 10,
+                    "3": 69
+                },
+                "test": {
+                    "1": 11,
+                    "3": 68
+                }
+            },
+            "Polite": {
+                "training": {
+                    "Form": 40,
+                    "Infm": 105
+                },
+                "validation": {
+                    "Form": 5,
+                    "Infm": 15
+                },
+                "test": {
+                    "Form": 3,
+                    "Infm": 11
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Art": 52,
+                    "Dem": 182,
+                    "Emp": 4,
+                    "Ind": 17,
+                    "Prs": 162,
+                    "Rel": 110,
+                    "Tot": 12
+                },
+                "validation": {
+                    "Art": 14,
+                    "Dem": 55,
+                    "Prs": 43,
+                    "Rel": 35
+                },
+                "test": {
+                    "Art": 14,
+                    "Dem": 56,
+                    "Prs": 42,
+                    "Rel": 35
+                }
+            },
+            "Voice": {
+                "training": {
+                    "Act": 491,
+                    "Pass": 134
+                },
+                "validation": {
+                    "Act": 134,
+                    "Pass": 46
+                },
+                "test": {
+                    "Act": 135,
+                    "Pass": 45
+                }
+            }
+        },
+        "Spanish": {
+            "Case": {
+                "training": {
+                    "Acc": 58,
+                    "Acc,Dat": 221,
+                    "Acc,Nom": 18,
+                    "Dat": 26
+                },
+                "validation": {
+                    "Acc": 7,
+                    "Acc,Dat": 28,
+                    "Acc,Nom": 3,
+                    "Dat": 3
+                },
+                "test": {
+                    "Acc": 7,
+                    "Acc,Dat": 28,
+                    "Acc,Nom": 2,
+                    "Dat": 3
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Def": 630,
+                    "Ind": 108
+                },
+                "validation": {
+                    "Def": 79,
+                    "Ind": 14
+                },
+                "test": {
+                    "Def": 79,
+                    "Ind": 13
+                }
+            },
+            "Degree": {
+                "training": {
+                    "Abs": 34,
+                    "Cmp": 1954,
+                    "Sup": 112
+                },
+                "validation": {
+                    "Abs": 7,
+                    "Cmp": 220,
+                    "Sup": 13
+                },
+                "test": {
+                    "Abs": 5,
+                    "Cmp": 222,
+                    "Sup": 28
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 281,
+                    "Masc": 516
+                },
+                "validation": {
+                    "Fem": 35,
+                    "Masc": 65
+                },
+                "test": {
+                    "Fem": 35,
+                    "Masc": 65
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 13,
+                    "Ind": 777,
+                    "Sub": 7
+                },
+                "validation": {
+                    "Cnd": 2,
+                    "Ind": 97,
+                    "Sub": 1
+                },
+                "test": {
+                    "Cnd": 1,
+                    "Ind": 98,
+                    "Sub": 1
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 4109,
+                    "Frac": 115,
+                    "Ord": 1073
+                },
+                "validation": {
+                    "Card": 516,
+                    "Frac": 22,
+                    "Ord": 143
+                },
+                "test": {
+                    "Card": 501,
+                    "Frac": 11,
+                    "Ord": 124
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 187,
+                    "Sing": 613
+                },
+                "validation": {
+                    "Plur": 24,
+                    "Sing": 76
+                },
+                "test": {
+                    "Plur": 23,
+                    "Sing": 77
+                }
+            },
+            "Number[psor]": {
+                "training": {
+                    "Plur": 189,
+                    "Sing": 191
+                },
+                "validation": {
+                    "Plur": 17,
+                    "Sing": 14
+                },
+                "test": {
+                    "Plur": 28,
+                    "Sing": 10
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 34,
+                    "3": 761
+                },
+                "validation": {
+                    "1": 4,
+                    "3": 96
+                },
+                "test": {
+                    "1": 4,
+                    "3": 95
+                }
+            },
+            "PrepCase": {
+                "training": {
+                    "Npr": 5883,
+                    "Pre": 59
+                },
+                "validation": {
+                    "Npr": 687,
+                    "Pre": 10
+                },
+                "test": {
+                    "Npr": 662,
+                    "Pre": 4
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Art": 535,
+                    "Dem": 54,
+                    "Ind": 26,
+                    "Int,Rel": 21,
+                    "Prs": 135,
+                    "Tot": 13
+                },
+                "validation": {
+                    "Art": 68,
+                    "Dem": 7,
+                    "Ind": 4,
+                    "Int,Rel": 2,
+                    "Prs": 17,
+                    "Tot": 1
+                },
+                "test": {
+                    "Art": 67,
+                    "Dem": 6,
+                    "Ind": 3,
+                    "Int,Rel": 3,
+                    "Prs": 17,
+                    "Tot": 2
+                }
+            },
+            "PunctSide": {
+                "training": {
+                    "Fin": 107,
+                    "Ini": 1401
+                },
+                "validation": {
+                    "Fin": 3,
+                    "Ini": 201
+                },
+                "test": {
+                    "Fin": 8,
+                    "Ini": 147
+                }
+            },
+            "PunctType": {
+                "training": {
+                    "Brck": 457,
+                    "Colo": 270,
+                    "Comm": 8059,
+                    "Dash": 528,
+                    "Excl": 14,
+                    "Peri": 3122,
+                    "Qest": 95,
+                    "Quot": 1685,
+                    "Semi": 44
+                },
+                "validation": {
+                    "Brck": 74,
+                    "Colo": 20,
+                    "Comm": 938,
+                    "Dash": 45,
+                    "Excl": 2,
+                    "Peri": 350,
+                    "Qest": 15,
+                    "Quot": 193,
+                    "Semi": 7
+                },
+                "test": {
+                    "Brck": 41,
+                    "Colo": 38,
+                    "Comm": 940,
+                    "Dash": 83,
+                    "Excl": 5,
+                    "Peri": 394,
+                    "Qest": 5,
+                    "Quot": 211,
+                    "Semi": 1
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 21,
+                    "Past": 450,
+                    "Pres": 319
+                },
+                "validation": {
+                    "Fut": 3,
+                    "Past": 56,
+                    "Pres": 40
+                },
+                "test": {
+                    "Fut": 2,
+                    "Past": 57,
+                    "Pres": 40
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 11523,
+                    "Ger": 101,
+                    "Inf": 483,
+                    "Part": 1740
+                },
+                "validation": {
+                    "Fin": 1340,
+                    "Ger": 12,
+                    "Inf": 51,
+                    "Part": 187
+                },
+                "test": {
+                    "Fin": 1429,
+                    "Ger": 12,
+                    "Inf": 43,
+                    "Part": 180
+                }
+            },
+            "Aspect": {
+                "training": {
+                    "Imp": 442,
+                    "Perf": 356
+                },
+                "validation": {
+                    "Imp": 55,
+                    "Perf": 45
+                },
+                "test": {
+                    "Imp": 56,
+                    "Perf": 44
+                }
+            },
+            "Voice": {
+                "training": {
+                    "Act": 708,
+                    "Pass": 90
+                },
+                "validation": {
+                    "Act": 89,
+                    "Pass": 11
+                },
+                "test": {
+                    "Act": 88,
+                    "Pass": 12
+                }
+            }
+        },
+        "Portuguese": {
+            "Definite": {
+                "training": {
+                    "Def": 5496,
+                    "Ind": 597
+                },
+                "validation": {
+                    "Def": 890,
+                    "Ind": 126
+                },
+                "test": {
+                    "Def": 916,
+                    "Ind": 110
+                }
+            },
+            "ExtPos": {
+                "training": {
+                    "ADJ": 5,
+                    "ADP": 81,
+                    "ADV": 101,
+                    "AUX": 353,
+                    "CCONJ": 82,
+                    "INTJ": 20,
+                    "NOUN": 212,
+                    "NUM": 5,
+                    "PROPN": 1858,
+                    "SCONJ": 120
+                },
+                "validation": {
+                    "ADJ": 1,
+                    "ADP": 16,
+                    "ADV": 15,
+                    "AUX": 42,
+                    "CCONJ": 15,
+                    "INTJ": 3,
+                    "NOUN": 35,
+                    "NUM": 1,
+                    "PROPN": 321,
+                    "SCONJ": 23
+                },
+                "test": {
+                    "ADP": 9,
+                    "ADV": 17,
+                    "AUX": 54,
+                    "CCONJ": 15,
+                    "INTJ": 7,
+                    "NOUN": 26,
+                    "PROPN": 286,
+                    "SCONJ": 19
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 2987,
+                    "Masc": 4091
+                },
+                "validation": {
+                    "Fem": 406,
+                    "Masc": 522
+                },
+                "test": {
+                    "Fem": 380,
+                    "Masc": 507
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 11,
+                    "Ind": 778
+                },
+                "validation": {
+                    "Cnd": 2,
+                    "Ind": 97
+                },
+                "test": {
+                    "Cnd": 1,
+                    "Ind": 98
+                }
+            },
+            "NumType": {
+                "training": {
+                    "Card": 1845,
+                    "Frac": 5,
+                    "Ord": 437,
+                    "Range": 2
+                },
+                "validation": {
+                    "Card": 317,
+                    "Ord": 50
+                },
+                "test": {
+                    "Card": 291,
+                    "Ord": 64
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 1181,
+                    "Sing": 5897
+                },
+                "validation": {
+                    "Plur": 157,
+                    "Sing": 772
+                },
+                "test": {
+                    "Plur": 139,
+                    "Sing": 748
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 38,
+                    "3": 758
+                },
+                "validation": {
+                    "1": 5,
+                    "3": 95
+                },
+                "test": {
+                    "1": 4,
+                    "3": 95
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Art": 706,
+                    "Prs": 18
+                },
+                "validation": {
+                    "Art": 89,
+                    "Prs": 2
+                },
+                "test": {
+                    "Art": 88,
+                    "Prs": 2
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 22,
+                    "Past": 434,
+                    "Pres": 333
+                },
+                "validation": {
+                    "Fut": 3,
+                    "Past": 55,
+                    "Pres": 41
+                },
+                "test": {
+                    "Fut": 3,
+                    "Past": 54,
+                    "Pres": 42
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 5598,
+                    "Ger": 57,
+                    "Inf": 215,
+                    "Part": 600
+                },
+                "validation": {
+                    "Fin": 903,
+                    "Ger": 13,
+                    "Inf": 28,
+                    "Part": 120
+                },
+                "test": {
+                    "Fin": 911,
+                    "Ger": 18,
+                    "Inf": 50,
+                    "Part": 105
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 1102,
+                    "Dat": 132,
+                    "Nom": 324
+                },
+                "validation": {
+                    "Acc": 170,
+                    "Dat": 16,
+                    "Nom": 78
+                },
+                "test": {
+                    "Acc": 178,
+                    "Dat": 18,
+                    "Nom": 58
+                }
+            },
+            "Number[psor]": {
+                "training": {
+                    "Plur": 36,
+                    "Sing": 129
+                },
+                "validation": {
+                    "Plur": 5,
+                    "Sing": 16
+                },
+                "test": {
+                    "Plur": 4,
+                    "Sing": 17
+                }
+            }
+        }
+    },
+    "bert-base-multilingual-cased": {
+        "French": {
+            "Definite": {
+                "training": {
+                    "Def": 600,
+                    "Ind": 154
+                },
+                "validation": {
+                    "Def": 76,
+                    "Ind": 19
+                },
+                "test": {
+                    "Def": 75,
+                    "Ind": 19
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 228,
+                    "Masc": 571
+                },
+                "validation": {
+                    "Fem": 29,
+                    "Masc": 71
+                },
+                "test": {
+                    "Fem": 28,
+                    "Masc": 72
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Cnd": 16,
+                    "Ind": 775
+                },
+                "validation": {
+                    "Cnd": 2,
+                    "Ind": 97
+                },
+                "test": {
+                    "Cnd": 2,
+                    "Ind": 97
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 150,
+                    "Sing": 650
+                },
+                "validation": {
+                    "Plur": 19,
+                    "Sing": 81
+                },
+                "test": {
+                    "Plur": 19,
+                    "Sing": 81
+                }
+            },
+            "Number[psor]": {
+                "training": {
+                    "Plur": 54,
+                    "Sing": 137
+                },
+                "validation": {
+                    "Plur": 7,
+                    "Sing": 17
+                },
+                "test": {
+                    "Plur": 6,
+                    "Sing": 18
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 33,
+                    "3": 758
+                },
+                "validation": {
+                    "1": 5,
+                    "3": 95
+                },
+                "test": {
+                    "1": 4,
+                    "3": 95
+                }
+            },
+            "Person[psor]": {
+                "training": {
+                    "1": 14,
+                    "3": 174
+                },
+                "validation": {
+                    "1": 2,
+                    "3": 22
+                },
+                "test": {
+                    "1": 2,
+                    "3": 21
+                }
+            },
+            "PronType": {
+                "training": {
+                    "Art": 520,
+                    "Dem": 39,
+                    "Ind": 24,
+                    "Prs": 206
+                },
+                "validation": {
+                    "Art": 65,
+                    "Dem": 5,
+                    "Ind": 3,
+                    "Prs": 26
+                },
+                "test": {
+                    "Art": 65,
+                    "Dem": 5,
+                    "Ind": 3,
+                    "Prs": 26
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 17,
+                    "Imp": 64,
+                    "Past": 381,
+                    "Pres": 335
+                },
+                "validation": {
+                    "Fut": 2,
+                    "Imp": 8,
+                    "Past": 48,
+                    "Pres": 42
+                },
+                "test": {
+                    "Fut": 2,
+                    "Imp": 8,
+                    "Past": 48,
+                    "Pres": 42
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 464,
+                    "Part": 329
+                },
+                "validation": {
+                    "Fin": 58,
+                    "Part": 42
+                },
+                "test": {
+                    "Fin": 58,
+                    "Part": 41
+                }
+            }
+        },
+        "Bengali": {
+            "Aspect": {
+                "training": {
+                    "Imp": 8,
+                    "Perf": 11
+                },
+                "validation": {
+                    "Imp": 1,
+                    "Perf": 2
+                },
+                "test": {
+                    "Imp": 1,
+                    "Perf": 1
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 16,
+                    "2": 17,
+                    "3": 7
+                },
+                "validation": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                },
+                "test": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 8,
+                    "Pres": 24
+                },
+                "validation": {
+                    "Fut": 1,
+                    "Pres": 3
+                },
+                "test": {
+                    "Fut": 1,
+                    "Pres": 3
+                }
+            },
+            "VerbForm": {
+                "training": {
+                    "Fin": 22,
+                    "Part": 10
+                },
+                "validation": {
+                    "Fin": 3,
+                    "Part": 2
+                },
+                "test": {
+                    "Fin": 3,
+                    "Part": 1
+                }
+            }
+        },
+        "Hindi": {
+            "Person": {
+                "training": {
+                    "1": 18,
+                    "3": 775
+                },
+                "validation": {
+                    "1": 3,
+                    "3": 97
+                },
+                "test": {
+                    "1": 2,
+                    "3": 97
+                }
+            }
+        },
+        "Sanskrit": {
+            "Person": {
+                "training": {
+                    "1": 23,
+                    "2": 13,
+                    "3": 102
+                },
+                "validation": {
+                    "1": 3,
+                    "2": 2,
+                    "3": 13
+                },
+                "test": {
+                    "1": 3,
+                    "2": 1,
+                    "3": 13
+                }
+            }
+        },
+        "Croatian": {
+            "Person": {
+                "training": {
+                    "1": 67,
+                    "2": 18,
+                    "3": 791
+                },
+                "validation": {
+                    "1": 8,
+                    "2": 3,
+                    "3": 99
+                },
+                "test": {
+                    "1": 8,
+                    "2": 2,
+                    "3": 99
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 135,
+                    "Dat": 15,
+                    "Gen": 74,
+                    "Ins": 19,
+                    "Loc": 72,
+                    "Nom": 592
+                },
+                "validation": {
+                    "Acc": 17,
+                    "Dat": 2,
+                    "Gen": 9,
+                    "Ins": 3,
+                    "Loc": 9,
+                    "Nom": 74
+                },
+                "test": {
+                    "Acc": 17,
+                    "Dat": 2,
+                    "Gen": 9,
+                    "Ins": 2,
+                    "Loc": 9,
+                    "Nom": 74
+                }
+            }
+        },
+        "Slovak": {
+            "Person": {
+                "training": {
+                    "1": 6,
+                    "3": 290
+                },
+                "validation": {
+                    "1": 1,
+                    "3": 37
+                },
+                "test": {
+                    "1": 1,
+                    "3": 36
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 86,
+                    "Dat": 22,
+                    "Gen": 67,
+                    "Ins": 78,
+                    "Loc": 101,
+                    "Nom": 473
+                },
+                "validation": {
+                    "Acc": 11,
+                    "Dat": 3,
+                    "Gen": 8,
+                    "Ins": 10,
+                    "Loc": 13,
+                    "Nom": 59
+                },
+                "test": {
+                    "Acc": 11,
+                    "Dat": 3,
+                    "Gen": 9,
+                    "Ins": 9,
+                    "Loc": 12,
+                    "Nom": 59
+                }
+            }
+        },
+        "Serbian": {
+            "Person": {
+                "training": {
+                    "1": 25,
+                    "3": 370
+                },
+                "validation": {
+                    "1": 3,
+                    "3": 47
+                },
+                "test": {
+                    "1": 4,
+                    "3": 46
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 42,
+                    "Dat": 6,
+                    "Gen": 34,
+                    "Ins": 9,
+                    "Loc": 34,
+                    "Nom": 290
+                },
+                "validation": {
+                    "Acc": 5,
+                    "Dat": 1,
+                    "Gen": 4,
+                    "Ins": 1,
+                    "Loc": 5,
+                    "Nom": 36
+                },
+                "test": {
+                    "Acc": 5,
+                    "Dat": 1,
+                    "Gen": 4,
+                    "Ins": 1,
+                    "Loc": 4,
+                    "Nom": 37
+                }
+            }
+        },
+        "Arabic": {
+            "Aspect": {
+                "training": {
+                    "Imp": 303,
+                    "Perf": 454
+                },
+                "validation": {
+                    "Imp": 38,
+                    "Perf": 57
+                },
+                "test": {
+                    "Imp": 38,
+                    "Perf": 57
+                }
+            },
+            "Case": {
+                "training": {
+                    "Acc": 133,
+                    "Gen": 308,
+                    "Nom": 356
+                },
+                "validation": {
+                    "Acc": 17,
+                    "Gen": 38,
+                    "Nom": 45
+                },
+                "test": {
+                    "Acc": 16,
+                    "Gen": 39,
+                    "Nom": 45
+                }
+            },
+            "Definite": {
+                "training": {
+                    "Def": 577,
+                    "Ind": 219
+                },
+                "validation": {
+                    "Def": 72,
+                    "Ind": 28
+                },
+                "test": {
+                    "Def": 72,
+                    "Ind": 27
+                }
+            },
+            "Gender": {
+                "training": {
+                    "Fem": 298,
+                    "Masc": 502
+                },
+                "validation": {
+                    "Fem": 38,
+                    "Masc": 62
+                },
+                "test": {
+                    "Fem": 37,
+                    "Masc": 63
+                }
+            },
+            "Mood": {
+                "training": {
+                    "Ind": 382,
+                    "Jus": 28,
+                    "Sub": 43
+                },
+                "validation": {
+                    "Ind": 48,
+                    "Jus": 4,
+                    "Sub": 5
+                },
+                "test": {
+                    "Ind": 48,
+                    "Jus": 3,
+                    "Sub": 6
+                }
+            },
+            "Number": {
+                "training": {
+                    "Plur": 46,
+                    "Sing": 749
+                },
+                "validation": {
+                    "Plur": 6,
+                    "Sing": 94
+                },
+                "test": {
+                    "Plur": 6,
+                    "Sing": 93
+                }
+            },
+            "Person": {
+                "training": {
+                    "1": 26,
+                    "3": 753
+                },
+                "validation": {
+                    "1": 4,
+                    "3": 94
+                },
+                "test": {
+                    "1": 3,
+                    "3": 95
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 26,
+                    "Past": 472,
+                    "Pres": 259
+                },
+                "validation": {
+                    "Fut": 3,
+                    "Past": 60,
+                    "Pres": 32
+                },
+                "test": {
+                    "Fut": 3,
+                    "Past": 59,
+                    "Pres": 33
+                }
+            },
+            "Voice": {
+                "training": {
+                    "Act": 680,
+                    "Pass": 82
+                },
+                "validation": {
+                    "Act": 86,
+                    "Pass": 10
+                },
+                "test": {
+                    "Act": 85,
+                    "Pass": 10
+                }
+            }
+        },
+        "Latin": {
+            "Aspect": {
+                "training": {
+                    "Imp": 566,
+                    "Perf": 118,
+                    "Prosp": 49
+                },
+                "validation": {
+                    "Imp": 71,
+                    "Perf": 15,
+                    "Prosp": 6
+                },
+                "test": {
+                    "Imp": 71,
+                    "Perf": 15,
+                    "Prosp": 6
+                }
+            }
+        },
+        "Italian": {
+            "Aspect": {
+                "training": {
+                    "Imp": 97,
+                    "Perf": 234
+                },
+                "validation": {
+                    "Imp": 12,
+                    "Perf": 30
+                },
+                "test": {
+                    "Imp": 12,
+                    "Perf": 29
+                }
+            }
+        },
+        "Spanish": {
+            "Aspect": {
+                "training": {
+                    "Imp": 424,
+                    "Perf": 373
+                },
+                "validation": {
+                    "Imp": 53,
+                    "Perf": 47
+                },
+                "test": {
+                    "Imp": 53,
+                    "Perf": 47
+                }
+            }
+        },
+        "Tamil": {
+            "Mood": {
+                "training": {
+                    "Imp": 16,
+                    "Ind": 34
+                },
+                "validation": {
+                    "Imp": 2,
+                    "Ind": 5
+                },
+                "test": {
+                    "Imp": 2,
+                    "Ind": 4
+                }
+            },
+            "Tense": {
+                "training": {
+                    "Fut": 49,
+                    "Past": 187,
+                    "Pres": 84
+                },
+                "validation": {
+                    "Fut": 6,
+                    "Past": 24,
+                    "Pres": 11
+                },
+                "test": {
+                    "Fut": 6,
+                    "Past": 24,
+                    "Pres": 10
+                }
+            }
+        }
+    }
+}
