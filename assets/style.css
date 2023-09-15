@@ -1,0 +1,104 @@
+body {
+  background-color: #fcfcfc;
+}
+  
+  #model_selection .VirtualizedSelectFocusedOption {
+    background-color: rgb(47, 15, 136);
+    color: white;
+  }
+
+#dropdown .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+
+#category .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+
+#languages .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+
+#family_selection .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+
+#quantity_of_languages .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+
+#tick .Select-control {
+  border-color: rgb(47, 15, 136) !important;
+}
+
+#language_graph4 .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+
+#categories_graph4 .VirtualizedSelectFocusedOption {
+  background-color: rgb(47, 15, 136);
+  color: white;
+}
+/* 
+#language_selection_map .Select-control {
+  background-color: #2D2D2D !important;
+} */
+
+/* #language_selection_map .Select.is-focused > .Select-control {
+  background-color: #2D2D2D;
+  border-width: none;
+} */
+
+/* #language_selection_map{
+  background-color: #2D2D2D;
+  color: white;
+  border-width: none;
+} */
+
+
+/* #language_selection_map .Select-placeholder {
+  border: 3px solid #ff0000;
+  border-radius: 4px;
+} */
+
+/* #language_selection_map .VirtualizedSelectOption { */
+  /* background-color: #2D2D2D; */
+  /* color: white;
+  border-color: #3cff00;
+  border-width: none;
+} */
+
+/* #language_selection_map .VirtualizedSelectFocusedOption {
+  background-color: #2929ff;
+} */
+
+/* #language_selection_map .Select.is-focused:not(.is-open) > .Select-control {
+  background-color: #2D2D2D; */
+  /* border-color: #3cff00;
+  box-shadow: none;
+  border-width: none;
+} */
+
+/* #language_selection_map .VirtualizedSelectDisabledOption{
+  background-color: #ff6b6b;
+  color: white;
+  border-color: #7a3453;
+  border-width: none;
+} */
+
+#tick {
+  padding-left: 2rem;
+  margin-left: 3rem;
+}
+
+#tick_lable {
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 1rem;
+}
