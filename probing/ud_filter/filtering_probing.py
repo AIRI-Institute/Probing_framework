@@ -70,9 +70,11 @@ class ProbingConlluFilter:
 
         list_texts = [read(p) for p in self.paths]
         conllu_data = "\n".join(list_texts)
-
+        conllu_data = re.sub(r'\d+\-\d+.*\n', '', conllu_data)
+        
         self.language = extract_lang_from_udfile_path(self.paths[0], language=language)
         self.sentences = parse(conllu_data)
+        print(self.sentences)
 
     def _filter_conllu(self, class_label: str) -> Tuple[List[str], List[str]]:
         """Filters sentences by class's query and saves the result to the relevant fields"""
