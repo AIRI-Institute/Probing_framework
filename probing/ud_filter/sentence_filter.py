@@ -94,14 +94,10 @@ class SentenceFilter:
 
     def pattern_relations(self, rel_pattern: str) -> List[str]:
         """Returns all relation names in the sentence that match the given pattern"""
-
-        rels = []
-        for rel in self.sent_deprels:
-            if re.fullmatch(
-                rel_pattern, rel, re.I
-            ):  # changed from re.serach to re.fullmatch
-                rels.append(rel)
-        return rels
+        return [
+            relfor for rel in self.sent_deprels 
+            if re.fullmatch(rel_pattern, rel, re.I) # changed from re.serach to re.fullmatch
+        ]
 
     def pairs_with_rel(
         self, node_pair: Tuple[str, str], rel_name: str
