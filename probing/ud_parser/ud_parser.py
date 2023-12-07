@@ -65,8 +65,9 @@ class ConlluUDParser:
         with open(result_path, "w", encoding="utf-8") as newf:
             my_writer = csv.writer(newf, delimiter="\t", lineterminator="\n")
             for part in partition_sets:
-                for sentence, value in zip(*partition_sets[part]):
-                    my_writer.writerow([part, value, sentence])
+                for sentence_and_id, value in zip(*partition_sets[part]):
+                    sentence, id = sentence_and_id
+                    my_writer.writerow([part, value, sentence, id])
         return result_path
 
     def find_category_token(
@@ -134,7 +135,8 @@ class ConlluUDParser:
                         )
                     ):
                         value = category_token["feats"][category]
-                        probing_data[value].append(s_text)
+                        token_id = category_token["id"] - 1
+                        probing_data[value].append((s_text, token_id))
                     elif self.sorting == "by_pos_and_deprel":
                         pos, deprel = subcategory.split("_")
                         if (
@@ -142,7 +144,8 @@ class ConlluUDParser:
                             and category_token["deprel"] == deprel
                         ):
                             value = category_token["feats"][category]
-                            probing_data[value].append(s_text)
+                            token_id = category_token["id"] - 1
+                            probing_data[value].append((s_text, token_id))
         return probing_data
 
     def filter_labels_after_split(self, labels: List[Any]) -> List[Any]:

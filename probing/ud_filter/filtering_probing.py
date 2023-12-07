@@ -41,7 +41,7 @@ class ProbingConlluFilter:
         self.classes: Dict[
             str, Tuple[Dict[str, Dict[str, Any]], Dict[Tuple[str, str], Dict[str, Any]]]
         ] = {}
-        self.probing_dict: Dict[str, List[str]] = {}
+        self.probing_dict: Dict[str, List[Tuple[str, List[int]]]] = {}
         self.parts_data: Dict[str, List[List[str]]] = {}
 
     def upload_files(
@@ -91,10 +91,11 @@ class ProbingConlluFilter:
         for sentence in self.sentences:
             sf = SentenceFilter(sentence)
             tokenized_sentence = " ".join(wordpunct_tokenize(sentence.metadata["text"]))
-            if sf.filter_sentence(node_pattern, constraints):
-                matching.append(tokenized_sentence)
+            filter_result = sf.filter_sentence(node_pattern, constraints)
+            if filter_result is not False:
+                matching.append((tokenized_sentence, filter_result))
             else:
-                not_matching.append(tokenized_sentence)
+                not_matching.append((tokenized_sentence, ()))
         return matching, not_matching
 
     def filter_and_convert(
@@ -128,7 +129,7 @@ class ProbingConlluFilter:
             matching, not_matching = self._filter_conllu(label)
             self.probing_dict[label] = matching
             if len(self.classes) == 1:
-                self.probing_dict["not_" + list(self.classes.keys())[0]] = not_matching
+                self.probing_dict["not_" + label] = not_matching
         self.probing_dict = delete_duplicates(self.probing_dict)
 
         self.parts_data = subsamples_split(
