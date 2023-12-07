@@ -189,7 +189,7 @@ class SentenceFilter:
                     k: {edges[i]} for i, k in enumerate(self.possible_token_pairs)
                 }
                 self.nodes_tokens = {
-                    np[i]: [list(self.possible_token_pairs[np])[0][i]]
+                    np[i]: list(self.possible_token_pairs[np])[0][i]
                     for np in self.possible_token_pairs
                     for i in range(2)
                 }
@@ -243,6 +243,6 @@ class SentenceFilter:
         else:
             self.sent_deprels = self.all_deprels()
             if self.match_constraints():
-                return True
+                return tuple(self.nodes_tokens.values())
             else:
                 return False
