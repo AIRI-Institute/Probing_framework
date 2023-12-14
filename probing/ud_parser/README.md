@@ -29,7 +29,7 @@ UD Parser can be provided with the directory with CONLLU files or directly with 
 ```python
 # You can provide a direct path to the folder with conllu files
 
-splitter.convert(dir_conllu_path=<folder path>)
+splitter.convert(dir_path=<folder path>)
 
 # Or you can pass paths to each of three possible conllu files
 
