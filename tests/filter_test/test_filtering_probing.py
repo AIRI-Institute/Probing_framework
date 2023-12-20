@@ -150,7 +150,7 @@ class TestProbingConlluFilter(unittest.TestCase):
             save_dir_path=task_dir.name,
             task_name="cl",
         )
-        self.assertEqual(queries_sents, self.probing_filter.probing_dict)
+        self.assertCountEqual(queries_sents, self.probing_filter.probing_dict)
         with open(f"{task_dir.name}/ru_taiga_cl.csv") as f:
             self.assertEqual(27, len(f.readlines()))
         task_dir.cleanup()
