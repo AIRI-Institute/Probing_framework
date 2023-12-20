@@ -151,7 +151,9 @@ def determine_ud_savepath(
     return Path(final_path)
 
 
-def delete_duplicates(probing_dict: Dict[str, List[str]]) -> Dict[str, List[str]]:
+def delete_duplicates(
+    probing_dict: Dict[str, List[Tuple[str, List[int]]]]
+) -> Dict[str, List[Tuple[str, List[int]]]]:
     """Deletes sentences with more than one different classes of node_pattern found"""
 
     all_sent = [sent for cl_sent in probing_dict.values() for sent, inds in cl_sent]
