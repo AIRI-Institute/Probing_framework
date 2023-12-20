@@ -240,9 +240,9 @@ class SentenceFilter:
         self.possible_token_pairs = {pair: set() for pair in self.constraints}
         if not self.find_all_nodes():
             return False
-
-        self.sent_deprels = self.all_deprels()
-        if self.match_constraints():
-            return tuple(self.nodes_tokens.values())
-
-        return False
+        else:
+            self.sent_deprels = self.all_deprels()
+            if self.match_constraints():
+                return tuple(self.nodes_tokens.values())
+            else:
+                return False
