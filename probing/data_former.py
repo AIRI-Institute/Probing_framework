@@ -24,7 +24,7 @@ class TextFormer:
         self.shuffle = shuffle
         self.data_path = get_probe_task_path(probe_task, data_path)
 
-        self.samples, self.unique_labels = self.form_data(sep=sep)
+        self.samples, self.unique_labels, self.num_words = self.form_data(sep=sep)
 
     def __len__(self):
         return len(self.samples)
@@ -48,8 +48,9 @@ class TextFormer:
         samples_dict = defaultdict(list)
         unique_labels = set()
         dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
-        for _, (stage, label, text) in dataset.iterrows():
-            samples_dict[stage].append((text, label))
+        for _, (stage, label, word_indices, text) in dataset.iterrows():
+            num_words = len(word_indices.split(","))
+            samples_dict[stage].append((text, label, word_indices))
             unique_labels.add(label)
 
         if self.shuffle:
@@ -58,7 +59,7 @@ class TextFormer:
             }
         else:
             samples_dict = {k: np.array(v) for k, v in samples_dict.items()}
-        return samples_dict, unique_labels
+        return samples_dict, unique_labels, num_words
 
 
 class EncodedVectorFormer(Dataset):

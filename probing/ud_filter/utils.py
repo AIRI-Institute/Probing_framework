@@ -17,7 +17,7 @@ def filter_labels_after_split(labels: List[str]) -> List[str]:
 
 
 def subsamples_split(
-    probing_dict: Dict[str, List[str]],
+    probing_dict: Dict[str, List[Tuple[str, List[int]]]],
     partition: List[float],
     random_seed: int,
     shuffle: bool = True,
@@ -49,7 +49,7 @@ def subsamples_split(
     if not probing_data:
         raise Exception("All classes have less sentences than the number of classes")
     parts = {}
-    data, labels = map(np.array, zip(*probing_data))
+    data, labels = map(list, zip(*probing_data))
     X_train, X_test, y_train, y_test = train_test_split(
         data,
         labels,
@@ -58,19 +58,20 @@ def subsamples_split(
         shuffle=shuffle,
         random_state=random_seed,
     )
-
     if len(partition) == 2:
         parts = {split[0]: [X_train, y_train], split[1]: [X_test, y_test]}
     else:
         filtered_labels = filter_labels_after_split(y_test)
         if len(filtered_labels) >= 2:
-            X_train = X_train[np.isin(y_train, filtered_labels)]
-            y_train = y_train[np.isin(y_train, filtered_labels)]
-            X_test = X_test[np.isin(y_test, filtered_labels)]
-            y_test = y_test[np.isin(y_test, filtered_labels)]
+            train_mask = np.isin(y_train, filtered_labels)
+            X_train = [X_train[i] for i in range(len(train_mask)) if train_mask[i]]
+            y_train = [y_train[i] for i in range(len(train_mask)) if train_mask[i]]
+            test_mask = np.isin(y_test, filtered_labels)
+            X_test = [X_test[i] for i in range(len(test_mask)) if test_mask[i]]
+            y_test = [y_test[i] for i in range(len(test_mask)) if test_mask[i]]
 
             val_size = partition[1] / (1 - partition[0])
-            if y_test.size != 0:
+            if len(y_test) != 0:
                 X_val, X_test, y_val, y_test = train_test_split(
                     X_test,
                     y_test,
@@ -118,8 +119,11 @@ def writer(
     with open(result_path, "w", encoding="utf-8") as newf:
         my_writer = csv.writer(newf, delimiter="\t", lineterminator="\n")
         for part in partition_sets:
-            for sentence, value in zip(*partition_sets[part]):
-                my_writer.writerow([part, value, sentence])
+            for sentence_and_ids, value in zip(*partition_sets[part]):
+                sentence, ids = sentence_and_ids
+                my_writer.writerow(
+                    [part, value, ",".join([str(x) for x in ids]), sentence]
+                )
     return result_path
 
 
@@ -147,14 +151,18 @@ def determine_ud_savepath(
     return Path(final_path)
 
 
-def delete_duplicates(probing_dict: Dict[str, List[str]]) -> Dict[str, List[str]]:
+def delete_duplicates(
+    probing_dict: Dict[str, List[Tuple[str, List[int]]]]
+) -> Dict[str, List[Tuple[str, List[int]]]]:
     """Deletes sentences with more than one different classes of node_pattern found"""
 
-    all_sent = [s for cl_sent in probing_dict.values() for s in cl_sent]
-    duplicates = [item for item, count in Counter(all_sent).items() if count > 1]
+    all_sent = [sent for cl_sent in probing_dict.values() for sent, inds in cl_sent]
+    duplicates = {item for item, count in Counter(all_sent).items() if count > 1}
     new_probing_dict = {}
     for cl in probing_dict:
-        new_probing_dict[cl] = [s for s in probing_dict[cl] if s not in duplicates]
+        new_probing_dict[cl] = [
+            (sent, ind) for sent, ind in probing_dict[cl] if sent not in duplicates
+        ]
     return new_probing_dict
 
 
