@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 from itertools import product
-from typing import Any, DefaultDict, Dict, List, Set, Tuple
+from typing import Any, DefaultDict, Dict, List, Optional, Set, Tuple
 
 import networkx as nx
 from conllu import models
@@ -230,7 +230,7 @@ class SentenceFilter:
         self,
         node_pattern: Dict[str, Dict[str, str]],
         constraints: Dict[Tuple[str, str], dict],
-    ) -> List[int] | None:
+    ) -> Optional[List[int]]:
         """Check if a sentence contains at least one instance of a node_pattern that matches
         all the given and isomophism constraints"""
         check_query(node_pattern, constraints)
