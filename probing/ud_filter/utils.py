@@ -17,7 +17,7 @@ def filter_labels_after_split(labels: List[str]) -> List[str]:
 
 
 def subsamples_split(
-    probing_dict: Dict[str, List[str]],
+    probing_dict: Dict[str, List[Tuple[str, List[int]]]],
     partition: List[float],
     random_seed: int,
     shuffle: bool = True,

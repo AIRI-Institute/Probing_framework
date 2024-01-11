@@ -189,7 +189,7 @@ class SentenceFilter:
                     k: {edges[i]} for i, k in enumerate(self.possible_token_pairs)
                 }
                 self.nodes_tokens = {
-                    np[i]: list(self.possible_token_pairs[np])[0][i]
+                    np[i]: [list(self.possible_token_pairs[np])[0][i]]
                     for np in self.possible_token_pairs
                     for i in range(2)
                 }
@@ -230,7 +230,7 @@ class SentenceFilter:
         self,
         node_pattern: Dict[str, Dict[str, str]],
         constraints: Dict[Tuple[str, str], dict],
-    ) -> bool:
+    ) -> List[int] | None:
         """Check if a sentence contains at least one instance of a node_pattern that matches
         all the given and isomophism constraints"""
         check_query(node_pattern, constraints)
@@ -239,10 +239,10 @@ class SentenceFilter:
         self.nodes_tokens = {node: [] for node in self.node_pattern}
         self.possible_token_pairs = {pair: set() for pair in self.constraints}
         if not self.find_all_nodes():
-            return False
+            return None
         else:
             self.sent_deprels = self.all_deprels()
             if self.match_constraints():
-                return tuple(self.nodes_tokens.values())
+                return [val[0] for val in self.nodes_tokens.values()]
             else:
-                return False
+                return None

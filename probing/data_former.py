@@ -49,7 +49,7 @@ class TextFormer:
         unique_labels = set()
         dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
         for _, (stage, label, text, word_indices) in dataset.iterrows():
-            num_words = len(word_indices)
+            num_words = len(word_indices.split(","))
             samples_dict[stage].append((text, label, word_indices))
             unique_labels.add(label)
 

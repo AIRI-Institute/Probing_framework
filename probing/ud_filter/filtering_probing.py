@@ -74,11 +74,13 @@ class ProbingConlluFilter:
         self.language = extract_lang_from_udfile_path(self.paths[0], language=language)
         self.sentences = parse(conllu_data)
 
-    def _filter_conllu(self, class_label: str) -> Tuple[List[str], List[str]]:
+    def _filter_conllu(
+        self, class_label: str
+    ) -> Tuple[List[Tuple[str, List[int]]], List[Tuple[str, List[int]]]]:
         """Filters sentences by class's query and saves the result to the relevant fields"""
 
-        matching = []
-        not_matching = []
+        matching: List[Tuple[str, List[int]]] = []
+        not_matching: List[Tuple[str, List[int]]] = []
 
         node_pattern = self.classes[class_label][0]
         constraints = self.classes[class_label][1]
@@ -92,10 +94,10 @@ class ProbingConlluFilter:
             sf = SentenceFilter(sentence)
             tokenized_sentence = " ".join(wordpunct_tokenize(sentence.metadata["text"]))
             filter_result = sf.filter_sentence(node_pattern, constraints)
-            if filter_result is not False:
+            if filter_result is not None:
                 matching.append((tokenized_sentence, filter_result))
             else:
-                not_matching.append((tokenized_sentence, ()))
+                not_matching.append((tokenized_sentence, []))
         return matching, not_matching
 
     def filter_and_convert(
