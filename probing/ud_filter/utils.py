@@ -122,7 +122,7 @@ def writer(
             for sentence_and_ids, value in zip(*partition_sets[part]):
                 sentence, ids = sentence_and_ids
                 my_writer.writerow(
-                    [part, value, sentence, ",".join([str(x) for x in ids])]
+                    [part, value, ",".join([str(x) for x in ids]), sentence]
                 )
     return result_path
 
