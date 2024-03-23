@@ -1,6 +1,6 @@
 import os
 from time import time
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union, get_args
 
 import numpy as np
 import torch
@@ -170,7 +170,7 @@ class ProbingPipeline:
         save_checkpoints: bool = False,
         verbose: bool = True,
     ) -> None:
-        if path_to_task_file:
+        if path_to_task_file or probe_task in get_args(UDProbingTaskName):
             task_data = TextFormer(probe_task, path_to_task_file)
             task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
             probing_task_language, probing_task_category = lang_category_extraction(
@@ -191,7 +191,7 @@ class ProbingPipeline:
 
         clear_memory()
         start_time = time()
-        if path_to_task_file:
+        if path_to_task_file or probe_task in get_args(UDProbingTaskName):
             (
                 probing_dataloaders,
                 mapped_labels,
