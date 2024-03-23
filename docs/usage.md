@@ -5,7 +5,7 @@ from probing.pipeline import ProbingPipeline
 from pathlib import Path
 
 experiment = ProbingPipeline(
-    hf_model_name="bert-base-uncased",
+    hf_model_name="DeepPavlov/rubert-base-cased",
     device="cuda:0",
     metric_names=["f1", "accuracy"],
     encoding_batch_size=32,
@@ -13,7 +13,7 @@ experiment = ProbingPipeline(
 )
 
 experiment.run(
-    probe_task="word_content",
+    probe_task="gapping",
     #path_to_task_file="example.csv",
     verbose=True,
     train_epochs=20

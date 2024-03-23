@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -92,6 +93,7 @@ class ProbingPipeline:
     def train(self, train_loader: DataLoader, layer: int) -> float:
         epoch_train_losses = []
         self.classifier.train()
+
         for i, batch in enumerate(train_loader):
             y = batch[1].to(self.transformer_model.device, non_blocking=True)
 
@@ -100,12 +102,8 @@ class ProbingPipeline:
                 x = batch[0].permute(1, 0, 2)
                 x = torch.squeeze(x[layer], 0).float()
                 x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
-            elif len(x.size()) == 2:
-                logger.warning(
-                    "Note that you provide 2-D tensor, which means that you consider not ",
-                    "layerwise probing task, but rather an output from some specific layer.",
-                )
-                x = x.to(self.transformer_model.device, non_blocking=True)
+            elif len(batch[0].size()) == 2:
+                x = batch[0].to(self.transformer_model.device, non_blocking=True)
             else:
                 raise NotImplementedError()
 
@@ -132,32 +130,31 @@ class ProbingPipeline:
 
         self.classifier.eval()
         with torch.no_grad():
-            for x, y in dataloader:
-                y = y.to(self.transformer_model.device, non_blocking=True)
+            try:
+                for x, y in dataloader:
+                    y = y.to(self.transformer_model.device, non_blocking=True)
 
-                if len(x.size()) == 3:
-                    # x is already on device since it was passed through the model
-                    x = x.permute(1, 0, 2)
-                    x = torch.squeeze(x[layer], 0).float()
-                    x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
-                elif len(x.size()) == 2:
-                    logger.warning(
-                        "Note that you provide 2-D tensor, which means that you consider not ",
-                        "layerwise probing task, but rather an output from some specific layer.",
-                    )
-                    x = x.to(self.transformer_model.device, non_blocking=True)
-                else:
-                    raise NotImplementedError()
+                    if len(x.size()) == 3:
+                        # x is already on device since it was passed through the model
+                        x = x.permute(1, 0, 2)
+                        x = torch.squeeze(x[layer], 0).float()
+                        x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+                    elif len(x.size()) == 2:
+                        x = x.to(self.transformer_model.device, non_blocking=True)
+                    else:
+                        raise NotImplementedError()
 
-                prediction = self.classifier(x)
-                loss = self.criterion(prediction, y)
-                epoch_losses.append(loss.item())
+                    prediction = self.classifier(x)
+                    loss = self.criterion(prediction, y)
+                    epoch_losses.append(loss.item())
 
-                if save_checkpoints:
-                    raise NotImplementedError()
+                    if save_checkpoints:
+                        raise NotImplementedError()
 
-                epoch_predictions += prediction.cpu().data.max(1).indices
-                epoch_true_labels += y.cpu()
+                    epoch_predictions += prediction.cpu().data.max(1).indices
+                    epoch_true_labels += y.cpu()
+            except:
+                pass
 
         epoch_metric_score = self.metrics.compute(epoch_predictions, epoch_true_labels)
         epoch_loss = np.mean(epoch_losses)
@@ -181,18 +178,21 @@ class ProbingPipeline:
             probing_task_language, probing_task_category = lang_category_extraction(
                 task_data.data_path
             )
-            probing_file_path = task_data.data_path
             original_classes_ratio = task_data.ratio_by_classes
         elif probing_dataloaders:
-            unique_classes = np.unique(
-                [item for sublist in probing_dataloaders["tr"] for item in sublist[1]]
-            )
+            train_classes = [
+                item for sublist in probing_dataloaders["tr"] for item in sublist[1]
+            ]
+            train_classes = [
+                item.item() if isinstance(item, torch.Tensor) else item
+                for item in train_classes
+            ]
+            unique_classes = np.unique(train_classes)
             num_classes = len(unique_classes)
+            original_classes_ratio = Counter(train_classes)
+            probing_task_language, probing_task_category = None, None
         else:
             raise NotImplementedError()
-
-        if verbose:
-            print(f"Task in progress: {probe_task}\nPath to data: {probing_file_path}")
 
         clear_memory()
         start_time = time()
@@ -212,17 +212,17 @@ class ProbingPipeline:
 
         if self.probing_type == ProbingType.LAYERWISE:
             num_layers_to_test = self.transformer_model.config.num_hidden_layers
+            probing_iter_range = (
+                trange(
+                    num_layers_to_test,
+                    desc="Probing by layers",
+                )
+                if verbose
+                else range(num_layers_to_test)
+            )
         elif self.probing_type == ProbingType.SINGLERUN:
             num_layers_to_test = 1
-
-        probing_iter_range = (
-            trange(
-                num_layers_to_test,
-                desc="Probing by layers",
-            )
-            if verbose
-            else range(num_layers_to_test)
-        )
+            probing_iter_range = range(num_layers_to_test)
 
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
@@ -262,34 +262,36 @@ class ProbingPipeline:
                 else None
             )
 
-            for epoch in range(train_epochs):
+            if len(next(iter(probing_dataloaders["tr"]))[0].size()) == 2:
+                logger.warning(
+                    "Note that you provide 2D tensor, which means that you consider not "
+                    "layerwise probing, but rather an output from `last_hidden_state`"
+                )
+
+            for epoch in trange(train_epochs):
                 epoch_train_loss = self.train(probing_dataloaders["tr"], layer)
 
                 epoch_val_loss, epoch_val_score = self.evaluate(
                     probing_dataloaders["va"], layer, save_checkpoints
                 )
 
-                self.log_info["results"]["train_loss"].add(layer, epoch_train_loss)
-                self.log_info["results"]["val_loss"].add(layer, epoch_val_loss)
+                self.log_info["results"].add("train_loss", epoch_train_loss)
+                self.log_info["results"].add("val_loss", epoch_val_loss)
 
                 for m in self.metric_names:
-                    self.log_info["results"]["val_score"][m].add(
-                        layer, epoch_val_score[m]
-                    )
+                    self.log_info["results"]["val_score"].add(m, epoch_val_score[m])
 
             _, epoch_test_score = self.evaluate(
                 probing_dataloaders["te"], layer, save_checkpoints
             )
 
             for m in self.metric_names:
-                self.log_info["results"]["test_score"][m].add(
-                    layer, epoch_test_score[m]
-                )
+                self.log_info["results"]["test_score"].add(m, epoch_test_score[m])
 
         self.log_info["params"]["mapped_labels"] = mapped_labels
         self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
         self.log_info["params"]["probing_task"] = probe_task
-        self.log_info["params"]["file_path"] = probing_file_path
+        self.log_info["params"]["file_path"] = path_to_task_file
         self.log_info["params"]["task_language"] = probing_task_language
         self.log_info["params"]["task_category"] = probing_task_category
         self.log_info["params"]["original_classes_ratio"] = original_classes_ratio
