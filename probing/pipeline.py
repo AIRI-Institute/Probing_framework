@@ -164,8 +164,10 @@ class ProbingPipeline:
         self,
         probe_task: Union[UDProbingTaskName, str],
         path_to_task_file: Optional[os.PathLike] = None,
-        probing_dataloaders: Dict[Literal["tr", "va", "te"], DataLoader] = None,
-        mapped_labels: Dict[str, int] = None,
+        probing_dataloaders: Optional[
+            Dict[Literal["tr", "va", "te"], DataLoader]
+        ] = None,
+        mapped_labels: Optional[Dict[str, int]] = None,
         train_epochs: int = 10,
         is_scheduler: bool = False,
         do_control_task: bool = False,
@@ -179,7 +181,7 @@ class ProbingPipeline:
                 task_data.data_path
             )
             original_classes_ratio = task_data.ratio_by_classes
-        elif probing_dataloaders:
+        elif probing_dataloaders is not None:
             train_classes = [
                 item for sublist in probing_dataloaders["tr"] for item in sublist[1]
             ]

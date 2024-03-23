@@ -1,5 +1,11 @@
 import os
 import typing
+
+try:
+    from typing import Literal  # type: ignore
+except:
+    from typing_extensions import Literal  # type: ignore
+
 from collections import Counter, defaultdict
 from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
@@ -34,7 +40,7 @@ class TextFormer:
         return self.samples[idx]
 
     @property
-    def ratio_by_classes(self) -> Dict[str, Dict[str, int]]:
+    def ratio_by_classes(self) -> Dict[Literal["tr", "va", "te"], Dict[str, int]]:
         ratio_by_classes = {}
         for class_name in self.samples:
             class_labels_all = [i[1] for i in self.samples[class_name]]

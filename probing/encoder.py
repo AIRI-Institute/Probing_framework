@@ -291,7 +291,8 @@ class TransformersLoader:
                 else data
             )
 
-            for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
+            for batch in iter_data:
+                batch_input_ids, batch_attention_mask, batch_labels = batch
                 in_cache_ids, out_cache_ids = self.Caching.check_cache_ids(
                     batch_input_ids
                 )
