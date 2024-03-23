@@ -205,13 +205,18 @@ class ProbingPipeline:
                 do_control_task=do_control_task,
             )
 
+        if self.probing_type == ProbingType.LAYERWISE:
+            num_layers_to_test = self.transformer_model.config.num_hidden_layers
+        elif self.probing_type == ProbingType.SINGLERUN:
+            num_layers_to_test = 1
+
         probing_iter_range = (
             trange(
-                self.transformer_model.config.num_hidden_layers,
+                num_layers_to_test,
                 desc="Probing by layers",
             )
             if verbose
-            else range(self.transformer_model.config.num_hidden_layers)
+            else range(num_layers_to_test)
         )
 
         for layer in probing_iter_range:

@@ -20,6 +20,7 @@ class ClassifierType(str, Enum):
 
 class ProbingType(str, Enum):
     LAYERWISE = "layerwise"
+    SINGLERUN = "singlerun"
 
 
 class AggregationType(str, Enum):
