@@ -22,9 +22,10 @@ class TextFormer:
     ):
         self.probe_task = probe_task
         self.shuffle = shuffle
+        self.sep = sep
         self.data_path = get_probe_task_path(probe_task, data_path)
 
-        self.samples, self.unique_labels = self.form_data(sep=sep)
+        self.samples, self.unique_labels = self.form_data()
 
     def __len__(self):
         return len(self.samples)
@@ -42,12 +43,10 @@ class TextFormer:
         return ratio_by_classes
 
     @typing.no_type_check
-    def form_data(
-        self, sep: str = "\t"
-    ) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
+    def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
-        dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
+        dataset = pd.read_csv(self.data_path, sep=self.sep, header=None, dtype=str)
         for _, (stage, label, text) in dataset.iterrows():
             samples_dict[stage].append((text, label))
             unique_labels.add(label)

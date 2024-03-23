@@ -1,7 +1,6 @@
 import os
-from collections import Counter
 from time import time
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -89,12 +88,21 @@ class ProbingPipeline:
         epoch_train_losses = []
         self.classifier.train()
         for i, batch in enumerate(train_loader):
-            # x is already on device since it was passed through the model
             y = batch[1].to(self.transformer_model.device, non_blocking=True)
 
-            x = batch[0].permute(1, 0, 2)
-            x = torch.squeeze(x[layer], 0).float()
-            x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+            if len(batch[0].size()) == 3:
+                # x is already on device since it was passed through the model
+                x = batch[0].permute(1, 0, 2)
+                x = torch.squeeze(x[layer], 0).float()
+                x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+            elif len(x.size()) == 2:
+                logger.warning(
+                    "Note that you provide 2-D tensor, which means that you consider not ",
+                    "layerwise probing task, but rather an output from some specific layer.",
+                )
+                x = x.to(self.transformer_model.device, non_blocking=True)
+            else:
+                raise NotImplementedError()
 
             self.classifier.zero_grad(set_to_none=True)
             prediction = self.classifier(x)
@@ -120,12 +128,21 @@ class ProbingPipeline:
         self.classifier.eval()
         with torch.no_grad():
             for x, y in dataloader:
-                # x is already on device since it was passed through the model
                 y = y.to(self.transformer_model.device, non_blocking=True)
 
-                x = x.permute(1, 0, 2)
-                x = torch.squeeze(x[layer], 0).float()
-                x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+                if len(x.size()) == 3:
+                    # x is already on device since it was passed through the model
+                    x = x.permute(1, 0, 2)
+                    x = torch.squeeze(x[layer], 0).float()
+                    x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+                elif len(x.size()) == 2:
+                    logger.warning(
+                        "Note that you provide 2-D tensor, which means that you consider not ",
+                        "layerwise probing task, but rather an output from some specific layer.",
+                    )
+                    x = x.to(self.transformer_model.device, non_blocking=True)
+                else:
+                    raise NotImplementedError()
 
                 prediction = self.classifier(x)
                 loss = self.criterion(prediction, y)
@@ -145,50 +162,48 @@ class ProbingPipeline:
         self,
         probe_task: Union[UDProbingTaskName, str],
         path_to_task_file: Optional[os.PathLike] = None,
+        probing_dataloaders: Dict[Literal["tr", "va", "te"], DataLoader] = None,
+        mapped_labels: Dict[str, int] = None,
         train_epochs: int = 10,
         is_scheduler: bool = False,
+        do_control_task: bool = False,
         save_checkpoints: bool = False,
         verbose: bool = True,
-        do_control_task: bool = False,
-        sep: str = "\t",
     ) -> None:
-        task_data = TextFormer(probe_task, path_to_task_file, sep)
-        task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
-        task_language, task_category = lang_category_extraction(task_data.data_path)
-
-        self.log_info["params"]["probing_task"] = probe_task
-        self.log_info["params"]["file_path"] = task_data.data_path
-        self.log_info["params"]["task_language"] = task_language
-        self.log_info["params"]["task_category"] = task_category
-        self.log_info["params"]["probing_type"] = self.probing_type
-        self.log_info["params"]["encoding_batch_size"] = self.encoding_batch_size
-        self.log_info["params"]["classifier_batch_size"] = self.classifier_batch_size
-        self.log_info["params"][
-            "hf_model_name"
-        ] = self.transformer_model.config._name_or_path
-        self.log_info["params"]["classifier_name"] = self.classifier_name
-        self.log_info["params"]["metric_names"] = self.metric_names
-        self.log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
+        if path_to_task_file:
+            task_data = TextFormer(probe_task, path_to_task_file)
+            task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
+            probing_task_language, probing_task_category = lang_category_extraction(
+                task_data.data_path
+            )
+            probing_file_path = task_data.data_path
+            original_classes_ratio = task_data.ratio_by_classes
+        elif probing_dataloaders:
+            unique_classes = np.unique(
+                [item for sublist in probing_dataloaders["tr"] for item in sublist[1]]
+            )
+            num_classes = len(unique_classes)
+        else:
+            raise NotImplementedError()
 
         if verbose:
-            print(
-                f"Task in progress: {probe_task}\nPath to data: {task_data.data_path}"
-            )
+            print(f"Task in progress: {probe_task}\nPath to data: {probing_file_path}")
 
         clear_memory()
         start_time = time()
-        (
-            probing_dataloaders,
-            mapped_labels,
-        ) = self.transformer_model.get_encoded_dataloaders(
-            task_dataset,
-            self.encoding_batch_size,
-            self.classifier_batch_size,
-            self.shuffle,
-            self.aggregation_embeddings,
-            verbose,
-            do_control_task=do_control_task,
-        )
+        if path_to_task_file:
+            (
+                probing_dataloaders,
+                mapped_labels,
+            ) = self.transformer_model.get_encoded_dataloaders(
+                task_dataset,
+                self.encoding_batch_size,
+                self.classifier_batch_size,
+                self.shuffle,
+                self.aggregation_embeddings,
+                verbose,
+                do_control_task=do_control_task,
+            )
 
         probing_iter_range = (
             trange(
@@ -198,8 +213,6 @@ class ProbingPipeline:
             if verbose
             else range(self.transformer_model.config.num_hidden_layers)
         )
-        self.log_info["params"]["tr_mapped_labels"] = mapped_labels
-        self.log_info["results"]["elapsed_time(sec)"] = 0
 
         for layer in probing_iter_range:
             self.classifier = self.get_classifier(
@@ -211,9 +224,8 @@ class ProbingPipeline:
             # getting weights for each label in order to provide it further to the loss function
             # be sure that the last element in each data sample is a label!
             tr_labels = torch.cat(
-                [element[-1] for element in list(probing_dataloaders["tr"])]
+                [element[-1] for element in iter(probing_dataloaders["tr"])]
             ).tolist()
-            # self.log_info["params"]["train_classes_ratio"] = Counter(tr_labels)
 
             class_weights = compute_class_weight(
                 "balanced", classes=np.unique(tr_labels), y=tr_labels
@@ -264,7 +276,23 @@ class ProbingPipeline:
                     layer, epoch_test_score[m]
                 )
 
+        self.log_info["params"]["mapped_labels"] = mapped_labels
         self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
+        self.log_info["params"]["probing_task"] = probe_task
+        self.log_info["params"]["file_path"] = probing_file_path
+        self.log_info["params"]["task_language"] = probing_task_language
+        self.log_info["params"]["task_category"] = probing_task_category
+        self.log_info["params"]["original_classes_ratio"] = original_classes_ratio
+
+        self.log_info["params"]["probing_type"] = self.probing_type
+        self.log_info["params"]["encoding_batch_size"] = self.encoding_batch_size
+        self.log_info["params"]["classifier_batch_size"] = self.classifier_batch_size
+        self.log_info["params"][
+            "hf_model_name"
+        ] = self.transformer_model.config._name_or_path
+        self.log_info["params"]["classifier_name"] = self.classifier_name
+        self.log_info["params"]["metric_names"] = self.metric_names
+
         output_path = self.log_info.save_log(probe_task)
         if verbose:
             print(f"Experiments were saved in the folder: {str(output_path)}")
