@@ -1,6 +1,11 @@
 import os
 from time import time
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union, get_args
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+try:
+    from typing import Literal, get_args  # type: ignore
+except:
+    from typing_extensions import Literal, get_args  # type: ignore
 
 import numpy as np
 import torch
