@@ -3,6 +3,11 @@ from collections import Counter
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+try:
+    from typing import Literal, get_args  # type: ignore
+except:
+    from typing_extensions import Literal, get_args  # type: ignore
+
 import numpy as np
 import torch
 from sklearn.utils.class_weight import compute_class_weight
@@ -88,13 +93,19 @@ class ProbingPipeline:
     def train(self, train_loader: DataLoader, layer: int) -> float:
         epoch_train_losses = []
         self.classifier.train()
+
         for i, batch in enumerate(train_loader):
-            # x is already on device since it was passed through the model
             y = batch[1].to(self.transformer_model.device, non_blocking=True)
 
-            x = batch[0].permute(1, 0, 2)
-            x = torch.squeeze(x[layer], 0).float()
-            x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+            if len(batch[0].size()) == 3:
+                # x is already on device since it was passed through the model
+                x = batch[0].permute(1, 0, 2)
+                x = torch.squeeze(x[layer], 0).float()
+                x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+            elif len(batch[0].size()) == 2:
+                x = batch[0].to(self.transformer_model.device, non_blocking=True)
+            else:
+                raise NotImplementedError()
 
             self.classifier.zero_grad(set_to_none=True)
             prediction = self.classifier(x)
@@ -119,23 +130,31 @@ class ProbingPipeline:
 
         self.classifier.eval()
         with torch.no_grad():
-            for x, y in dataloader:
-                # x is already on device since it was passed through the model
-                y = y.to(self.transformer_model.device, non_blocking=True)
+            try:
+                for x, y in dataloader:
+                    y = y.to(self.transformer_model.device, non_blocking=True)
 
-                x = x.permute(1, 0, 2)
-                x = torch.squeeze(x[layer], 0).float()
-                x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+                    if len(x.size()) == 3:
+                        # x is already on device since it was passed through the model
+                        x = x.permute(1, 0, 2)
+                        x = torch.squeeze(x[layer], 0).float()
+                        x = torch.unsqueeze(x, 0) if len(x.size()) == 1 else x
+                    elif len(x.size()) == 2:
+                        x = x.to(self.transformer_model.device, non_blocking=True)
+                    else:
+                        raise NotImplementedError()
 
-                prediction = self.classifier(x)
-                loss = self.criterion(prediction, y)
-                epoch_losses.append(loss.item())
+                    prediction = self.classifier(x)
+                    loss = self.criterion(prediction, y)
+                    epoch_losses.append(loss.item())
 
-                if save_checkpoints:
-                    raise NotImplementedError()
+                    if save_checkpoints:
+                        raise NotImplementedError()
 
-                epoch_predictions += prediction.cpu().data.max(1).indices
-                epoch_true_labels += y.cpu()
+                    epoch_predictions += prediction.cpu().data.max(1).indices
+                    epoch_true_labels += y.cpu()
+            except:
+                pass
 
         epoch_metric_score = self.metrics.compute(epoch_predictions, epoch_true_labels)
         epoch_loss = np.mean(epoch_losses)
@@ -145,21 +164,145 @@ class ProbingPipeline:
         self,
         probe_task: Union[UDProbingTaskName, str],
         path_to_task_file: Optional[os.PathLike] = None,
+        probing_dataloaders: Optional[
+            Dict[Literal["tr", "va", "te"], DataLoader]
+        ] = None,
+        mapped_labels: Optional[Dict[str, int]] = None,
         train_epochs: int = 10,
         is_scheduler: bool = False,
+        do_control_task: bool = False,
         save_checkpoints: bool = False,
         verbose: bool = True,
-        do_control_task: bool = False,
-        sep: str = "\t",
     ) -> None:
-        task_data = TextFormer(probe_task, path_to_task_file, sep)
-        task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
-        task_language, task_category = lang_category_extraction(task_data.data_path)
+        if path_to_task_file is not None or probe_task in get_args(UDProbingTaskName):
+            task_data = TextFormer(probe_task, path_to_task_file)
+            task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
+            probing_task_language, probing_task_category = lang_category_extraction(
+                task_data.data_path
+            )
+            original_classes_ratio = task_data.ratio_by_classes
+        elif probing_dataloaders is not None:
+            train_classes = [
+                item for sublist in probing_dataloaders["tr"] for item in sublist[1]
+            ]
+            train_classes = [
+                item.item() if isinstance(item, torch.Tensor) else item
+                for item in train_classes
+            ]
+            unique_classes = np.unique(train_classes)
+            num_classes = len(unique_classes)
+            original_classes_ratio = {"tr": Counter(train_classes)}
+            probing_task_language, probing_task_category = None, None
+        else:
+            raise NotImplementedError()
 
+        clear_memory()
+        start_time = time()
+        if path_to_task_file or probe_task in get_args(UDProbingTaskName):
+            (
+                probing_dataloaders,
+                mapped_labels,
+            ) = self.transformer_model.get_encoded_dataloaders(
+                task_dataset,
+                self.encoding_batch_size,
+                self.classifier_batch_size,
+                self.shuffle,
+                self.aggregation_embeddings,
+                verbose,
+                do_control_task=do_control_task,
+            )
+
+        if self.probing_type == ProbingType.LAYERWISE:
+            num_layers_to_test = self.transformer_model.config.num_hidden_layers
+            probing_iter_range = (
+                trange(
+                    num_layers_to_test,
+                    desc="Probing by layers",
+                )
+                if verbose
+                else range(num_layers_to_test)
+            )
+        elif self.probing_type == ProbingType.SINGLERUN:
+            num_layers_to_test = 1
+            probing_iter_range = range(num_layers_to_test)
+        else:
+            raise NotImplementedError()
+
+        if probing_dataloaders is not None:
+            # getting weights for each label in order to provide it further to the loss function
+            # be sure that the last element in each data sample is a label!
+            tr_labels = torch.cat(
+                [element[-1] for element in iter(probing_dataloaders["tr"])]
+            ).tolist()
+
+            class_weights = compute_class_weight(
+                "balanced", classes=np.unique(tr_labels), y=tr_labels
+            )
+            class_weights = torch.tensor(class_weights, dtype=torch.float)
+
+            for layer in probing_iter_range:
+                self.classifier = self.get_classifier(
+                    self.classifier_name,
+                    num_classes,
+                    self.transformer_model.config.hidden_size,
+                ).to(self.transformer_model.device)
+
+                loss_func = torch.nn.CrossEntropyLoss(weight=class_weights).to(
+                    self.transformer_model.device
+                )
+
+                if self.classifier == ClassifierType("mdl"):
+                    self.criterion = KL_Loss(loss=loss_func)
+                else:
+                    self.criterion = loss_func
+
+                self.optimizer = AdamW(self.classifier.parameters())
+
+                self.scheduler = (
+                    get_linear_schedule_with_warmup(
+                        self.optimizer,
+                        num_warmup_steps=2000,
+                        num_training_steps=len(probing_dataloaders["tr"])
+                        // train_epochs,
+                    )
+                    if is_scheduler
+                    else None
+                )
+
+                if len(next(iter(probing_dataloaders["tr"]))[0].size()) == 2:
+                    logger.warning(
+                        "Note that you provide 2D tensor, which means that you consider not "
+                        "layerwise probing, but rather an output from `last_hidden_state`"
+                    )
+
+                for epoch in trange(train_epochs):
+                    epoch_train_loss = self.train(probing_dataloaders["tr"], layer)
+
+                    epoch_val_loss, epoch_val_score = self.evaluate(
+                        probing_dataloaders["va"], layer, save_checkpoints
+                    )
+
+                    self.log_info["results"].add("train_loss", epoch_train_loss)
+                    self.log_info["results"].add("val_loss", epoch_val_loss)
+
+                    for m in self.metric_names:
+                        self.log_info["results"]["val_score"].add(m, epoch_val_score[m])
+
+                _, epoch_test_score = self.evaluate(
+                    probing_dataloaders["te"], layer, save_checkpoints
+                )
+
+                for m in self.metric_names:
+                    self.log_info["results"]["test_score"].add(m, epoch_test_score[m])
+
+        self.log_info["params"]["mapped_labels"] = mapped_labels
+        self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
         self.log_info["params"]["probing_task"] = probe_task
-        self.log_info["params"]["file_path"] = task_data.data_path
-        self.log_info["params"]["task_language"] = task_language
-        self.log_info["params"]["task_category"] = task_category
+        self.log_info["params"]["file_path"] = path_to_task_file
+        self.log_info["params"]["task_language"] = probing_task_language
+        self.log_info["params"]["task_category"] = probing_task_category
+        self.log_info["params"]["original_classes_ratio"] = original_classes_ratio
+
         self.log_info["params"]["probing_type"] = self.probing_type
         self.log_info["params"]["encoding_batch_size"] = self.encoding_batch_size
         self.log_info["params"]["classifier_batch_size"] = self.classifier_batch_size
@@ -168,103 +311,7 @@ class ProbingPipeline:
         ] = self.transformer_model.config._name_or_path
         self.log_info["params"]["classifier_name"] = self.classifier_name
         self.log_info["params"]["metric_names"] = self.metric_names
-        self.log_info["params"]["original_classes_ratio"] = task_data.ratio_by_classes
 
-        if verbose:
-            print(
-                f"Task in progress: {probe_task}\nPath to data: {task_data.data_path}"
-            )
-
-        clear_memory()
-        start_time = time()
-        (
-            probing_dataloaders,
-            mapped_labels,
-        ) = self.transformer_model.get_encoded_dataloaders(
-            task_dataset,
-            self.encoding_batch_size,
-            self.classifier_batch_size,
-            self.shuffle,
-            self.aggregation_embeddings,
-            verbose,
-            do_control_task=do_control_task,
-        )
-
-        probing_iter_range = (
-            trange(
-                self.transformer_model.config.num_hidden_layers,
-                desc="Probing by layers",
-            )
-            if verbose
-            else range(self.transformer_model.config.num_hidden_layers)
-        )
-        self.log_info["params"]["tr_mapped_labels"] = mapped_labels
-        self.log_info["results"]["elapsed_time(sec)"] = 0
-
-        for layer in probing_iter_range:
-            self.classifier = self.get_classifier(
-                self.classifier_name,
-                num_classes,
-                self.transformer_model.config.hidden_size,
-            ).to(self.transformer_model.device)
-
-            # getting weights for each label in order to provide it further to the loss function
-            # be sure that the last element in each data sample is a label!
-            tr_labels = torch.cat(
-                [element[-1] for element in list(probing_dataloaders["tr"])]
-            ).tolist()
-            # self.log_info["params"]["train_classes_ratio"] = Counter(tr_labels)
-
-            class_weights = compute_class_weight(
-                "balanced", classes=np.unique(tr_labels), y=tr_labels
-            )
-            class_weights = torch.tensor(class_weights, dtype=torch.float)
-            loss_func = torch.nn.CrossEntropyLoss(weight=class_weights).to(
-                self.transformer_model.device
-            )
-
-            if self.classifier == ClassifierType("mdl"):
-                self.criterion = KL_Loss(loss=loss_func)
-            else:
-                self.criterion = loss_func
-
-            self.optimizer = AdamW(self.classifier.parameters())
-
-            self.scheduler = (
-                get_linear_schedule_with_warmup(
-                    self.optimizer,
-                    num_warmup_steps=2000,
-                    num_training_steps=len(probing_dataloaders["tr"]) // train_epochs,
-                )
-                if is_scheduler
-                else None
-            )
-
-            for epoch in range(train_epochs):
-                epoch_train_loss = self.train(probing_dataloaders["tr"], layer)
-
-                epoch_val_loss, epoch_val_score = self.evaluate(
-                    probing_dataloaders["va"], layer, save_checkpoints
-                )
-
-                self.log_info["results"]["train_loss"].add(layer, epoch_train_loss)
-                self.log_info["results"]["val_loss"].add(layer, epoch_val_loss)
-
-                for m in self.metric_names:
-                    self.log_info["results"]["val_score"][m].add(
-                        layer, epoch_val_score[m]
-                    )
-
-            _, epoch_test_score = self.evaluate(
-                probing_dataloaders["te"], layer, save_checkpoints
-            )
-
-            for m in self.metric_names:
-                self.log_info["results"]["test_score"][m].add(
-                    layer, epoch_test_score[m]
-                )
-
-        self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
         output_path = self.log_info.save_log(probe_task)
         if verbose:
             print(f"Experiments were saved in the folder: {str(output_path)}")

@@ -1,5 +1,11 @@
 import os
 import typing
+
+try:
+    from typing import Literal  # type: ignore
+except:
+    from typing_extensions import Literal  # type: ignore
+
 from collections import Counter, defaultdict
 from typing import DefaultDict, Dict, Optional, Set, Tuple, Union
 
@@ -22,9 +28,10 @@ class TextFormer:
     ):
         self.probe_task = probe_task
         self.shuffle = shuffle
+        self.sep = sep
         self.data_path = get_probe_task_path(probe_task, data_path)
 
-        self.samples, self.unique_labels = self.form_data(sep=sep)
+        self.samples, self.unique_labels = self.form_data()
 
     def __len__(self):
         return len(self.samples)
@@ -33,7 +40,7 @@ class TextFormer:
         return self.samples[idx]
 
     @property
-    def ratio_by_classes(self) -> Dict[str, Dict[str, int]]:
+    def ratio_by_classes(self) -> Dict[Literal["tr", "va", "te"], Dict[str, int]]:
         ratio_by_classes = {}
         for class_name in self.samples:
             class_labels_all = [i[1] for i in self.samples[class_name]]
@@ -42,12 +49,10 @@ class TextFormer:
         return ratio_by_classes
 
     @typing.no_type_check
-    def form_data(
-        self, sep: str = "\t"
-    ) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
+    def form_data(self) -> Tuple[DefaultDict[str, np.ndarray], Set[str]]:
         samples_dict = defaultdict(list)
         unique_labels = set()
-        dataset = pd.read_csv(self.data_path, sep=sep, header=None, dtype=str)
+        dataset = pd.read_csv(self.data_path, sep=self.sep, header=None, dtype=str)
         for _, (stage, label, text) in dataset.iterrows():
             samples_dict[stage].append((text, label))
             unique_labels.add(label)

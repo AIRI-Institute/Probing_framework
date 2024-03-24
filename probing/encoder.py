@@ -162,7 +162,11 @@ class TransformersLoader:
         aggregation_embeddings: AggregationType,
     ) -> List[torch.Tensor]:
         layers_outputs = []
-        for output in model_outputs[1:]:  # type: ignore
+        if len(model_outputs) == 1:
+            process_outputs = model_outputs
+        else:
+            process_outputs = model_outputs[1:]
+        for output in process_outputs:  # type: ignore
             if aggregation_embeddings == AggregationType("first"):
                 sent_vector = output[:, 0, :]  # type: ignore
             elif aggregation_embeddings == AggregationType("last"):
@@ -255,11 +259,13 @@ class TransformersLoader:
                 return_dict=self.return_dict,
             )
 
-        model_outputs = (
-            model_outputs["hidden_states"]
-            if "hidden_states" in model_outputs
-            else model_outputs["encoder_hidden_states"]
-        )
+        if "hidden_states" in model_outputs:
+            model_outputs = model_outputs["hidden_states"]
+        elif "last_hidden_state" in model_outputs:
+            model_outputs = model_outputs["last_hidden_state"]
+        else:
+            model_outputs = model_outputs["encoder_hidden_states"]
+
         layers_outputs = self._get_embeddings_by_layers(
             model_outputs, aggregation_embeddings=aggregation_embeddings
         )
@@ -285,7 +291,8 @@ class TransformersLoader:
                 else data
             )
 
-            for batch_input_ids, batch_attention_mask, batch_labels in iter_data:
+            for batch in iter_data:
+                batch_input_ids, batch_attention_mask, batch_labels = batch
                 in_cache_ids, out_cache_ids = self.Caching.check_cache_ids(
                     batch_input_ids
                 )
@@ -357,10 +364,6 @@ class TransformersLoader:
         verbose: bool = True,
         do_control_task: bool = False,
     ) -> Tuple[Dict[Literal["tr", "va", "te"], DataLoader], Dict[str, int]]:
-        # if self.tokenizer.model_max_length > self.model_max_length:
-        #     logger.warning(
-        #         f"In tokenizer model_max_length = {self.tokenizer.model_max_length}. Changed to {self.model_max_length} for preventing Out-Of-Memory."
-        #     )
         if self.Caching is None:
             if self.tokenizer is None:
                 raise RuntimeError("Tokenizer is None")
@@ -368,7 +371,7 @@ class TransformersLoader:
 
         tokenized_datasets = self.get_tokenized_datasets(task_dataset)
         encoded_dataloaders = {}
-        for stage, _ in tokenized_datasets.items():
+        for stage in tokenized_datasets:
             stage_dataloader_tokenized = DataLoader(
                 tokenized_datasets[stage], batch_size=encoding_batch_size
             )
