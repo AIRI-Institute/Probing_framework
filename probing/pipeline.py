@@ -174,7 +174,7 @@ class ProbingPipeline:
         save_checkpoints: bool = False,
         verbose: bool = True,
     ) -> None:
-        if path_to_task_file or probe_task in get_args(UDProbingTaskName):
+        if path_to_task_file is not None or probe_task in get_args(UDProbingTaskName):
             task_data = TextFormer(probe_task, path_to_task_file)
             task_dataset, num_classes = task_data.samples, len(task_data.unique_labels)
             probing_task_language, probing_task_category = lang_category_extraction(
@@ -191,7 +191,7 @@ class ProbingPipeline:
             ]
             unique_classes = np.unique(train_classes)
             num_classes = len(unique_classes)
-            original_classes_ratio = Counter(train_classes)
+            original_classes_ratio = {"tr": Counter(train_classes)}
             probing_task_language, probing_task_category = None, None
         else:
             raise NotImplementedError()
@@ -225,14 +225,10 @@ class ProbingPipeline:
         elif self.probing_type == ProbingType.SINGLERUN:
             num_layers_to_test = 1
             probing_iter_range = range(num_layers_to_test)
+        else:
+            raise NotImplementedError()
 
-        for layer in probing_iter_range:
-            self.classifier = self.get_classifier(
-                self.classifier_name,
-                num_classes,
-                self.transformer_model.config.hidden_size,
-            ).to(self.transformer_model.device)
-
+        if probing_dataloaders is not None:
             # getting weights for each label in order to provide it further to the loss function
             # be sure that the last element in each data sample is a label!
             tr_labels = torch.cat(
@@ -243,52 +239,61 @@ class ProbingPipeline:
                 "balanced", classes=np.unique(tr_labels), y=tr_labels
             )
             class_weights = torch.tensor(class_weights, dtype=torch.float)
-            loss_func = torch.nn.CrossEntropyLoss(weight=class_weights).to(
-                self.transformer_model.device
-            )
 
-            if self.classifier == ClassifierType("mdl"):
-                self.criterion = KL_Loss(loss=loss_func)
-            else:
-                self.criterion = loss_func
+            for layer in probing_iter_range:
+                self.classifier = self.get_classifier(
+                    self.classifier_name,
+                    num_classes,
+                    self.transformer_model.config.hidden_size,
+                ).to(self.transformer_model.device)
 
-            self.optimizer = AdamW(self.classifier.parameters())
-
-            self.scheduler = (
-                get_linear_schedule_with_warmup(
-                    self.optimizer,
-                    num_warmup_steps=2000,
-                    num_training_steps=len(probing_dataloaders["tr"]) // train_epochs,
-                )
-                if is_scheduler
-                else None
-            )
-
-            if len(next(iter(probing_dataloaders["tr"]))[0].size()) == 2:
-                logger.warning(
-                    "Note that you provide 2D tensor, which means that you consider not "
-                    "layerwise probing, but rather an output from `last_hidden_state`"
+                loss_func = torch.nn.CrossEntropyLoss(weight=class_weights).to(
+                    self.transformer_model.device
                 )
 
-            for epoch in trange(train_epochs):
-                epoch_train_loss = self.train(probing_dataloaders["tr"], layer)
+                if self.classifier == ClassifierType("mdl"):
+                    self.criterion = KL_Loss(loss=loss_func)
+                else:
+                    self.criterion = loss_func
 
-                epoch_val_loss, epoch_val_score = self.evaluate(
-                    probing_dataloaders["va"], layer, save_checkpoints
+                self.optimizer = AdamW(self.classifier.parameters())
+
+                self.scheduler = (
+                    get_linear_schedule_with_warmup(
+                        self.optimizer,
+                        num_warmup_steps=2000,
+                        num_training_steps=len(probing_dataloaders["tr"])
+                        // train_epochs,
+                    )
+                    if is_scheduler
+                    else None
                 )
 
-                self.log_info["results"].add("train_loss", epoch_train_loss)
-                self.log_info["results"].add("val_loss", epoch_val_loss)
+                if len(next(iter(probing_dataloaders["tr"]))[0].size()) == 2:
+                    logger.warning(
+                        "Note that you provide 2D tensor, which means that you consider not "
+                        "layerwise probing, but rather an output from `last_hidden_state`"
+                    )
+
+                for epoch in trange(train_epochs):
+                    epoch_train_loss = self.train(probing_dataloaders["tr"], layer)
+
+                    epoch_val_loss, epoch_val_score = self.evaluate(
+                        probing_dataloaders["va"], layer, save_checkpoints
+                    )
+
+                    self.log_info["results"].add("train_loss", epoch_train_loss)
+                    self.log_info["results"].add("val_loss", epoch_val_loss)
+
+                    for m in self.metric_names:
+                        self.log_info["results"]["val_score"].add(m, epoch_val_score[m])
+
+                _, epoch_test_score = self.evaluate(
+                    probing_dataloaders["te"], layer, save_checkpoints
+                )
 
                 for m in self.metric_names:
-                    self.log_info["results"]["val_score"].add(m, epoch_val_score[m])
-
-            _, epoch_test_score = self.evaluate(
-                probing_dataloaders["te"], layer, save_checkpoints
-            )
-
-            for m in self.metric_names:
-                self.log_info["results"]["test_score"].add(m, epoch_test_score[m])
+                    self.log_info["results"]["test_score"].add(m, epoch_test_score[m])
 
         self.log_info["params"]["mapped_labels"] = mapped_labels
         self.log_info["results"]["elapsed_time(sec)"] = time() - start_time
