@@ -1,0 +1,26 @@
+This Dashboard helps to visualize the probing data you have uploaded. Below you will find a description of each chart. Remember that since this dashboard is based on Plotly, you can interact with each chart: use zoom in/out, save graphs as PNG, hide trends on line graphs (by clicking on the legend of the desired language) and much more.
+Map – it provides the genealogical data on the languages, so you can choose the language(s) that you need and see its language family, subfamily, genus and the distribution area of chosen language(s).
+Graph 1 – “Average values of each category” (horizontal bar chart)
+It provides the average values of all categories presented in the selected model.
+Graph 2 – “Average values for all families” (scatter plot)
+It displays the average values of language families, where the size of the points corresponds to the number of languages of this family represented in the files. This graph is accompanied by a sidebar “Number of files”, which counts the files in which the languages of this family are represented.
+Graph 3 – “Average values of each layer” (bar chart + boxplot)
+It shows the average values of each layer of the selected model, and also reflects the spread of values (information appears when hovering over the boxplot).
+Graph 4 – “Average values of all languages” (bar chart + boxplot)
+It gives a rating of languages sorted by average values (when you hover over the boxplot, you can see the spread of values for each language).
+Graph 5 – “Average values of all categories (for each language family)” (line graph)
+First, you select a language family (one or more), and then lines become available that reflect the average values of the language families in each layer.
+Graph 6 – “Values of the languages represented in the selected category” (line graph)
+There are two dropdowns where first you can choose the category and then you will see the list of languages presented in the selected category. It shows the average values of languages.
+Graph 7 – “Values of the categories of the selected language” (line graph)
+This graph shows the average values of the selected categories for a particular language. Statistics are also available for each selected category: the number of examples presented in the train, validation and test dataset.
+Graph 8 – “Structure of the language family” (treemap)
+It reflects the structure of the selected language family, where the size of cells is linked with the number of files presented in the probing data for each language.
+Graph 9 – “Average values by category” (boxplot + scatter plot)
+It shows the range of average values for all categories presented in the chosen language family. If the switch “Show languages” is on, you can see the points corresponding to the language average values.
+Graph 10 – “The most similar/dissimilar trends & non-comparable trends by category” (line graphs)
+There are three columns. The similarity of trends is calculated by comparing all languages with the pattern line (median trend), so the first and the second columns show the languages that are close to this pattern line to the greatest and least degree (the Frechet distance is used). With the help of the dropdown, you can select the quantity of languages that you want to see on the charts. However, if the number is maximum, then two columns will be identical. The third column reflects the categories represented by a small quantity of languages, so it would be unfair to compare trends.
+Graph 11 – “Average values for each "category-language" pair” (heatmap)
+The cell of this heatmap is the average values for the certain category and language. The darker the cell, the lower the value.
+Graph 12 – “Values of all languages in which the selected category is represented” (heatmap)
+It provides the data for each language from the category selected in the dropdown. Here you can see the average values for each language for each layer of the model.
